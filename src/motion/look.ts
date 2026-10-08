@@ -57,13 +57,17 @@ export function reachTo(p: Pose, parts: Part[], side: "L" | "R", target: Vec3, w
   const out = side === "L" ? -1 : 1;
   const ik = armIK(sh, target, pole ?? [out * 0.6, -1, -0.2]);
   const arm = side === "L" ? p.armL : p.armR;
+  // kut iz IK-a na najbliži ekvivalent trenutnog (±360°), da se ruka ne vrti dugim putem
+  const near = (cur: number, v: number) => v + 360 * Math.round((cur - v) / 360);
   for (let i = 0; i < 2; i++) {
+    ik.th[i] = near(arm.th[i], ik.th[i]);
     arm.th[i] = arm.th[i] + (ik.th[i] - arm.th[i]) * weight;
     arm.ph[i] = arm.ph[i] + (ik.ph[i] - arm.ph[i]) * weight;
   }
   // šaka nastavlja smjer podlaktice
   const fore = new THREE.Vector3(...ik.wrist).sub(new THREE.Vector3(...ik.elbow)).normalize();
-  const [th, ph] = dirToAngles([fore.x, fore.y, fore.z]);
+  const [th0, ph] = dirToAngles([fore.x, fore.y, fore.z]);
+  const th = near(arm.th[2], th0);
   arm.th[2] = arm.th[2] + (th - arm.th[2]) * weight;
   arm.ph[2] = arm.ph[2] + (ph - arm.ph[2]) * weight;
   return ik;

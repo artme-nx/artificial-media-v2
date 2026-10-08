@@ -188,7 +188,7 @@ function torsoDims(T: Torso) {
     [ys - 0.1, 0.86], [ys + 0.06, 0.8], [ys + 0.17, 0.6], [T.collarY - 0.06, 0.3], [T.collarY, 0.225],
   ];
   const D: Array<[number, number]> = [
-    [T.tailY, 0.5], [y0 - 0.35, 0.53], [y0, 0.55], [y0 + 0.5, 0.52], [T.waistY - 0.35, 0.47], [T.waistY + 0.05, 0.44], [T.waistY + 0.75, 0.5], [ys - 0.38, 0.5],
+    [T.tailY, 0.58], [y0 - 0.35, 0.56], [y0, 0.55], [y0 + 0.5, 0.52], [T.waistY - 0.35, 0.47], [T.waistY + 0.05, 0.44], [T.waistY + 0.75, 0.5], [ys - 0.38, 0.5],
     [ys - 0.1, 0.47], [ys + 0.06, 0.42], [ys + 0.17, 0.34], [T.collarY - 0.06, 0.25], [T.collarY, 0.21],
   ];
   return { w: (y: number) => table(W, y), d: (y: number) => table(D, y) };
@@ -226,7 +226,7 @@ function phiOpen(y: number, T: Torso, w: number) {
 function tailOpen(y: number, T: Torso) {
   const k1 = smooth(T.buttonY, T.buttonY - 0.14, y);
   const k2 = smooth(T.buttonY - 0.14, T.tailY, y);
-  return 1.75 * k1 + (2.55 - 1.75) * Math.pow(k2, 0.75);
+  return 2.0 * k1 + (2.72 - 2.0) * Math.pow(k2, 0.75);
 }
 /** Polovica razreza između skutova (rad), od donjeg dijela leđa nadolje. */
 function ventHalf(y: number, T: Torso) {

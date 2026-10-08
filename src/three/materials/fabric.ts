@@ -134,5 +134,5 @@ export function patentMaterial() {
 /** Palica: tanka bijela (10-lik §1 [PRIJEDLOG]), lakirana. */
 export function batonMaterial(color = "#f4f1ea") {
   // lakirana bijela palica, ali bez oštrog odsjaja koji bi u bloomu svijetlio kao svjetlosni štap
-  return new THREE.MeshPhysicalMaterial({ color, roughness: 0.48, clearcoat: 0.25, clearcoatRoughness: 0.35, envMapIntensity: 0.8 });
+  return new THREE.MeshPhysicalMaterial({ color, roughness: 0.62, clearcoat: 0.15, clearcoatRoughness: 0.4, envMapIntensity: 0.7 });
 }

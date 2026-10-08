@@ -91,7 +91,7 @@ export class Theatre {
   floor: THREE.Mesh;
   /** razine svjetla 0..1 (vodi redatelj) */
   levels = { key: 1, rim: 1, rows: [1, 1, 1], curtain: 1, haze: 1 };
-  private base = { key: 340, rim: 380, row: 46, curtain: 9, bounce: 1.6 };
+  private base = { key: 300, rim: 380, row: 46, curtain: 9, bounce: 3.2 };
   /** topli odbljesak poda ispod reflektora (bez sjene): podiže prednju stranu, vrat i šake kao na pravoj pozornici */
   bounce: THREE.PointLight;
 
@@ -145,7 +145,7 @@ export class Theatre {
     // odozgo, malo sprijeda i s desne strane: kiparsko svjetlo, sjena lutke pada na pod iza-lijevo (vidi se u kadru)
     this.key.position.set(1.0, 8.2, 2.6);
     this.key.target.position.set(0, 0.9, 0.4);
-    configurePCSSSpot(this.key, 0.45, 2048);
+    configurePCSSSpot(this.key, 1.1, 2048); // veći izvor: mekši rub sjene preko glave
     // hladno kontra svjetlo iza dirigenta (sa strane orkestra, visoko): ocrtava siluetu smokinga i palicu
     this.rim = new THREE.SpotLight(COOL, this.base.rim, 0, THREE.MathUtils.degToRad(8), 0.55, 2);
     // strmo odozgo-straga: obrubljuje glavu i ramena, a krug svjetla na podu pada pod noge (ne u prvi plan kadra)
@@ -164,8 +164,8 @@ export class Theatre {
     });
     // mek sjaj na naborima zavjese iza orkestra (dubina): odozdo straga, ne dira orkestar
     this.curtainLight = new THREE.SpotLight("#c9d2e4", this.base.curtain, 0, THREE.MathUtils.degToRad(34), 1, 2);
-    this.curtainLight.position.set(0, 0.4, -6.9);
-    this.curtainLight.target.position.set(0, 4.2, -8.4);
+    this.curtainLight.position.set(0, 1.4, -7.2);
+    this.curtainLight.target.position.set(0, 6.0, -8.4); // dno zavjese ostaje u mraku (bez svijetlog valovitog ruba uz pod)
     for (const L of [this.key, this.rim, ...this.rows, this.curtainLight]) this.group.add(L, L.target);
     this.bounce = new THREE.PointLight("#ffd8b4", this.base.bounce, 3.2, 2);
     this.bounce.position.set(0.1, -0.04, 1.3); // malo ispod poda: pod ga ne zrcali (bez vruće točke), lutka dobiva svjetlo odozdo
@@ -215,7 +215,7 @@ export class Theatre {
 
   volumetricLights() {
     return [
-      { light: this.key, density: 1.9, shadow: true, tint: "#ffe1c0" }, // snop u dimu čita se kao tungsten
+      { light: this.key, density: 1.9, shadow: true, tint: "#ffe1c0", scale: 1.5 }, // snop u dimu čita se kao tungsten
       { light: this.rim, density: 0.4 },
       { light: this.rows[0], density: 0.18, shadow: true },
       { light: this.rows[1], density: 0.12 },

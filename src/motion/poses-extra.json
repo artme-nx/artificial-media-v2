@@ -510,5 +510,419 @@
     },
     "handL": "grip",
     "handR": "elegant"
+  },
+  "logo_i": {
+    "_opis": "Lutka-I iz loga (05-logo runda 2b/3, POSE_IH): b_enhaut, desna ruka zaobljena iznad glave, lijeva uz tijelo. Kraj kadra 2 uvoda.",
+    "support": "L",
+    "touch": -1,
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 2,
+      "pitch": -4,
+      "yaw": -8
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": -4,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": -4,
+      "pitch": -8,
+      "yaw": -22
+    },
+    "armL": {
+      "th": [
+        -6,
+        2,
+        8
+      ],
+      "ph": [
+        4,
+        14,
+        14
+      ],
+      "roll": [
+        0,
+        0,
+        -20
+      ]
+    },
+    "armR": {
+      "th": [
+        168,
+        222,
+        240
+      ],
+      "ph": [
+        -6,
+        -4,
+        0
+      ],
+      "roll": [
+        0,
+        0,
+        -20
+      ]
+    },
+    "legL": {
+      "th": [
+        2,
+        1
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -42,
+      "fp": 0
+    },
+    "legR": {
+      "th": [
+        -2,
+        -1
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 42,
+      "fp": 0
+    },
+    "handL": "elegant",
+    "handR": "elegant"
+  },
+  "dirigent_nastup": {
+    "_opis": "Kadar 6 uvoda: dirigent nastupa (okrenut publici) — uspravno, prsa podignuta, palica u šaci dijagonalno naprijed-dolje, druga ruka mirna; blagi kontrapost.",
+    "support": "L",
+    "pelvis": {
+      "tilt": 2,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": -1,
+      "pitch": -3,
+      "yaw": 0
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": -2,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 0,
+      "pitch": -4,
+      "yaw": 0
+    },
+    "armL": {
+      "th": [
+        -14,
+        -25,
+        -25
+      ],
+      "ph": [
+        10,
+        50,
+        44
+      ],
+      "roll": [
+        0,
+        0,
+        -10
+      ]
+    },
+    "armR": {
+      "th": [
+        12,
+        8,
+        6
+      ],
+      "ph": [
+        4,
+        14,
+        14
+      ],
+      "roll": [
+        0,
+        0,
+        10
+      ]
+    },
+    "legL": {
+      "th": [
+        -3,
+        -1
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -18
+    },
+    "legR": {
+      "th": [
+        5,
+        2
+      ],
+      "ph": [
+        8,
+        -6
+      ],
+      "foot": 24
+    },
+    "handL": "grip",
+    "handR": "elegant"
+  },
+  "dirigent_priprema": {
+    "_opis": "Kadrovi 7–8 uvoda: priprema prije prvog udarca — obje ruke podignute (laktovi u visini ramena, podlaktice gore), palica visoko, prsa podignuta, pogled prema orkestru; tišina. Kutovi podlaktice −198° (= 162°): prijelaz iz nastupa ide van i gore preko strane, ne kroz nadlakticu.",
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 0,
+      "pitch": -4,
+      "yaw": 0
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": -3,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 0,
+      "pitch": -6,
+      "yaw": 0
+    },
+    "armL": {
+      "th": [
+        -85,
+        -198,
+        -190
+      ],
+      "ph": [
+        40,
+        37,
+        30
+      ],
+      "roll": [
+        0,
+        0,
+        -30
+      ]
+    },
+    "armR": {
+      "th": [
+        85,
+        198,
+        190
+      ],
+      "ph": [
+        40,
+        37,
+        30
+      ],
+      "roll": [
+        0,
+        0,
+        30
+      ]
+    },
+    "legL": {
+      "th": [
+        -4,
+        -2
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -16
+    },
+    "legR": {
+      "th": [
+        4,
+        2
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 16
+    },
+    "handL": "grip",
+    "handR": "elegant"
+  },
+  "dirigent_naklon": {
+    "_opis": "Kadar 10 uvoda: dubok naklon dirigenta prema publici — pregib iz kukova i prsa, glava prati, ruka s palicom ispružena dolje uz tijelo, druga na prsima.",
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 18,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 0,
+      "pitch": 46,
+      "yaw": 0
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": 12,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 0,
+      "pitch": 20,
+      "yaw": 0
+    },
+    "armL": {
+      "th": [
+        -14,
+        -8,
+        -4
+      ],
+      "ph": [
+        12,
+        26,
+        30
+      ],
+      "roll": [
+        0,
+        0,
+        0
+      ]
+    },
+    "armR": {
+      "th": [
+        30,
+        -60,
+        -70
+      ],
+      "ph": [
+        30,
+        55,
+        50
+      ],
+      "roll": [
+        0,
+        0,
+        80
+      ]
+    },
+    "legL": {
+      "th": [
+        -2.5,
+        -2.5
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -10
+    },
+    "legR": {
+      "th": [
+        2.5,
+        2.5
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 10
+    },
+    "handL": "grip",
+    "handR": "elegant"
+  },
+  "b_reverence_duboka": {
+    "_opis": "Balet (F5): dubok, gracilan révérence — prednja noga u dubljem pliéu, stražnja klizne iza na prste, trup i glava se duboko naklone, desna ruka se otvara prema publici (ispravak Probe 1: 'korak natrag').",
+    "support": "L",
+    "touch": -1,
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 10,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": -2,
+      "pitch": 34,
+      "yaw": -6
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": 10,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 5,
+      "pitch": 22,
+      "yaw": 10
+    },
+    "armL": {
+      "th": [
+        -14,
+        4,
+        18
+      ],
+      "ph": [
+        18,
+        34,
+        32
+      ],
+      "roll": [
+        0,
+        0,
+        -20
+      ]
+    },
+    "armR": {
+      "th": [
+        58,
+        70,
+        76
+      ],
+      "ph": [
+        30,
+        44,
+        46
+      ],
+      "roll": [
+        0,
+        0,
+        80
+      ]
+    },
+    "legL": {
+      "th": [
+        2,
+        0
+      ],
+      "ph": [
+        36,
+        -38
+      ],
+      "foot": -40,
+      "fp": 0
+    },
+    "legR": {
+      "th": [
+        -12,
+        -7
+      ],
+      "ph": [
+        -6,
+        -62
+      ],
+      "foot": 40,
+      "fp": 72
+    },
+    "handL": "elegant",
+    "handR": "elegant"
   }
 }

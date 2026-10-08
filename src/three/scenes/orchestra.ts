@@ -88,8 +88,8 @@ export class Orchestra {
     // tri reda: violine, violončela, timpani (sjede okrenuti prema dirigentu, +z)
     const rows: Array<{ kind: Kind; n: number; z: number; y: number; spread: number }> = [
       { kind: "violina", n: 6, z: -2.6, y: 0, spread: 1.15 },
-      { kind: "violoncelo", n: 5, z: -4.1, y: 0.22, spread: 1.35 },
-      { kind: "timpani", n: 3, z: -5.6, y: 0.44, spread: 1.8 },
+      { kind: "violoncelo", n: 5, z: -4.1, y: 0.36, spread: 1.35 },
+      { kind: "timpani", n: 3, z: -5.6, y: 0.72, spread: 1.8 },
     ];
     rows.forEach((r, ri) => {
       for (let i = 0; i < r.n; i++) {

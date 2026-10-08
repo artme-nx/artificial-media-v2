@@ -69,7 +69,8 @@ const LogoSvg = forwardRef<SVGSVGElement, {
   style?: React.CSSProperties;
 }>(function LogoSvg({ v, figRef, className, title, decorative, style }, ref) {
   const [x, y, w, h] = v.viewBox;
-  // obrezan viewBox: bez zaštitne zone od 40 jedinica (zaštitnu zonu daje raspored)
+  // obrezan viewBox: bez zaštitne zone od 40 jedinica (zaštitnu zonu daje raspored); overflow visible jer kosi
+  // potezi prvog i zadnjeg A izlaze malo izvan obreza (inače su "odrezani okomito")
   const pad = 40;
   const vb = `${x + pad} ${y + pad * 0.35} ${w - 2 * pad} ${h - pad * 1.35}`;
   const byWord = (word: string) => v.letters.filter((l) => l.word === word);
@@ -85,6 +86,7 @@ const LogoSvg = forwardRef<SVGSVGElement, {
       aria-hidden={decorative ? true : undefined}
       aria-label={decorative ? undefined : title}
       fill="currentColor"
+      overflow="visible"
       data-logo
     >
       {v.shadow && (
@@ -154,7 +156,8 @@ export async function playAssembly(svg: SVGSVGElement | null, fig: SVGPathElemen
     const t0 = performance.now();
     await new Promise<void>((resolve) => {
       const step = (t: number) => {
-        const u = Math.min(1, (t - t0) / DUR);
+        // vremenska oznaka rAF-a može biti malo prije t0 (početak framea) → bez negativnog napretka
+        const u = Math.min(1, Math.max(0, (t - t0) / DUR));
         const i = Math.min(frames.length, Math.floor(easeInOut(u) * (frames.length + 1)));
         fig.setAttribute("d", i >= frames.length ? finalD : frames[i]);
         if (u < 1) requestAnimationFrame(step);

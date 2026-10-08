@@ -41,7 +41,8 @@ export function materialsFor(look: Look): MatSet {
       const maple = mapleMaterial();
       m = { body: maple, head: maple, fingers: maple, brushed, polished, perlage, neckBrushed };
     } else {
-      const body = brushedSteel({ brush: 1, roughness: 0.3, anisotropy: 0.6, tint: 0.92 });
+      // anizotropija umjerena: veća daje povremene vruće točke na zakrivljenim dijelovima (izgledaju kao LED)
+      const body = brushedSteel({ brush: 1, roughness: 0.33, anisotropy: 0.35, tint: 0.92 });
       const fingers = brushedSteel({ brush: 1, roughness: 0.34, anisotropy: 0, tint: 0.92 });
       m = { body, head: body, fingers, brushed, polished, perlage, neckBrushed };
     }

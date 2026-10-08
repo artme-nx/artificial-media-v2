@@ -161,7 +161,9 @@ export class Post {
     this.volumetric.setResolutionScale(Math.min(1, q.volScale / Math.max(1, dpr)));
     Object.assign(this.n8ao.configuration, { halfRes: q.aoHalf || dpr > 1.4 });
     // MSAA samo kad je DPR nizak (pri DPR ≥ 1,5 slika je ionako nadsamplirana)
-    this.composer.multisampling = dpr <= 1.3 ? Math.min(q.msaa, this.renderer.capabilities.maxSamples) : 0;
+    // pri DPR ~1 rubovi su najvidljiviji: MSAA 4 (izmjereno: kadar uvoda i dalje 60 fps na M5); do 1,3 razina; iznad 0
+    const samples = q.msaa > 0 && dpr <= 1.05 ? 4 : dpr <= 1.3 ? q.msaa : 0;
+    this.composer.multisampling = Math.min(samples, this.renderer.capabilities.maxSamples);
     this.composer.setSize(w, h, false);
     const db = this.renderer.getDrawingBufferSize(new THREE.Vector2());
     this.n8ao.setSize(db.x, db.y);

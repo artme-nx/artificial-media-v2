@@ -42,7 +42,7 @@ export function SiteNav({ onHome = true }: { onHome?: boolean }) {
         <nav
           aria-label="Primary"
           className="mx-auto grid grid-cols-[1fr_auto] items-center md:grid-cols-[1fr_auto_1fr]"
-          style={{ height: "var(--nav-height)", paddingInline: "var(--sp-gutter)", maxWidth: "var(--sp-page)" }}
+          style={{ height: "var(--nav-height)", paddingInline: "var(--sp-gutter)", maxWidth: "calc(var(--sp-page) + 2 * var(--sp-gutter))" }}
         >
           <Link href="/" className="nav-logo pointer-events-auto inline-flex items-center self-center justify-self-start" aria-label={site.brand.name.text}>
             <Logo decorative className="block h-[0.95rem] w-auto md:h-[1.05rem]" />

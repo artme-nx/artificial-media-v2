@@ -311,6 +311,11 @@ export class VolumetricPass extends Pass {
   setSteps(n: number) {
     this.march.uniforms.steps.value = n;
   }
+  /** Ambijentalni dim (bez svjetla) — mijenja se po kadru, npr. u mraku uvoda je 0. */
+  setAmbientDensity(d: number) {
+    this.march.uniforms.ambientDensity.value = d;
+  }
+
   configure(lights: VolLight[], o: VolSettings = {}) {
     this.lights = lights.slice(0, MAX_VOL_LIGHTS);
     const u = this.march.uniforms;

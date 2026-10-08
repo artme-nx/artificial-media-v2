@@ -27,7 +27,7 @@ export function getPose(name: PoseName): Pose {
   let p: Pose;
   if ((KANON_POSES as readonly string[]).includes(name)) {
     const ballet = name.startsWith("b_");
-    p = kanonPose(name, ballet ? { handL: HAND_OPEN, handR: HAND_OPEN } : {});
+    p = kanonPose(name, ballet ? { handL: HAND_ELEGANT, handR: HAND_ELEGANT } : {});
     if (name === "otvara") { p.handL = { ...HAND_OPEN }; p.handR = { ...HAND_OPEN }; }
   } else if (name === "dirigent") {
     p = poseFromParts((lutkaV2 as unknown as { pose: Part[] }).pose.map(toPart), { handL: HAND_GRIP, handR: HAND_OPEN });

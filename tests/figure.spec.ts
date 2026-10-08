@@ -30,6 +30,12 @@ test.describe("lutka: sudari i pod", () => {
   const SEQUENCES: Record<string, Array<[number, string]>> = {
     // baletna scena (07, 6. 10.): port de bras → révérence
     balet: [[0, "b_enhaut"], [0.08, "b_enhaut"], [0.36, "b_seconde"], [0.6, "b_bas"], [0.88, "b_reverence"], [1, "b_reverence"]],
+    // manifest (F5): en haut → à la seconde → bras bas → dubok révérence
+    manifest: [[0, "b_enhaut"], [0.12, "b_enhaut"], [0.38, "b_seconde"], [0.58, "b_bas"], [0.86, "b_reverence_duboka"], [1, "b_reverence_duboka"]],
+    // uvod, kadar 2: port de bras do poze slova I iz loga
+    uvod_ples: [[0, "b_bas"], [0.3, "b_seconde"], [0.66, "b_enhaut"], [1, "logo_i"]],
+    // uvod, kadrovi 6–10: nastup → priprema → (takt je IK) → nastup → naklon
+    uvod_dirigent: [[0, "dirigent_nastup"], [0.4, "dirigent_priprema"], [0.7, "dirigent_nastup"], [1, "dirigent_naklon"]],
   };
   for (const [seq, keys] of Object.entries(SEQUENCES)) {
     test(`niz ${seq}: 41 točka`, () => {

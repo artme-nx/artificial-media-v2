@@ -36,7 +36,7 @@ export const DEFAULTS = {
 } as const;
 
 /** 10-lik §1: palica — tanka bijela. [PRIJEDLOG] (boja je u src/three/materials) */
-export const BATON_COLOR = "#F4F1EA";
+export const BATON_COLOR = "#E6E1D6";
 
 /** 11 F8: endpoint forme (Formspree, Web3Forms…). [ODLUKA KRISTIANA]. Bez njega forma iskreno kaže da nije spojena. */
 export const FORM_ENDPOINT = process.env.NEXT_PUBLIC_FORM_ENDPOINT ?? "";

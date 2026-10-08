@@ -14,7 +14,7 @@ Zadatak: `brand/11-stranica-v2-zadatak.md` (8. 10. 2026.). Ovaj dokument se ažu
 | F1 Tokeni, tipografija, logo, kostur stranice | ✅ gotovo | testovi 39/39 dev, 30/30 prod |
 | F2 Lutka: tijelo, materijali, mehanika | ✅ objavljeno (QC ispod praga) | QC 5,2 → 6,2 → 5,6; nadmašuje donju granicu; preostale mane ispod |
 | F3 Kostim, palica, roboti, pozornica | ✅ objavljeno (QC ispod praga) | QC 5,0 → 5,0 → 5,0; nadmašuje donju granicu (krug 2 i 3); /lab/scena |
-| F4 Kazališni uvod (kadrovi 1–10) | — | |
+| F4 Kazališni uvod (kadrovi 1–10) | ✅ objavljeno (QC ispod praga) | QC 4,8 → 5,2 → 5,3 (tipografija 8); 10 kadrova, unatrag, skip, statično; 54–60 fps |
 | F5 Manifest s baletom, reelovi, svjetovi | — | |
 | F6 Drvo / robot ispod kursora | — | |
 | F7 Usluge, Why AI?, CTA, FAQ, podnožje | — | |
@@ -22,11 +22,12 @@ Zadatak: `brand/11-stranica-v2-zadatak.md` (8. 10. 2026.). Ovaj dokument se ažu
 | F9 Nizovi slika, posteri, performanse, pristupačnost | — | |
 | Završetak (README, REVIEW.md) | — | |
 
-**Sljedeći korak:** F4 — vratiti radnu verziju uvoda (stash), uskladiti s pozornicom iz F3, mobitel, kadrovi 1–10 na screenshotovima, QC, commit/deploy.
+**Sljedeći korak:** F5 — baletna scena manifesta (`src/three/scenes/ballet-scene.ts`, `/lab/balet` već postoje) u sekciju manifesta preko redatelja, reelovi s lutkom koja gleda aktivni slot, svjetovi; QC; commit/deploy.
 
 **Poznati problemi:**
 - F2 QC (3 kruga, prosjek 5,6–6,2, prag 8 nije dostignut). Preostalo prema subagentu: (1) drvo u širokim kadrovima čita se kao mat bež, u makrou "pluto/pjegava ljuska" — kandidat: pečena 4K tekstura ptičjeg oka s mipmapama umjesto čistog proceduralnog shadera; (2) točkasti odsjaji malog reflektora na poliranim dijelovima (struk B, tjeme) — hrapaviji polirani dijelovi ili veći izvori svjetla; (3) amplituda pogleda glave se ne čita dovoljno; (4) poze en haut/dirigent/"seže" još krute; (5) mehanika prstiju i dlan; (6) mehanizam ramena "grub". Ponovna ocjena u F3–F8.
 - F3 QC (3 kruga, prosjek 5,0; prag 8 nije dostignut; od kruga 2 "nadmašuje donju granicu: da"). Preostalo prema subagentu: (1) drvo — glava "glatka plastika", oči kao mjehurići, šake tamnije/porozne → kandidat i dalje pečena tekstura ptičjeg oka s mipmapama; (2) šaka i palica — dlan blok, prsti ne obuhvaćaju dršku u krupnom kadru, palica na 3/4 kadrovima zrnata; (3) zapešće i vrat čitaju se tamno umjesto svijetlog brušenog čelika; (4) snop bez jasne sjene lutke i ovala na podu u glavnom kadru, slaba kontaktna sjena; (5) aura/rub oko glave i šake (DOF/bloom); (6) pruge sjena na rukavima i leđima (PCSS na tkanini), šljokice; (7) kroj: revers bez debljine, rukavi kao cijevi, ovratnik; (8) poza stilla "ta-da", noge paralelne; (9) logika stilla (dirigent okrenut kameri — namjerno, kao kadar 10/Blender, ali QC traži 3/4 prema orkestru s podijem i pultom); (10) široki kadar slabo čita kazalište; (11) orkestar u istoj pozi, bijeli odsjaji na zglobovima; (12) šake pod toplim svjetlom djeluju zlatno.
+- F4 QC (3 kruga, 4,8 / 5,2 / 5,3; tipografija 8). Preostalo: (1) drvo i metal u srednjem kadru (plastika/pozlata, zglobovi bez vidljive mehanike) — isti uteg kao F2/F3; (2) palica u kadrovima 8–9 slabo čitljiva; (3) skuti stepenasti, nazubljeni rubovi hlača; (4) mobitel: dirigent izlazi iz lijevog ruba (8–9), palica odrezana (7, 10); (5) kadrovi 6–10 bez tvrdog stošca, kruga na podu i jasne sjene; (6) orkestar: klonovi iste poze, instrumenti nečitljivi; (7) šake kao blokovi; (8) balet u 2: noge paralelne, bez relevéa, lutka tamna; (9) kadar 6 ukočen, horizont u struku; (10) kadar 8 "ruke uvis", glava u naklonu klizi kroz ovratnik; (11) "disappear." se čita kao "disappear:" (kurzivno r + točka).
 - Performanse: s punim efektima na DPR 2 scena je preteška (21 fps); dinamička rezolucija drži ~60 fps spuštanjem DPR-a do ~1,4. Razina high smanjena (MSAA 2, volumetrija 0,4/36, AO 12) → ~70–86 fps na DPR 1. Dorada u F9.
 
 ## Plan
@@ -55,10 +56,10 @@ Redoslijed: F0 → F1 → F2 → … → F9 → završetak. Svaka faza: testovi 
 - [ ] Interakcija 3: okretanje s inercijom (F6)
 - [ ] Interakcija 4: lutka gleda reel (F5)
 - [ ] Interakcija 5: révérence na dnu stranice (F7)
-- [ ] Kazališni uvod, kadrovi 1–6, titranje vezano za scroll i unatrag, skip, statična verzija, pravi tekst (F4)
-- [~] Dirigent u smokingu, tri takta 4/4, kimanje na prvi udarac (F3, F4) — kostim i poze u F3; takt u uvodu F4
-- [~] Robotski orkestar, kadrovi 7–10 (F3, F4) — orkestar gotov (F3), kadrovi u F4
-- [ ] Mrak → svijetli ostatak stranice (F4)
+- [x] Kazališni uvod, kadrovi 1–6, titranje vezano za scroll i unatrag, skip, statična verzija, pravi tekst (F4)
+- [x] Dirigent u smokingu, tri takta 4/4, kimanje na prvi udarac (F3, F4) — kostim F3; takt (IK, obje ruke) i kimanje u F4
+- [x] Robotski orkestar, kadrovi 7–10 (F3, F4)
+- [x] Mrak → svijetli ostatak stranice (F4)
 - [x] Smoking dorađen: reveri, skut, gumbi; palica vidljiva (F3) — frak sa skutovima, 2×3 gumba, studovi, pojas; `?kroj=frak|smoking`
 - [ ] Drvo / robot ispod kursora, poravnato i u pokretu; mobitel prst i samostalno kretanje (F6)
 - [ ] Niz slika umjesto videa, `ScrollSequence`, skripta video → frameovi, rezolucija po uređaju (F9)
@@ -77,7 +78,7 @@ Redoslijed: F0 → F1 → F2 → … → F9 → završetak. Svaka faza: testovi 
 - [x] Logo runda 3 geometrija, jednobojno, lutka kao I; varijante naglaska ART/ME kao prekidač (F1)
 - [x] Animacija loga 1–2 s + statična verzija (F1)
 - [x] Favicon iz lutke, SVG + PNG 32/180/512 (F1)
-- [ ] ART ME se pokazuje, nigdje se ne objašnjava; priča imena nije na stranici (F1, F4)
+- [x] ART ME se pokazuje, nigdje se ne objašnjava; priča imena nije na stranici (F1, F4)
 
 **03-nove-tvrdnje**
 - [x] Nadnaslov, H1, manifest, svjetovi, otvaranje usluga, Why AI?, FAQ — točno iz navedenih odjeljaka, sa statusom (F1)
@@ -102,3 +103,4 @@ Redoslijed: F0 → F1 → F2 → … → F9 → završetak. Svaka faza: testovi 
 - Uvoz snimljenog pokreta: scripts/import-motion.mjs (glTF RIG_lutka → kanon-parts-frames), samoprovjera 1,5·10⁻⁵.
 - F2 QC krug 2: 6,2; krug 3: 5,6 → F2 zatvoren s popisom preostalih mana (gore). Commit + deploy F2.
 - F3: frak (skinned) sa skutovima i rezom u struku, gumbi, studovi, pojas, krilati ovratnik, leptir-mašna i maramica; vuna s naborima; palica u šaci; robotski orkestar (instanciran) s instrumentima; pozornica (pod, baršun, portal), tungsten snop s bojom u dimu, hladni orkestar, kontra svjetlo, odbljesak poda; jednobojno zrno; prašina samo u snopu. Pronađen i uklonjen uzrok "LED" točaka (anizotropni GGX na sitnim dijelovima) + test vrućih točaka. Svjetla se više ne gase preko `visible` (rekompajliranje usred scrolla). Razina high ubrzana (~53 → ~70–86 fps). QC 3 kruga: 5,0 / 5,0 / 5,0 (krug 2–3: nadmašuje donju granicu) → F3 zatvoren s popisom preostalih mana.
+- F4: kazališni uvod na početnoj — jedan trajni canvas i redatelj (lijeno učitavanje, kompajliranje unaprijed, pauza), kadrovi 1–3 sami (CSS animacija slova od prvog prikaza, plesačica završava u pozi slova I iz loga, logo), 4–10 scrollom i unatrag (titranje ART ME, reflektor, priprema, redovi, tri takta 4/4 kroz IK, naklon), Skip intro, preskakanje scrollom, statična verzija, prijelaz u svijetlo. Testovi `intro.spec.ts` (desktop + mobitel). QC 4,8 / 5,2 / 5,3 → F4 zatvoren s popisom preostalih mana.

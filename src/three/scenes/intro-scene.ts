@@ -4,9 +4,9 @@ import type { Tier } from "../core/post";
 import { lensCamera, depthOfField } from "../core/camera";
 import { Theatre } from "./theatre";
 import { Figure } from "../figure/figure";
-import { PoseAnimator, smootherstep, applySecondary } from "@/src/motion/animator";
-import { getPose } from "@/src/motion/library";
-import { blendPose, normalizePose, partMap, type Pose, type Part, type LathePart, type BallPart, type Vec3 } from "@/src/figure/kanon";
+import { smootherstep, applySecondary } from "@/src/motion/animator";
+import { getPose, type PoseName } from "@/src/motion/library";
+import { blendPose, partMap, type Pose, type Part, type LathePart, type Vec3 } from "@/src/figure/kanon";
 import { reachTo } from "@/src/motion/look";
 import { configurePCSSSpot } from "../core/pcss";
 
@@ -33,12 +33,12 @@ const seg = (p: number, [a, b]: readonly [number, number]) => Math.min(1, Math.m
 type CamKey = { p: number; pos: [number, number, number]; target: [number, number, number]; mm: number };
 // kamera kao film: polagani, glatki pokreti; objektivi u mm
 const CAM: CamKey[] = [
-  { p: 0.0, pos: [0.0, 1.5, 6.4], target: [0.0, 1.35, 0.4], mm: 50 }, // 2: lutka u protusvjetlu (silueta)
-  { p: 0.2, pos: [0.0, 1.55, 5.6], target: [0.0, 1.38, 0.4], mm: 60 }, // 6: otkrivanje (sprijeda)
-  { p: 0.3, pos: [0.35, 1.5, 4.4], target: [0.0, 1.42, 0.4], mm: 70 }, // 6→7: polagani prilaz
-  { p: 0.46, pos: [2.6, 1.6, 4.6], target: [-0.2, 1.4, -0.6], mm: 50 }, // 7→8: kamera obilazi na 3/4 iza dirigenta
-  { p: 0.6, pos: [1.7, 1.7, 5.3], target: [-0.1, 1.4, -1.6], mm: 45 }, // 8→9: preko ramena, orkestar u dubini
-  { p: 0.86, pos: [1.2, 1.6, 4.9], target: [-0.1, 1.45, -1.2], mm: 50 }, // 9
+  { p: 0.0, pos: [-1.05, 1.3, 7.4], target: [-1.0, 0.92, 0.4], mm: 50 }, // 2: plesačica u protusvjetlu u desnoj trećini, tekst lijevo (desktop; portret: sredina)
+  { p: 0.2, pos: [-2.6, 1.75, 5.6], target: [0.2, 1.15, 0.2], mm: 32 }, // 6: reflektor udari — 3/4 odozgo i široko: stožac, lokva svjetla, sjena
+  { p: 0.3, pos: [-1.3, 1.35, 4.7], target: [0.0, 1.45, 0.3], mm: 45 }, // 6→7: prilaz dok se dirigent okreće orkestru
+  { p: 0.46, pos: [1.7, 1.55, 4.3], target: [-0.2, 1.55, -1.0], mm: 50 }, // 7: iza dirigenta — ruke se dižu, palica gore; tišina
+  { p: 0.6, pos: [2.7, 2.1, 5.7], target: [-0.4, 1.3, -2.4], mm: 40 }, // 8: široko preko ramena — redovi orkestra se pale
+  { p: 0.86, pos: [3.1, 1.55, 2.5], target: [-0.6, 1.5, -0.9], mm: 50 }, // 9: sa strane — takt 4/4, palica i zapešće vidljivi
   { p: 1.0, pos: [2.3, 1.3, 5.0], target: [0.0, 1.15, 0.4], mm: 50 }, // 10: naklon prema gledatelju (3/4, da se pregib vidi)
 ];
 
@@ -47,7 +47,6 @@ export class IntroScene implements StageScene {
   camera = lensCamera(50);
   theatre = new Theatre();
   dancer: Figure;
-  private dancerAnim: PoseAnimator;
   private backlight: THREE.SpotLight;
   private engine: Engine | null = null;
   /** napredak scroll dijela uvoda (kadrovi 4–10) */
@@ -55,6 +54,8 @@ export class IntroScene implements StageScene {
   private smoothP = 0;
   /** kadar 2 (vrijeme): 0..1 vidljivost plesačice u protusvjetlu */
   dancerLevel = 0;
+  /** kadar 2 (vrijeme): 0..1 faza port de bras → poza slova I iz loga */
+  dancerPhase = 0;
   private time = 0;
   private dir = new THREE.Vector3();
   private tmpPos = new THREE.Vector3();
@@ -68,9 +69,7 @@ export class IntroScene implements StageScene {
     this.dancer = new Figure({ look: "wood" });
     this.dancer.group.position.set(0, 0, 0.4);
     this.scene.add(this.dancer.group);
-    const start = getPose("b1_enhaut");
-    this.dancerAnim = new PoseAnimator(start);
-    this.dancer.setPose(start);
+    this.dancer.setPose(getPose("b_bas"));
     this.backlight = new THREE.SpotLight("#ffe2c4", 0, 0, THREE.MathUtils.degToRad(11), 0.55, 2);
     this.backlight.position.set(0, 3.6, -4.6);
     this.backlight.target.position.set(0, 1.4, 0.6);
@@ -91,7 +90,6 @@ export class IntroScene implements StageScene {
   activate(engine: Engine) {
     this.engine = engine;
     this.scene.environment ??= this.theatre.environment(engine.renderer);
-    this.scene.environmentIntensity = 0.85;
     this.theatre.conductor.viewCamera = this.camera;
     this.configurePost();
   }
@@ -108,10 +106,10 @@ export class IntroScene implements StageScene {
           { light: this.theatre.rim, density: 0.4 },
           { light: this.theatre.rows[0], density: 0.18 },
         ],
-        settings: { density: 0.09, ambientDensity: 0.0006, ambientColor: "#7d8088", heightFalloff: 0.1, floorY: 0, noiseScale: 0.32, noiseAmount: 0.9, g: 0.42, intensity: 1 },
+        settings: { density: 0.09, ambientDensity: 0.0006, ambientColor: "#7d8088", heightFalloff: 0.1, floorY: 0, noiseScale: 0.32, noiseAmount: 0.6, g: 0.42, intensity: 1 },
       },
-      dof: { focus: 5, range: 1.2, bokeh: 4 },
-      bloom: { intensity: 0.35, threshold: 4.0, smoothing: 0.4, radius: 0.6 },
+      dof: { focus: 5, range: 1.2, bokeh: 3 },
+      bloom: { intensity: 0.3, threshold: 6.0, smoothing: 0.4, radius: 0.6 },
       vignette: { darkness: 0.66, offset: 0.22 },
       grain: 0.08,
     });
@@ -136,6 +134,10 @@ export class IntroScene implements StageScene {
     T.applyLevels();
     // plesačica (kadar 2) je vidljiva samo prije otkrivanja dirigenta
     const dancerOn = this.dancerLevel > 0.001 && reveal < 0.01;
+    // mrak je mrak (kadrovi 1, 3–5): odrazi okruženja na podu i metalu te ambijentalni dim samo koliko svjetla gore
+    const lit = Math.max(T.levels.key, T.levels.rim, ...T.levels.rows);
+    this.scene.environmentIntensity = 0.85 * smootherstep(Math.min(1, lit)) + (dancerOn ? 0.05 * this.dancerLevel : 0);
+    this.engine?.post.volumetric.setAmbientDensity(0.0006 * lit);
     this.dancer.group.visible = dancerOn;
     this.backlight.intensity = dancerOn ? 70 * this.dancerLevel : 0; // bez `visible` (vidi Theatre.applyLevels)
     if (dancerOn && !this.backlight.shadow.autoUpdate) this.backlight.shadow.needsUpdate = true;
@@ -153,41 +155,52 @@ export class IntroScene implements StageScene {
     return { reveal, raise, rows, play, bow };
   }
 
-  private conductorPose(p: number, s: { raise: number; play: number; bow: number }, t: number): Pose {
-    // osnovna poza: stoji → dirigent podiže ruke (pripremni položaj) → dirigira → naklon
-    let pose = blendPose(getPose("stoji"), getPose("dirigent_rad"), smootherstep(s.raise));
-    if (s.bow > 0) pose = blendPose(pose, this.bowPose(), smootherstep(Math.min(1, Math.max(0, (s.bow - 0.45) / 0.55))));
-    // dirigiranje: 3 takta 4/4 (12 udaraca) — palica crta obrazac dolje–lijevo–desno–gore
+  /**
+   * Koreografija dirigenta (kadrovi 6–10), deterministički po napretku scrolla:
+   * nastup (okrenut publici) → okret i priprema (ruke gore, palica visoko) → tišina dok se redovi pale →
+   * palica padne na prvi takt, tri takta 4/4 (palica IK, slobodna ruka zrcalno i manje, kimanje na 1) →
+   * ruke se spuste, okret prema publici, dubok naklon.
+   */
+  private conductorPose(s: { raise: number; play: number; bow: number }, t: number): Pose {
+    let pose = blendPose(getPose("dirigent_nastup"), getPose("dirigent_priprema"), smootherstep(s.raise));
     if (s.play > 0 && s.play < 1 && s.bow === 0) {
       const beats = s.play * 12;
       const parts = this.theatre.conductor.parts;
       if (parts.length) {
-        const target = beatPattern(beats, parts);
-        reachTo(pose, parts, "L", target, Math.min(1, s.play * 10, (1 - s.play) * 10));
-        // kimanje glavom na prvi udarac takta
+        const w = Math.min(1, s.play * 14, (1 - s.play) * 10);
+        reachTo(pose, parts, "L", beatPattern(beats, parts, 1), w);
+        reachTo(pose, parts, "R", beatPattern(beats, parts, -1), w * 0.55);
+        // kimanje glavom na prvi udarac takta, prsa prate
         const inBar = beats % 4;
         const nod = inBar < 1 ? Math.sin(Math.min(1, inBar / 0.4) * Math.PI) : 0;
-        pose.head.pitch += nod * 7;
+        pose.head.pitch += nod * 8;
         pose.neck.pitch += nod * 3;
-        pose.chest.pitch += nod * 1.5;
+        pose.chest.pitch += nod * 2;
       }
     }
-    void p;
-    void t;
+    if (s.bow > 0) {
+      // kraj skladbe: ruke dolje dok se okreće prema publici, zatim naklon
+      pose = blendPose(pose, getPose("dirigent_nastup"), smootherstep(Math.min(1, s.bow / 0.4)));
+      pose = blendPose(pose, getPose("dirigent_naklon"), smootherstep(Math.min(1, Math.max(0, (s.bow - 0.42) / 0.5))));
+    }
+    // sekundarni pokret: disanje i blago prebacivanje težine (tišina u kadru 8 nije smrznuta)
+    applySecondary(pose, t, { breath: 1, sway: s.play > 0 && s.play < 1 ? 0.15 : 0.35 });
     return pose;
   }
 
-  /** Naklon dirigenta prema publici: dubok naklon iz struka, ruka s palicom uz tijelo, druga na prsima. */
-  private bowPose(): Pose {
-    const b = getPose("stoji");
-    b.pelvis.pitch = 14;
-    b.chest.pitch = 40;
-    b.neck.pitch = 12;
-    b.head.pitch = 18;
-    // ruka s palicom ispružena dolje uz tijelo, palica prema podu; druga ruka na prsima
-    b.armL = { th: [-14, -8, -4], ph: [12, 26, 30], roll: [0, 0, 0] };
-    b.armR = { th: [30, -60, -70], ph: [30, 55, 50], roll: [0, 0, 80] };
-    return normalizePose(b);
+  /** Port de bras plesačice (kadar 2) po fazi 0..1; završava u pozi slova I iz loga. */
+  private dancerPose(phase: number, t: number): Pose {
+    const keys: Array<[number, PoseName]> = [[0, "b_bas"], [0.3, "b_seconde"], [0.66, "b_enhaut"], [1, "logo_i"]];
+    let pose = getPose(keys[0][1]);
+    for (let k = 0; k < keys.length - 1; k++) {
+      const [a0, na] = keys[k], [b0, nb] = keys[k + 1];
+      if (phase >= a0 && phase <= b0) {
+        pose = blendPose(getPose(na), getPose(nb), smootherstep((phase - a0) / (b0 - a0)));
+        break;
+      }
+    }
+    applySecondary(pose, t, { breath: 1, sway: 0.3 });
+    return pose;
   }
 
   update(dt: number) {
@@ -196,27 +209,22 @@ export class IntroScene implements StageScene {
     this.smoothP += (this.progress - this.smoothP) * Math.min(1, dt * 10);
     const p = this.smoothP;
     const s = this.apply(p);
-    // dirigent
-    if (this.theatre.conductor.group.visible) {
-      const pose = this.conductorPose(p, s, this.time);
-      this.theatre.conductor.setPose(pose);
-    }
-    // plesačica: polagani port de bras u petlji (kadar 2)
-    if (this.dancer.group.visible) {
-      const k = (Math.sin(this.time * 0.7) + 1) / 2;
-      const pose = blendPose(getPose("b1_enhaut"), getPose("b_seconde"), smootherstep(k));
-      applySecondary(pose, this.time, { breath: 1, sway: 0.6 });
-      this.dancer.setPose(pose);
-    }
-    // orkestar u ritmu (1,6 udaraca u sekundi ≈ 96 bpm); udarac vezan uz scroll u kadru 9
+    const C = this.theatre.conductor;
+    if (C.group.visible) C.setPose(this.conductorPose(s, this.time));
+    if (this.dancer.group.visible) this.dancer.setPose(this.dancerPose(this.dancerPhase, this.time));
+    // orkestar u ritmu; udarac vezan uz scroll u kadru 9
     const beat = s.play > 0 && s.play < 1 ? (s.play * 12) % 4 : (this.time * 1.6) % 4;
     this.theatre.orchestra.update(this.time, beat);
-    // kamera
     this.cameraAt(p);
     if (this.engine) {
       this.theatre.contact.update(this.engine.renderer, this.scene);
       this.theatre.dust.update(dt, this.camera, this.engine.height);
-      const focus = this.dancer.group.visible ? new THREE.Vector3(0, 1.45, 0.4) : new THREE.Vector3(0, 1.5, 0.4);
+      // fokus na glavi lika u kadru (i u naklonu, kad glava ide naprijed i dolje)
+      const fig = this.dancer.group.visible ? this.dancer : C;
+      const head = fig.map.head as LathePart | undefined;
+      const focus = head
+        ? fig.toWorld(new THREE.Vector3(...head.S).addScaledVector(new THREE.Vector3(...head.M.y), head.L * 0.5))
+        : this.tmpTarget.set(0, 1.5, 0.4);
       const dist = this.camera.position.distanceTo(focus);
       this.engine.post.dof.cocMaterial.focusDistance = dist;
       this.engine.post.dof.cocMaterial.focusRange = Math.max(0.4, depthOfField(this.camera.getFocalLength(), 2.0, dist).range);
@@ -229,8 +237,13 @@ export class IntroScene implements StageScene {
     while (i < CAM.length - 2 && CAM[i + 1].p < p) i++;
     const a = CAM[i], b = CAM[i + 1];
     const u = smootherstep(Math.min(1, Math.max(0, (p - a.p) / (b.p - a.p))));
-    this.tmpPos.set(...a.pos).lerp(this.dir.set(...b.pos), u);
-    this.tmpTarget.set(...a.target).lerp(this.dir.set(...b.target), u);
+    // portret: kadar 2 je okomit (plesačica u donjoj polovici, tekst iznad nje), bez bočnog pomaka prvog ključa
+    const pa: [number, number, number] = this.camera.aspect < 0.8 && a.p === 0 ? [0, 1.75, 8.4] : a.pos;
+    const ta: [number, number, number] = this.camera.aspect < 0.8 && a.p === 0 ? [0, 1.62, 0.4] : a.target;
+    this.tmpPos.set(...pa).lerp(this.dir.set(...b.pos), u);
+    this.tmpTarget.set(...ta).lerp(this.dir.set(...b.target), u);
+    // portret (mobitel): veći okomiti kut objektiva → kamera bliže cilju, da lik ne bude sitan
+    if (this.camera.aspect < 0.8) this.tmpPos.sub(this.tmpTarget).multiplyScalar(0.8).add(this.tmpTarget);
     // vrlo blago "disanje" kamere (ručna kamera na stalku)
     this.tmpPos.y += Math.sin(this.time * 0.45) * 0.008;
     this.camera.position.copy(this.tmpPos);
@@ -244,29 +257,28 @@ export class IntroScene implements StageScene {
  * Dirigentski obrazac 4/4 (dolje–lijevo–desno–gore) za šaku s palicom, u prostoru lutke (jedinice glave).
  * Udarac (ictus) je oštar pad s malim odskokom; između udaraca glatki luk.
  */
-export function beatPattern(beats: number, parts: Part[]): Vec3 {
+export function beatPattern(beats: number, parts: Part[], side: 1 | -1 = 1): Vec3 {
   const P = partMap(parts);
   const chest = P.chest as LathePart;
-  const sh = (P.shoulderL as BallPart).c;
   const C = new THREE.Vector3(...chest.S), X = new THREE.Vector3(...chest.M.x), Y = new THREE.Vector3(...chest.M.y), Z = new THREE.Vector3(...chest.M.z);
-  // ishodište obrasca: ispred prsa, malo prema desnoj ruci lutke (L na ekranu)
-  const origin = C.clone().addScaledVector(Y, 1.25).addScaledVector(Z, 1.9).addScaledVector(X, -0.35);
-  void sh;
+  // ishodište obrasca: ispred prsa, malo prema ruci koja ga crta (side 1 = ruka s palicom, −1 = slobodna, zrcalno)
+  const origin = C.clone().addScaledVector(Y, 1.3).addScaledVector(Z, 1.95).addScaledVector(X, -0.38 * side);
   const beat = beats % 4;
   const k = Math.floor(beat), f = beat - k;
-  // točke udaraca (x desno na ekranu, y gore) — za dirigenta okrenutog orkestru ovo je u njegovom okviru prsa
+  // točke udaraca u okviru prsa: 1 dolje, 2 prema unutra, 3 van, 4 gore (širok, čitljiv obrazac)
+  const A = 1.4;
   const pts: Array<[number, number]> = [
-    [0.0, -0.55], // 1 dolje
-    [0.55, -0.35], // 2 lijevo (od dirigenta) — x u okviru prsa
-    [-0.65, -0.35], // 3 desno
-    [-0.1, 0.35], // 4 gore
+    [0.0, -0.55],
+    [0.55, -0.35],
+    [-0.65, -0.35],
+    [-0.1, 0.38],
   ];
   const a = pts[k], b = pts[(k + 1) % 4];
-  // put: glatki luk s odskokom nakon udarca
+  // put: glatki luk s odskokom nakon udarca (ictus)
   const e = f * f * (3 - 2 * f);
-  const bounce = Math.sin(Math.min(1, f / 0.35) * Math.PI) * 0.22 * (1 - f);
-  const x = a[0] + (b[0] - a[0]) * e;
-  const y = a[1] + (b[1] - a[1]) * e + bounce;
+  const bounce = Math.sin(Math.min(1, f / 0.35) * Math.PI) * 0.24 * (1 - f);
+  const x = (a[0] + (b[0] - a[0]) * e) * A * side;
+  const y = (a[1] + (b[1] - a[1]) * e + bounce) * A;
   const p = origin.clone().addScaledVector(X, x).addScaledVector(Y, y);
   return [p.x, p.y, p.z];
 }

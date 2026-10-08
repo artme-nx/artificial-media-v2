@@ -31,6 +31,11 @@ Pravilo (11 §0.2): kad odluka nedostaje, biram najrazumniju opciju, zapisujem j
 | R13 | Jednobojno filmsko zrno (vlastiti efekt) umjesto `NoiseEffect` | RGB šum je u kontroli kvalitete izgledao "grubo i u boji"; zrno je jače u srednjim tonovima, crna ostaje crna. | `src/three/core/grain.ts` |
 | R14 | Svjetla se gase jačinom 0, ne preko `visible` | Promjena broja svjetala u three.js rekompajlira sve materijale (zastoj usred scrolla); sjena ugašenog svjetla se ne crta. | `Theatre.applyLevels()` |
 | R15 | Test vrućih točaka (`tests/hotspots.spec.ts`) | Pravilo 10-lik "bez svjetla/LED-ica": male zasićene mrlje s tamnom okolinom padaju test (krupni kadrovi metala su izuzeti — tamo je širok odsjaj ispravan). | `tests/hotspots.spec.ts` |
+| R16 | Koreografija uvoda: nastup → priprema (ruke gore) → tišina → takt 4/4 s obje ruke → naklon; kamera po kadru (3/4 odozgo u 6, iza u 7, široko preko ramena u 8, sa strane u 9, 3/4 sprijeda u 10) | Kontrola kvalitete: kadrovi 7–9 su se stapali, naklon sprijeda se nije čitao. | `src/three/scenes/intro-scene.ts` (`CAM`, `conductorPose`) |
+| R17 | Kadar 2: plesačica završava u pozi slova I iz loga; desktop urednički (lutka desno, tekst lijevo), mobitel okomito (tekst gore) | Kadar 3 je ista lutka u logu — rima kadrova; tekst nikad preko tijela ni lokve svjetla. | `intro-scene.ts`, `components.css` |
+| R18 | Animacija slova H1 je čisti CSS (inline slova, ne inline-block) + `aria-label` na H1; ručni kerning "Wh" | H1 vidljiv u prvoj sekundi bez JS-a; inline-block gubi kerning; display rez Bodonija ima širok W. | `components/sections/intro.tsx` |
+| R19 | Izjave na Bodoniju s `opsz` 36 | Automatski optički rez pri 80–100 px (opsz 96) ima crte koje na ekranu nestaju. | `.statement` u `app/components.css` |
+| R20 | MSAA 4 pri DPR ≤ 1,05 (inače 2, iznad 1,3 nijedan) | Pri DPR 1 stepenasti rubovi su najvidljiviji; izmjereno i dalje 54–60 fps. | `Post.setSize()` |
 
 
 ## Dizajn

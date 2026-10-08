@@ -28,7 +28,7 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
     envMapIntensity: 0.9,
   });
   return extendMaterial(m, {
-    key: "maple-v5",
+    key: "maple-v6",
     uniforms: { uTone: { value: tone } },
     fragmentPars: /* glsl */ `
       uniform float uTone;
@@ -81,8 +81,9 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
           vec3 gp = sp + warp;
           // srednja skala (preživi i u srednjem kadru): duge pruge uzduž osi s blagim valom
           float wave = fbm2o( vec3( sp.x * 1.8, sp.y * 0.35, sp.z * 1.8 ) );
-          float s1 = vnoise( vec3( sp.x * 30.0 + wave * 2.0, sp.y * 0.5, sp.z * 30.0 + wave * 2.0 ) );
-          float streak = smoothstep( 0.5, 0.88, s1 ) * aaFade( px * 30.0 * 1.2 );
+          // žila srednje skale (~1 cm) — vidljiva i u srednjem kadru (drvo, ne plastika)
+          float s1 = vnoise( vec3( sp.x * 18.0 + wave * 2.0, sp.y * 0.45, sp.z * 18.0 + wave * 2.0 ) );
+          float streak = smoothstep( 0.48, 0.86, s1 ) * aaFade( px * 18.0 * 1.1 );
           // fina vlakna
           const float G1 = 80.0, G2 = 240.0;
           float g1 = vnoise( vec3( gp.x * G1, gp.y * 1.2, gp.z * G1 ) );
@@ -101,8 +102,8 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
           vec3 cLight = vec3( 0.80, 0.60, 0.33 ) * uTone;
 
           vec3 col = mix( cBase, cLight, smoothstep( 0.55, 0.85, tone ) * 0.5 );
-          col = mix( col, cWarm, smoothstep( 0.2, 0.5, 1.0 - tone ) * 0.45 + tone2 * 0.12 );
-          col = mix( col, cStreak, streak * 0.3 );
+          col = mix( col, cWarm, smoothstep( 0.2, 0.5, 1.0 - tone ) * 0.45 + tone2 * 0.22 );
+          col = mix( col, cStreak, streak * 0.45 );
           col = mix( col, cFiber, min( 1.0, fibers * 1.5 ) );
           col = mix( col, cCore, core * 0.8 * aCore );
           col = mix( col, cLight * 1.08, glint * 0.35 * aE );

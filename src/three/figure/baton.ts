@@ -23,7 +23,7 @@ export class Baton {
   mesh: THREE.Mesh;
   /** okvir palice u okviru šake (jedinice glave) */
   grip = new THREE.Matrix4();
-  private minPx = 1.6;
+  private minPx = 1.25;
   constructor() {
     this.mesh = new THREE.Mesh(batonGeometry(), batonMaterial(BATON_COLOR));
     this.mesh.castShadow = true;
