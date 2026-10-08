@@ -12,8 +12,8 @@ Zadatak: `brand/11-stranica-v2-zadatak.md` (8. 10. 2026.). Ovaj dokument se ažu
 |---|---|---|
 | F0 Priprema i kostur | ✅ gotovo | live 200 |
 | F1 Tokeni, tipografija, logo, kostur stranice | ✅ gotovo | testovi 39/39 dev, 30/30 prod |
-| F2 Lutka: tijelo, materijali, mehanika | — | |
-| F3 Kostim, palica, roboti, pozornica | — | |
+| F2 Lutka: tijelo, materijali, mehanika | ✅ objavljeno (QC ispod praga) | QC 5,2 → 6,2 → 5,6; nadmašuje donju granicu; preostale mane ispod |
+| F3 Kostim, palica, roboti, pozornica | u tijeku (paralelno) | smoking (skinned), palica, orkestar, pozornica — /lab/scena |
 | F4 Kazališni uvod (kadrovi 1–10) | — | |
 | F5 Manifest s baletom, reelovi, svjetovi | — | |
 | F6 Drvo / robot ispod kursora | — | |
@@ -22,9 +22,11 @@ Zadatak: `brand/11-stranica-v2-zadatak.md` (8. 10. 2026.). Ovaj dokument se ažu
 | F9 Nizovi slika, posteri, performanse, pristupačnost | — | |
 | Završetak (README, REVIEW.md) | — | |
 
-**Sljedeći korak:** F2 — lutka u visokoj rezoluciji (`/lab/lutka`): geometrija iz kanona, šake s 5 prstiju, satni zglobovi, javor i čelik, sustav poza.
+**Sljedeći korak:** F2 QC krug 2 (subagent) → commit/deploy F2; zatim dovršiti F3 (still dirigenta s orkestrom, QC).
 
-**Poznati problemi:** —
+**Poznati problemi:**
+- F2 QC (3 kruga, prosjek 5,6–6,2, prag 8 nije dostignut). Preostalo prema subagentu: (1) drvo u širokim kadrovima čita se kao mat bež, u makrou "pluto/pjegava ljuska" — kandidat: pečena 4K tekstura ptičjeg oka s mipmapama umjesto čistog proceduralnog shadera; (2) točkasti odsjaji malog reflektora na poliranim dijelovima (struk B, tjeme) — hrapaviji polirani dijelovi ili veći izvori svjetla; (3) amplituda pogleda glave se ne čita dovoljno; (4) poze en haut/dirigent/"seže" još krute; (5) mehanika prstiju i dlan; (6) mehanizam ramena "grub". Ponovna ocjena u F3–F8.
+- Performanse: s punim efektima na DPR 2 scena je preteška (21 fps); dinamička rezolucija drži ~60 fps spuštanjem DPR-a do ~1,4. Dorada u F9.
 
 ## Plan
 
@@ -60,11 +62,11 @@ Redoslijed: F0 → F1 → F2 → … → F9 → završetak. Svaka faza: testovi 
 - [ ] Drvo / robot ispod kursora, poravnato i u pokretu; mobitel prst i samostalno kretanje (F6)
 - [ ] Niz slika umjesto videa, `ScrollSequence`, skripta video → frameovi, rezolucija po uređaju (F9)
 - [ ] Ne šteka, izgleda kao 4K video (F9, §6)
-- [ ] Format pokreta spreman za snimljeni pokret balerine (F2, README)
+- [x] Format pokreta spreman za snimljeni pokret balerine (F2, README) — clip.ts + import-motion.mjs (README u završetku)
 
 **10-lik**
-- [ ] Ptičje oko javor, brušeni čelik, mehanika sata na svim navedenim zglobovima, 5 prstiju s 3/2 zgloba (F2)
-- [ ] Struk A i B kao prekidač (F2)
+- [~] Ptičje oko javor, brušeni čelik, mehanika sata na svim navedenim zglobovima, 5 prstiju s 3/2 zgloba (F2) — napravljeno; QC ocjenjuje drvo i mehaniku prstiju ispod praga
+- [x] Struk A i B kao prekidač (F2)
 - [ ] Kostim, palica, ljubičasta samo na leptir-mašni i maramici (F3)
 - [ ] Roboti po [ROBOT], orkestar u pozadini i izvan fokusa (F3)
 - [ ] Toplo svjetlo na dirigentu, hladno na orkestru (F3)
@@ -94,3 +96,7 @@ Redoslijed: F0 → F1 → F2 → … → F9 → završetak. Svaka faza: testovi 
 - F0: Next.js kostur, tokeni (tri sloja + način dark/light), `sync-brand.mjs`, `content/site.ts` (izvor + status), prekidači (`config/switches.ts`), Playwright kostur (12/12 zeleno na dev serveru).
 - F0 objavljen: live 200 (drugi curl nakon 2 min).
 - F1: tokeni (tri sloja + dark/light), Bodoni Moda + Jost, logo s prekidačem naglaska, animacija loga (flipbook poza iz kanona), favicon, sve sekcije s copyjem, /start forma (4 koraka), axe AA 0 prekršaja, test slijepljenih riječi.
+- F2: /lab/lutka — tokareni dijelovi visoke rezolucije (analitičke normale; popravljen bug s normalama prema unutra), ptičje oko javor (proceduralni shader v3: gusta oči nasumične veličine, žila s domain warpom, chatoyance u sjaju, AA preko fwidth), brušeni čelik (anizotropija), satni mehanizam zgloba (polirani prsten s kosim rubom, skeletonizirani kotač, pinion, most, ležaj, vijci s utorom, perlage), šake s 5 prstiju (3/2 zgloba, 1,35× kanona), struk A/B, poze (7 kanonskih + dirigent iz lutka-v2.json pretvoren natrag u kutove + scenske), stupnjevani prijelazi s oprugama, disanje, IK, pogled glave ±35°. Provjere sudara i poda (TS port test_paritet) prolaze.
+- QC F2 krug 1 (subagent): 5,2 — mane: ptičje oko, moiré, krom zglobovi, uzemljenje, plitka mehanika, šaka, izgorjeli rubovi, poze, kadriranje → popravljeno.
+- Uvoz snimljenog pokreta: scripts/import-motion.mjs (glTF RIG_lutka → kanon-parts-frames), samoprovjera 1,5·10⁻⁵.
+- F2 QC krug 2: 6,2; krug 3: 5,6 → F2 zatvoren s popisom preostalih mana (gore). Commit + deploy F2.
