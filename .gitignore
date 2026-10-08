@@ -1,0 +1,30 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# testing
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# QA: only reports and up to 6 selected JPGs per phase are committed (see qa/README.md)
+/qa/**/*.png
+/qa/**/raw/
+/qa/tmp/
+
+# local tooling
+.venv*/
+__pycache__/
+*.pyc
+
+# misc
+.DS_Store
+*.pem
+.env*
+!.env.example

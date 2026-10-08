@@ -1,0 +1,189 @@
+/* Design tokens — GENERIRANO iz design/tokens.json (scripts/build-tokens.mjs). Ne uređuj ručno. */
+
+/* === PRIMITIVE === */
+:root {
+  --p-color-ink-500: #5E5862;
+  --p-color-ink-700: #36313A;
+  --p-color-ink-800: #242026;
+  --p-color-ink-850: #1B181C;
+  --p-color-ink-900: #151316;
+  --p-color-ink-950: #0B0B0C;
+  --p-color-paper-50: #F3EFE7;
+  --p-color-paper-100: #EFEBE3;
+  --p-color-paper-200: #E7E1D6;
+  --p-color-paper-300: #D8D0C2;
+  --p-color-paper-400: #A39D96;
+  --p-color-violet-400: #A27BD8;
+  --p-color-violet-700: #5B2A86;
+  --p-color-white: #FFFFFF;
+  --p-color-black: #000000;
+  --p-font-bodoni: var(--font-bodoni), 'Bodoni Moda', 'Didot', 'Bodoni 72', Georgia, serif;
+  --p-font-jost: var(--font-jost), 'Jost', 'Futura', 'Avenir Next', system-ui, sans-serif;
+  --p-size-display-xl: clamp(2.6rem, 1.35rem + 5.4vw, 7.25rem);
+  --p-size-display-l: clamp(2.2rem, 1.3rem + 3.7vw, 5.25rem);
+  --p-size-display-m: clamp(1.75rem, 1.2rem + 2.3vw, 3.4rem);
+  --p-size-display-s: clamp(1.4rem, 1.1rem + 1.2vw, 2.1rem);
+  --p-size-title: clamp(1.15rem, 1.02rem + 0.55vw, 1.5rem);
+  --p-size-body-l: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --p-size-body: 1.0625rem;
+  --p-size-small: 0.875rem;
+  --p-size-label: 0.75rem;
+  --p-leading-display: 1.02;
+  --p-leading-title: 1.2;
+  --p-leading-body: 1.6;
+  --p-tracking-display: -0.018em;
+  --p-tracking-label: 0.24em;
+  --p-tracking-wide: 0.32em;
+  --p-space-1: 0.25rem;
+  --p-space-2: 0.5rem;
+  --p-space-3: 0.75rem;
+  --p-space-4: 1rem;
+  --p-space-6: 1.5rem;
+  --p-space-8: 2rem;
+  --p-space-12: 3rem;
+  --p-space-16: 4rem;
+  --p-space-24: 6rem;
+  --p-space-32: 8rem;
+  --p-space-section: clamp(6rem, 3.5rem + 9vw, 13rem);
+  --p-space-gutter: clamp(1.25rem, 0.6rem + 2.6vw, 3.5rem);
+  --p-duration-micro: 180ms;
+  --p-duration-base: 320ms;
+  --p-duration-pose: 450ms;
+  --p-duration-reveal: 900ms;
+  --p-duration-cine: 1600ms;
+  --p-duration-stage: 1400ms;
+  --p-ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --p-ease-in-out-cine: cubic-bezier(0.65, 0, 0.35, 1);
+  --p-ease-ballet: cubic-bezier(0.45, 0, 0.2, 1);
+  --p-radius-none: 0;
+  --p-radius-hair: 2px;
+  --p-radius-pill: 999px;
+  --p-measure-prose: 62ch;
+  --p-measure-narrow: 34rem;
+  --p-measure-page: 84rem;
+  --p-z-canvas: 0;
+  --p-z-content: 10;
+  --p-z-intro: 20;
+  --p-z-nav: 50;
+  --p-z-overlay: 80;
+}
+
+/* === SEMANTIC (zadano: svijetla pozornica) === */
+:root {
+  --bg: var(--p-color-paper-50);
+  --bg-raised: var(--p-color-paper-100);
+  --bg-sunken: var(--p-color-paper-200);
+  --fg: var(--p-color-ink-900);
+  --fg-muted: var(--p-color-ink-500);
+  --line: var(--p-color-paper-300);
+  --line-strong: var(--p-color-ink-900);
+  --accent: var(--p-color-violet-700);
+  --focus: var(--p-color-violet-700);
+  --invert-bg: var(--p-color-ink-900);
+  --invert-fg: var(--p-color-paper-50);
+  --stage: var(--p-color-paper-50);
+  --ff-display: var(--p-font-bodoni);
+  --ff-sans: var(--p-font-jost);
+  --fs-display-xl: var(--p-size-display-xl);
+  --fs-display-l: var(--p-size-display-l);
+  --fs-display-m: var(--p-size-display-m);
+  --fs-display-s: var(--p-size-display-s);
+  --fs-title: var(--p-size-title);
+  --fs-body-l: var(--p-size-body-l);
+  --fs-body: var(--p-size-body);
+  --fs-small: var(--p-size-small);
+  --fs-label: var(--p-size-label);
+  --lh-display: var(--p-leading-display);
+  --lh-title: var(--p-leading-title);
+  --lh-body: var(--p-leading-body);
+  --tr-display: var(--p-tracking-display);
+  --tr-label: var(--p-tracking-label);
+  --tr-wide: var(--p-tracking-wide);
+  --sp-section: var(--p-space-section);
+  --sp-gutter: var(--p-space-gutter);
+  --sp-stack-s: var(--p-space-4);
+  --sp-stack-m: var(--p-space-8);
+  --sp-stack-l: var(--p-space-16);
+  --sp-stack-xl: var(--p-space-24);
+  --sp-measure: var(--p-measure-prose);
+  --sp-measure-narrow: var(--p-measure-narrow);
+  --sp-page: var(--p-measure-page);
+  --mo-micro: var(--p-duration-micro);
+  --mo-base: var(--p-duration-base);
+  --mo-pose: var(--p-duration-pose);
+  --mo-reveal: var(--p-duration-reveal);
+  --mo-cine: var(--p-duration-cine);
+  --mo-stage: var(--p-duration-stage);
+  --mo-ease-out: var(--p-ease-out-expo);
+  --mo-ease-cine: var(--p-ease-in-out-cine);
+  --mo-ease-ballet: var(--p-ease-ballet);
+  --rad-control: var(--p-radius-pill);
+  --rad-frame: var(--p-radius-hair);
+  --z-canvas: var(--p-z-canvas);
+  --z-content: var(--p-z-content);
+  --z-intro: var(--p-z-intro);
+  --z-nav: var(--p-z-nav);
+  --z-overlay: var(--p-z-overlay);
+}
+
+/* === MODE: dark === */
+[data-stage="dark"] {
+  --bg: var(--p-color-ink-950);
+  --bg-raised: var(--p-color-ink-850);
+  --bg-sunken: var(--p-color-black);
+  --fg: var(--p-color-paper-100);
+  --fg-muted: var(--p-color-paper-400);
+  --line: var(--p-color-ink-700);
+  --line-strong: var(--p-color-paper-100);
+  --accent: var(--p-color-violet-400);
+  --focus: var(--p-color-violet-400);
+  --invert-bg: var(--p-color-paper-100);
+  --invert-fg: var(--p-color-ink-950);
+  --stage: var(--p-color-ink-950);
+}
+
+/* === COMPONENT === */
+:root {
+  --nav-height: 4.5rem;
+  --nav-fg: var(--fg);
+  --nav-link-gap: var(--p-space-8);
+  --button-primary-bg: var(--invert-bg);
+  --button-primary-fg: var(--invert-fg);
+  --button-ghost-fg: var(--fg);
+  --button-ghost-line: var(--line-strong);
+  --button-height: 3rem;
+  --button-height-s: 2.75rem;
+  --button-pad-x: var(--p-space-6);
+  --button-radius: var(--rad-control);
+  --field-line: var(--line-strong);
+  --field-line-idle: var(--line);
+  --field-fg: var(--fg);
+  --field-error: var(--p-color-violet-700);
+  --field-height: 3.25rem;
+  --reel-slot-bg: var(--bg-sunken);
+  --reel-slot-line: var(--line);
+  --reel-radius: var(--rad-frame);
+  --faq-line: var(--line);
+  --faq-question: var(--fs-title);
+  --focus-ring: var(--focus);
+  --focus-width: 2px;
+  --focus-offset: 3px;
+}
+
+/* === TAILWIND @theme (most prema semantičkom sloju) === */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-raised: var(--bg-raised);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-focus: var(--focus);
+  --color-invert-bg: var(--invert-bg);
+  --color-invert-fg: var(--invert-fg);
+  --color-stage: var(--stage);
+  --font-display: var(--ff-display);
+  --font-sans: var(--ff-sans);
+}
