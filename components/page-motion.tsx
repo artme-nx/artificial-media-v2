@@ -88,11 +88,14 @@ export function PageMotion() {
     }
 
     const onLoad = () => ScrollTrigger.refresh();
+    // 3D je spreman → manifest postaje visok (CSS uz data-stage3d): preračunaj okidače
+    window.addEventListener("stage3d-ready", onLoad);
     window.addEventListener("load", onLoad);
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
 
     return () => {
       window.removeEventListener("load", onLoad);
+      window.removeEventListener("stage3d-ready", onLoad);
       ctx.revert();
       ScrollTrigger.getAll().forEach((t) => t.kill());
       if (raf) gsap.ticker.remove(raf);

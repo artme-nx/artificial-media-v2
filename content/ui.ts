@@ -8,7 +8,7 @@ export const ui = {
   menu: "Menu",
   close: "Close",
   dragHint: "Drag the hand or head to pose · drag the stage to turn",
-  dragHintTouch: "Drag to pose · move your finger to look inside",
+  dragHintTouch: "Touch to look inside · drag to turn",
   reelPlaceholder: "Placeholder",
   reelFilterLabel: "Filter reels",
   faqToggle: "Toggle answer",

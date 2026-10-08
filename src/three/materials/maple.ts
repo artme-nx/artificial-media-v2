@@ -28,7 +28,7 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
     envMapIntensity: 0.9,
   });
   return extendMaterial(m, {
-    key: "maple-v6",
+    key: "maple-v7",
     uniforms: { uTone: { value: tone } },
     fragmentPars: /* glsl */ `
       uniform float uTone;
@@ -36,16 +36,19 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
       float gH;
       float gGlint;
       // Worley s podacima ćelije: x = udaljenost do središta oka (u jedinicama polumjera oka), yzw = vektor
+      // Worley u 2×2×2 susjedstvu (umjesto 3×3×3): točke ćelija su u [0,15; 0,85], pa je najbliža uvijek u
+      // osam ćelija oko točke — ~3× jeftinije, bez vidljive razlike (krupni kadar lutke preko cijelog ekrana)
       vec4 eyeCells( vec3 q, out float has ) {
         vec3 i = floor( q ), f = fract( q );
+        vec3 s = step( 0.5, f ) - 1.0;
         float best = 9.0; vec3 bv = vec3( 0.0 ); has = 0.0;
-        for ( int z = -1; z <= 1; z ++ )
-        for ( int y = -1; y <= 1; y ++ )
-        for ( int x = -1; x <= 1; x ++ ) {
-          vec3 g = vec3( float( x ), float( y ), float( z ) );
+        for ( int z = 0; z <= 1; z ++ )
+        for ( int y = 0; y <= 1; y ++ )
+        for ( int x = 0; x <= 1; x ++ ) {
+          vec3 g = vec3( float( x ), float( y ), float( z ) ) + s;
           vec3 h = hash33( i + g + 13.7 );
           if ( h.z > 0.72 ) continue;                 // ne ima svaka ćelija oko
-          vec3 o = hash33( i + g );
+          vec3 o = 0.5 + ( hash33( i + g ) - 0.5 ) * 0.7;
           float rad = mix( 0.3, 0.48, h.x * h.x );     // polumjer oka ~1,4–2,3 mm (jezgra ~0,7–1,1 mm)
           vec3 r = g + o - f;
           float d = length( r ) / rad;
@@ -64,10 +67,12 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
 
           // ---- oči: sitna tamna točka (ne prsten); vlakna je obilaze
           const float EYE_F = 46.0;                   // ćelije po jedinici glave (~4,8 mm): gusto, kao pravo ptičje oko
-          float has;
-          vec4 e = eyeCells( vec3( sp.x * EYE_F, sp.y * EYE_F * 0.8, sp.z * EYE_F ), has );
-          float d = e.x;
           float aE = aaFade( px * EYE_F * 1.6 );
+          // oči manje od piksela: preskoči Worley (široki kadrovi, ušteda)
+          float has = 0.0;
+          vec4 e = vec4( 9.0, 0.0, 0.0, 0.0 );
+          if ( aE > 0.002 ) e = eyeCells( vec3( sp.x * EYE_F, sp.y * EYE_F * 0.8, sp.z * EYE_F ), has );
+          float d = e.x;
           // tamna jezgra se gasi ranije od svijetlog prstena: u srednjem kadru oči su svjetlucanje, ne tamne mrlje
           float aCore = aaFade( px * EYE_F * 2.6 );
           float core = ( 1.0 - smoothstep( 0.25, 0.6, d ) ) * has;            // tamna točka s mekim rubom

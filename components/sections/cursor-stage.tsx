@@ -6,7 +6,7 @@ import { ui } from "@/content/ui";
  */
 export function CursorStageSection() {
   return (
-    <section id="atelier" aria-hidden="true" className="cursor-stage relative h-[100dvh] min-h-[38rem]" data-stage-anchor="atelier">
+    <section id="atelier" aria-hidden="true" className="cursor-stage relative h-[100dvh] min-h-[38rem]" data-scene="cursor">
       <p className="label muted absolute inset-x-0 bottom-8 text-center" data-hint>
         <span className="hidden md:inline">{ui.dragHint}</span>
         <span className="md:hidden">{ui.dragHintTouch}</span>

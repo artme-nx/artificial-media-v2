@@ -15,7 +15,7 @@ export function CtaSection() {
             <T s={site.cta.button} />
           </Link>
         </div>
-        <div data-stage-anchor="cta" aria-hidden="true" className="cta-figure hidden aspect-[3/4] w-full max-w-[16rem] justify-self-end md:col-span-4 md:block" />
+        <div data-doll-anchor="cta" aria-hidden="true" className="cta-figure hidden aspect-[3/4] w-full max-w-[16rem] justify-self-end md:col-span-4 md:block" />
       </div>
     </section>
   );

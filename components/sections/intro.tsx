@@ -121,7 +121,11 @@ export function IntroSection() {
       }
       setStage({ introAutoDone: true, dancerLevel: 0, dancerPhase: 1 });
       root.dataset.introAuto = "done";
-      root.dataset.introLogo = "1"; // veliki logo je na ekranu; scroll ga (i ovaj atribut) gasi u kadru 5
+      // veliki logo je na ekranu samo ako smo još u kadrovima 3–5 (preskakanje skokom niže ga ne smije ostaviti)
+      const sec = section.current;
+      const p = sec ? Math.min(1, Math.max(0, -sec.getBoundingClientRect().top / Math.max(1, sec.offsetHeight - window.innerHeight))) : 0;
+      if (p < 0.19) root.dataset.introLogo = "1";
+      else delete root.dataset.introLogo;
     };
     // kadar 1 (prvi dio naslova) se animira čistim CSS-om od prvog prikaza (ne čeka JS); GSAP preuzima ostatak,
     // usklađen s vremenom od učitavanja stranice

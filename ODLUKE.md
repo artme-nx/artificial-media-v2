@@ -36,6 +36,12 @@ Pravilo (11 §0.2): kad odluka nedostaje, biram najrazumniju opciju, zapisujem j
 | R18 | Animacija slova H1 je čisti CSS (inline slova, ne inline-block) + `aria-label` na H1; ručni kerning "Wh" | H1 vidljiv u prvoj sekundi bez JS-a; inline-block gubi kerning; display rez Bodonija ima širok W. | `components/sections/intro.tsx` |
 | R19 | Izjave na Bodoniju s `opsz` 36 | Automatski optički rez pri 80–100 px (opsz 96) ima crte koje na ekranu nestaju. | `.statement` u `app/components.css` |
 | R20 | MSAA 4 pri DPR ≤ 1,05 (inače 2, iznad 1,3 nijedan) | Pri DPR 1 stepenasti rubovi su najvidljiviji; izmjereno i dalje 54–60 fps. | `Post.setSize()` |
+| R21 | Baletna scena (manifest): svijetla topla siva pozornica, protusvjetlo i dva visoka snopa kroz dim (raspršenje pojačano samo u dimu), gornji reflektor se pali na kraju (krug svjetla); kamera u cilindričnim koordinatama oko lutke, kruženje 46° (`?kruzenje=0` = fiksni 3/4 kut) | 07 (6. 10.): "pozadina svijetla, s maglom; svjetlo reflektora kroz dim; na kraju lutka manja u krugu svjetla". Na bijeloj pozadini snop se ne vidi — zato topla siva i jače raspršenje samo u dimu. | `src/three/scenes/ballet-scene.ts` |
+| R22 | Révérence kao baletni naklon: dubok plié, stražnja noga iza na prstima, trup gotovo uspravan, glava se nakloni, ruka se otvara prema publici; kamera 3/4 malo odozgo | Proba 1: "izgleda kao korak natrag"; prvi pokušaj s dubokim pregibom trupa izgledao je kao posrtanje. | `b_reverence_duboka` u `poses-extra.json` |
+| R23 | Male lutke u sekcijama (reelovi; F7 usluge, CTA, podnožje) dijele **jedan mali prozirni canvas** koji se seli u sidro sekcije na ekranu | Glavni canvas je preko cijelog ekrana iza sadržaja s postprocessingom (pozadina ne bi odgovarala stranici); drugi mali kontekst bez postprocessinga je jeftin i kroji se uz sadržaj. | `components/stage/doll-stage.tsx`, `src/three/doll/doll-view.ts` |
+| R24 | Sekcije bez 3D scene imaju neprozirnu pozadinu | Sljedeća sekcija pri scrollu "pokrije" scenu umjesto da scena prosijava kroz nju. | `main > section:not([data-scene])` u `components.css` |
+| R25 | Aktivni reel = pod mišem/fokusom, inače najbliži sredini ekrana | Radova još nema; "video koji se pušta" (07) je aktivni slot. Kad stignu videi, aktivan je onaj koji svira. | `components/sections/reels.tsx` |
+| R26 | Ptičje oko: Worley u 2×2×2 ćelije + preskakanje kad su oči manje od piksela | Krupni kadar lutke preko cijelog ekrana: 23 → 54 fps na M5, bez vidljive razlike. | `src/three/materials/maple.ts` |
 
 
 ## Dizajn

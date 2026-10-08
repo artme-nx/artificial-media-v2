@@ -34,7 +34,7 @@ export function SiteFooter({ onHome = true }: { onHome?: boolean }) {
             <T s={site.footer.impressum} as="p" className="ph mt-2" />
           </div>
         </div>
-        <div data-stage-anchor="footer" aria-hidden="true" className="footer-figure" />
+        <div data-doll-anchor="footer" aria-hidden="true" className="footer-figure" />
       </div>
     </footer>
   );

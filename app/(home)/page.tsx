@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { PageMotion } from "@/components/page-motion";
 import { StatusOverlay } from "@/components/status-overlay";
 import { StageCanvas } from "@/components/stage/stage-canvas";
+import { DollStage } from "@/components/stage/doll-stage";
 import { IntroSection } from "@/components/sections/intro";
 import { ManifestSection } from "@/components/sections/manifest";
 import { ReelsSection } from "@/components/sections/reels";
@@ -32,6 +33,7 @@ export default function Home() {
       </main>
       <SiteFooter />
       <PageMotion />
+      <DollStage />
       <StatusOverlay />
     </>
   );

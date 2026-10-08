@@ -6,7 +6,7 @@ import { mapleMaterial } from "../materials/maple";
 import { buildCostume, poseCostume, COVERED_PARTS, COVERED_JOINTS, type CostumeMeshes } from "./costume";
 import { Baton } from "./baton";
 import { readSwitches } from "@/config/switches";
-import { brushedSteel, polishedSteel, perlageSteel } from "../materials/steel";
+import { brushedSteel, polishedSteel, perlageSteel, hiTechSteel } from "../materials/steel";
 
 /**
  * Lutka (10-lik): drvo (ptičje oko javor) + brušeni čelik sa satnim mehanizmima na svim zglobovima s popisa
@@ -16,7 +16,8 @@ import { brushedSteel, polishedSteel, perlageSteel } from "../materials/steel";
  * Tijelo je kruto po dijelovima, kao prava drvena lutka: svaki frame raspored iz kanona (lutka-core) → matrice.
  */
 export const UNIT = 0.22; // metara po jedinici glave (lutka-v2.json: unit)
-export type Look = "wood" | "robot";
+/** wood = javor; robot = brušeni čelik (orkestar, lab); robot-hitech = F6 ispod kursora (razdjelne linije) */
+export type Look = "wood" | "robot" | "robot-hitech";
 export type Waist = "A" | "B";
 
 const WOOD_PARTS = ["head", "chest", "pelvis", "upperL", "upperR", "foreL", "foreR", "thighL", "thighR", "shinL", "shinR", "footL", "footR"] as const;
@@ -40,6 +41,10 @@ export function materialsFor(look: Look): MatSet {
     if (look === "wood") {
       const maple = mapleMaterial();
       m = { body: maple, head: maple, fingers: maple, brushed, polished, perlage, neckBrushed };
+    } else if (look === "robot-hitech") {
+      const body = hiTechSteel();
+      const fingers = brushedSteel({ brush: 1, roughness: 0.34, anisotropy: 0, tint: 0.92 });
+      m = { body, head: hiTechSteel({ head: true }), fingers, brushed, polished, perlage, neckBrushed };
     } else {
       // anizotropija umjerena: veća daje povremene vruće točke na zakrivljenim dijelovima (izgledaju kao LED)
       const body = brushedSteel({ brush: 1, roughness: 0.33, anisotropy: 0.35, tint: 0.92 });

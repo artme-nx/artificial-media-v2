@@ -96,3 +96,49 @@ export function perlageSteel() {
     },
   });
 }
+
+/**
+ * "Hi-tech" robot (11 F6, 10-lik [ROBOT]): brušeni čelik s preciznim razdjelnim linijama — prstenasti spojevi
+ * uzduž dijela i uzdužni šav sprijeda, kao obrađeni metalni segmenti. I dalje bez svjetla, LED-ica i ekrana.
+ * Linije su u lokalnom prostoru dijela (os y = os uda); gase se po veličini piksela (bez moiréa).
+ */
+export function hiTechSteel({ roughness = 0.24, anisotropy = 0.3, tint = 0.84, head = false }: { roughness?: number; anisotropy?: number; tint?: number; head?: boolean } = {}) {
+  const m = new THREE.MeshPhysicalMaterial({
+    color: STEEL.clone().multiplyScalar(tint),
+    metalness: 1,
+    roughness,
+    anisotropy,
+    envMapIntensity: 1.75,
+  });
+  return extendMaterial(m, {
+    key: `steel-hitech-v3-${head ? "h" : "b"}`,
+    uniforms: { uHead: { value: head ? 1 : 0 } },
+    fragmentPars: /* glsl */ `uniform int uHead; float gSeam; float gEdge;`,
+    hooks: {
+      color_fragment: /* glsl */ `
+        {
+          vec3 p = vObjPos;
+          float px = length( fwidth( p ) );
+          // tanke, oštre razdjelnice (obrađeni segmenti), s analitičkim AA (bez šahovskog šuma)
+          float fy = fract( p.y * 2.4 + vSeed * 0.37 );
+          float dy = min( fy, 1.0 - fy ) / 2.4;               // udaljenost do linije u jedinicama glave
+          float w = 0.0045;
+          float aa = max( px * 0.8, 1e-4 );
+          float ring = ( 1.0 - smoothstep( w - aa, w + aa, dy ) ) * float( uHead == 0 );
+          // svijetli obrađeni rub uz liniju (jedna strana)
+          float edge = ( 1.0 - smoothstep( 0.0, w * 1.6 + aa, abs( dy - w * 2.2 ) ) ) * ( 1.0 - ring ) * float( uHead == 0 );
+          // uzdužni šav: na tijelu sprijeda, na glavi straga (ne u visini "očiju")
+          float a = atan( p.z, p.x );
+          float sa = abs( sin( 0.5 * ( a - ( uHead == 1 ? -1.5708 : 1.5708 ) ) ) );
+          float seam = 1.0 - smoothstep( 0.006 - aa * 2.0, 0.006 + aa * 2.0, sa * length( p.xz ) );
+          gSeam = max( ring, seam * 0.9 );
+          gEdge = edge;
+          float lod = 1.0 - smoothstep( 0.004, 0.012, px );
+          float br = vnoise( vec3( a * 40.0, p.y * 380.0, vSeed * 7.0 ) );
+          diffuseColor.rgb *= ( 1.0 - gSeam * 0.8 ) * ( 1.0 + gEdge * 0.3 ) * ( 0.97 + 0.06 * br * lod );
+        }
+      `,
+      roughnessmap_fragment: /* glsl */ `roughnessFactor = clamp( roughnessFactor + gSeam * 0.4 - gEdge * 0.14, 0.06, 1.0 );`,
+    },
+  });
+}

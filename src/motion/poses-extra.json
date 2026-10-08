@@ -841,39 +841,39 @@
     "handR": "elegant"
   },
   "b_reverence_duboka": {
-    "_opis": "Balet (F5): dubok, gracilan révérence — prednja noga u dubljem pliéu, stražnja klizne iza na prste, trup i glava se duboko naklone, desna ruka se otvara prema publici (ispravak Probe 1: 'korak natrag').",
+    "_opis": "Balet (F5): révérence — klasični naklon: dubok plié na obje noge (prednja nosi, stražnja iza na prstima, koljeno savijeno), trup 28° iz kukova, glava se pokloni, ruke dolje kroz à la seconde (desna otvorena prema publici); dno se zadrži.",
     "support": "L",
     "touch": -1,
     "pelvis": {
       "tilt": 0,
       "pitch": 10,
-      "yaw": 0
+      "yaw": -4
     },
     "chest": {
       "tilt": -2,
-      "pitch": 34,
+      "pitch": 28,
       "yaw": -6
     },
     "neck": {
       "tilt": 0,
-      "pitch": 10,
+      "pitch": 12,
       "yaw": 0
     },
     "head": {
-      "tilt": 5,
-      "pitch": 22,
-      "yaw": 10
+      "tilt": 4,
+      "pitch": 28,
+      "yaw": 6
     },
     "armL": {
       "th": [
         -14,
-        4,
-        18
+        6,
+        22
       ],
       "ph": [
-        18,
+        16,
         34,
-        32
+        40
       ],
       "roll": [
         0,
@@ -883,14 +883,14 @@
     },
     "armR": {
       "th": [
-        58,
-        70,
-        76
+        52,
+        62,
+        70
       ],
       "ph": [
-        30,
-        44,
-        46
+        24,
+        34,
+        38
       ],
       "roll": [
         0,
@@ -900,27 +900,695 @@
     },
     "legL": {
       "th": [
+        4,
+        1
+      ],
+      "ph": [
+        38,
+        -44
+      ],
+      "foot": -34,
+      "fp": 0
+    },
+    "legR": {
+      "th": [
+        -12,
+        -6
+      ],
+      "ph": [
+        -6,
+        -58
+      ],
+      "foot": 34,
+      "fp": 62
+    },
+    "handL": "elegant",
+    "handR": "elegant"
+  },
+  "b_enhaut_s": {
+    "_opis": "Balet (F5, scenski): en haut s mekim laktom druge ruke (zaobljena à la seconde), glava prema ruci.",
+    "support": "L",
+    "touch": -1,
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 2,
+      "pitch": -4,
+      "yaw": -8
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": -4,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": -4,
+      "pitch": -8,
+      "yaw": -22
+    },
+    "armL": {
+      "th": [
+        -74,
+        -88,
+        -98
+      ],
+      "ph": [
+        18,
+        40,
+        52
+      ],
+      "roll": [
+        0,
+        0,
+        -40
+      ]
+    },
+    "armR": {
+      "th": [
+        168,
+        222,
+        240
+      ],
+      "ph": [
+        -6,
+        -4,
+        0
+      ],
+      "roll": [
+        0,
+        0,
+        -20
+      ]
+    },
+    "legL": {
+      "th": [
+        2,
+        1
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -42,
+      "fp": 0
+    },
+    "legR": {
+      "th": [
+        -2,
+        -1
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 42,
+      "fp": 0
+    },
+    "handL": "elegant",
+    "handR": "elegant"
+  },
+  "b_seconde_s": {
+    "_opis": "Balet (F5, scenski): à la seconde zaobljeno (laktovi mekani, šake malo naprijed), prsa podignuta.",
+    "support": "L",
+    "touch": -1,
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 0,
+      "pitch": -5,
+      "yaw": 6
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": -3,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 3,
+      "pitch": -6,
+      "yaw": 18
+    },
+    "armL": {
+      "th": [
+        -74,
+        -88,
+        -98
+      ],
+      "ph": [
+        18,
+        40,
+        52
+      ],
+      "roll": [
+        0,
+        0,
+        -40
+      ]
+    },
+    "armR": {
+      "th": [
+        74,
+        88,
+        98
+      ],
+      "ph": [
+        18,
+        40,
+        52
+      ],
+      "roll": [
+        0,
+        0,
+        40
+      ]
+    },
+    "legL": {
+      "th": [
+        2,
+        1
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -42,
+      "fp": 0
+    },
+    "legR": {
+      "th": [
+        -2,
+        -1
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 42,
+      "fp": 0
+    },
+    "handL": "elegant",
+    "handR": "elegant"
+  },
+  "b_bas_s": {
+    "_opis": "Balet (F5, scenski): bras bas simetrično zaobljeno (šake ispred bokova, dlanovi prema unutra).",
+    "support": "L",
+    "touch": -1,
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 1,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": 2,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 2,
+      "pitch": 4,
+      "yaw": 6
+    },
+    "armL": {
+      "th": [
+        -12,
+        8,
+        26
+      ],
+      "ph": [
+        14,
+        34,
+        40
+      ],
+      "roll": [
+        0,
+        0,
+        -20
+      ]
+    },
+    "armR": {
+      "th": [
+        12,
+        -8,
+        -26
+      ],
+      "ph": [
+        14,
+        34,
+        40
+      ],
+      "roll": [
+        0,
+        0,
+        20
+      ]
+    },
+    "legL": {
+      "th": [
         2,
         0
       ],
       "ph": [
-        36,
-        -38
+        6,
+        -6
       ],
       "foot": -40,
       "fp": 0
     },
     "legR": {
       "th": [
+        -4,
+        -4
+      ],
+      "ph": [
+        0,
+        -6
+      ],
+      "foot": 42,
+      "fp": 20
+    },
+    "handL": "elegant",
+    "handR": "elegant"
+  },
+  "b_zavrsna": {
+    "_opis": "Balet (F5): kraj — lutka stoji u krugu svjetla, prva pozicija, ruke bras bas, glava gore.",
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 0,
+      "pitch": -3,
+      "yaw": 0
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": -2,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 0,
+      "pitch": -5,
+      "yaw": 0
+    },
+    "armL": {
+      "th": [
         -12,
-        -7
+        8,
+        26
+      ],
+      "ph": [
+        14,
+        34,
+        40
+      ],
+      "roll": [
+        0,
+        0,
+        -20
+      ]
+    },
+    "armR": {
+      "th": [
+        12,
+        -8,
+        -26
+      ],
+      "ph": [
+        14,
+        34,
+        40
+      ],
+      "roll": [
+        0,
+        0,
+        20
+      ]
+    },
+    "legL": {
+      "th": [
+        2,
+        1
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -42,
+      "fp": 0
+    },
+    "legR": {
+      "th": [
+        -2,
+        -1
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 42,
+      "fp": 0
+    },
+    "handL": "elegant",
+    "handR": "elegant",
+    "support": "L",
+    "touch": -1
+  },
+  "biljeznica_drzi": {
+    "_opis": "F8 (/start): drži otvorenu bilježnicu ispred prsa (dalja ruka), olovka spremna (bliža ruka), glava prema bilježnici.",
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 0,
+      "pitch": 5,
+      "yaw": 0
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": 3,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 0,
+      "pitch": 5,
+      "yaw": 0
+    },
+    "armL": {
+      "th": [
+        -18,
+        40,
+        50
+      ],
+      "ph": [
+        30,
+        80,
+        70
+      ],
+      "roll": [
+        0,
+        0,
+        -40
+      ]
+    },
+    "armR": {
+      "th": [
+        20,
+        -30,
+        -40
+      ],
+      "ph": [
+        25,
+        70,
+        70
+      ],
+      "roll": [
+        0,
+        0,
+        40
+      ]
+    },
+    "legL": {
+      "th": [
+        -2.5,
+        -2.5
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -10
+    },
+    "legR": {
+      "th": [
+        2.5,
+        2.5
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 10
+    },
+    "handL": "hold",
+    "handR": "grip"
+  },
+  "biljeznica_pise": {
+    "_opis": "F8 (/start): piše — prsa i glava malo nagnuti prema stranici.",
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 0,
+      "pitch": 7,
+      "yaw": 0
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": 4,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 0,
+      "pitch": 8,
+      "yaw": 0
+    },
+    "armL": {
+      "th": [
+        -18,
+        40,
+        50
+      ],
+      "ph": [
+        30,
+        80,
+        70
+      ],
+      "roll": [
+        0,
+        0,
+        -40
+      ]
+    },
+    "armR": {
+      "th": [
+        24,
+        -34,
+        -44
+      ],
+      "ph": [
+        28,
+        72,
+        70
+      ],
+      "roll": [
+        0,
+        0,
+        40
+      ]
+    },
+    "legL": {
+      "th": [
+        -2.5,
+        -2.5
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -10
+    },
+    "legR": {
+      "th": [
+        2.5,
+        2.5
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 10
+    },
+    "handL": "hold",
+    "handR": "grip"
+  },
+  "biljeznica_misli": {
+    "_opis": "F8 (/start): razmišlja (pauza > 1,5 s) — olovka uz bradu, glava blago gore i u stranu.",
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 0,
+      "pitch": 2,
+      "yaw": 0
+    },
+    "neck": {
+      "tilt": 2,
+      "pitch": -2,
+      "yaw": 4
+    },
+    "head": {
+      "tilt": 4,
+      "pitch": -6,
+      "yaw": 12
+    },
+    "armL": {
+      "th": [
+        -18,
+        40,
+        50
+      ],
+      "ph": [
+        30,
+        80,
+        70
+      ],
+      "roll": [
+        0,
+        0,
+        -40
+      ]
+    },
+    "armR": {
+      "th": [
+        22,
+        -120,
+        -138
+      ],
+      "ph": [
+        34,
+        64,
+        52
+      ],
+      "roll": [
+        0,
+        0,
+        60
+      ]
+    },
+    "legL": {
+      "th": [
+        -2.5,
+        -2.5
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -10
+    },
+    "legR": {
+      "th": [
+        2.5,
+        2.5
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 10
+    },
+    "handL": "hold",
+    "handR": "grip"
+  },
+  "b_reverence_pocetak": {
+    "_opis": "Balet (F5): početak révérencea — plié, stražnja noga klizne iza, trup se tek naginje, glava još gore (pokloni se zadnja).",
+    "support": "L",
+    "touch": -1,
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 10,
+      "yaw": -4
+    },
+    "chest": {
+      "tilt": -2,
+      "pitch": 12,
+      "yaw": -6
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": 2,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 3,
+      "pitch": 0,
+      "yaw": 10
+    },
+    "armL": {
+      "th": [
+        -60,
+        -74,
+        -84
+      ],
+      "ph": [
+        18,
+        36,
+        44
+      ],
+      "roll": [
+        0,
+        0,
+        -40
+      ]
+    },
+    "armR": {
+      "th": [
+        72,
+        82,
+        88
+      ],
+      "ph": [
+        20,
+        32,
+        38
+      ],
+      "roll": [
+        0,
+        0,
+        60
+      ]
+    },
+    "legL": {
+      "th": [
+        4,
+        1
+      ],
+      "ph": [
+        38,
+        -44
+      ],
+      "foot": -34,
+      "fp": 0
+    },
+    "legR": {
+      "th": [
+        -12,
+        -6
       ],
       "ph": [
         -6,
-        -62
+        -58
       ],
-      "foot": 40,
-      "fp": 72
+      "foot": 34,
+      "fp": 62
     },
     "handL": "elegant",
     "handR": "elegant"

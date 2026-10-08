@@ -11,7 +11,7 @@ export type StageState = {
   /** uvod: je li automatski dio (kadrovi 1–3) gotov */
   introAutoDone: boolean;
   /** koja 3D zona je trenutno na ekranu */
-  zone: "intro" | "ballet" | "doll" | "cursor" | null;
+  zone: "intro" | "ballet" | "cursor" | null;
   /** napredak baletne scene (manifest), 0..1 */
   balletProgress: number;
 };

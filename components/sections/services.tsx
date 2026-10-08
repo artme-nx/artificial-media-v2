@@ -16,7 +16,7 @@ export function ServicesSection() {
           <h2 id="services-h" className="statement md:sticky md:top-[calc(var(--nav-height)+2rem)]" style={{ fontSize: "var(--fs-display-m)", maxWidth: "12ch" }}>
             <T s={site.services.opener} />
           </h2>
-          <div data-stage-anchor="services" aria-hidden="true" className="services-figure mt-10 hidden aspect-[3/4] w-full max-w-[22rem] md:sticky md:top-[calc(var(--nav-height)+12rem)] md:block" />
+          <div data-doll-anchor="service" aria-hidden="true" className="services-figure mt-10 hidden aspect-[3/4] w-full max-w-[22rem] md:sticky md:top-[calc(var(--nav-height)+12rem)] md:block" />
         </div>
         <ul className="md:col-span-7 md:col-start-6">
           {site.services.items.map((it) => (

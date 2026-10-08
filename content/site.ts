@@ -76,7 +76,7 @@ export const site = {
   },
 
   worlds: {
-    line: s("We don't build campaigns. We build worlds.", "03 §26, §29, §31 (iza reelova)", "approved"),
+    line: s("We don’t build campaigns. We build worlds.", "03 §26, §29, §31 (iza reelova)", "approved"),
   },
 
   services: {

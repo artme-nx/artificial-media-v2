@@ -31,7 +31,7 @@ test.describe("lutka: sudari i pod", () => {
     // baletna scena (07, 6. 10.): port de bras → révérence
     balet: [[0, "b_enhaut"], [0.08, "b_enhaut"], [0.36, "b_seconde"], [0.6, "b_bas"], [0.88, "b_reverence"], [1, "b_reverence"]],
     // manifest (F5): en haut → à la seconde → bras bas → dubok révérence
-    manifest: [[0, "b_enhaut"], [0.12, "b_enhaut"], [0.38, "b_seconde"], [0.58, "b_bas"], [0.86, "b_reverence_duboka"], [1, "b_reverence_duboka"]],
+    manifest: [[0, "b_enhaut_s"], [0.12, "b_enhaut_s"], [0.36, "b_seconde_s"], [0.54, "b_bas_s"], [0.66, "b_reverence_pocetak"], [0.76, "b_reverence_duboka"], [0.86, "b_reverence_duboka"], [0.96, "b_zavrsna"], [1, "b_zavrsna"]],
     // uvod, kadar 2: port de bras do poze slova I iz loga
     uvod_ples: [[0, "b_bas"], [0.3, "b_seconde"], [0.66, "b_enhaut"], [1, "logo_i"]],
     // uvod, kadrovi 6–10: nastup → priprema → (takt je IK) → nastup → naklon

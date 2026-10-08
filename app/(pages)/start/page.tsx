@@ -3,6 +3,7 @@ import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { StatusOverlay } from "@/components/status-overlay";
 import { BriefForm } from "@/components/start/brief-form";
+import { NotebookStage } from "@/components/start/notebook-stage";
 import { site } from "@/content/site";
 import { T } from "@/components/t";
 
@@ -24,7 +25,9 @@ export default function Start() {
               <BriefForm />
             </div>
           </div>
-          <div data-stage-anchor="start" aria-hidden="true" className="start-figure order-first h-[38vh] md:order-none md:col-span-6 md:col-start-7 md:h-auto md:min-h-[70vh] lg:col-span-6 lg:col-start-7" />
+          <div aria-hidden="true" className="start-figure order-first h-[34vh] md:order-none md:col-span-6 md:col-start-7 md:h-auto md:min-h-[70vh] lg:col-span-6 lg:col-start-7">
+            <NotebookStage />
+          </div>
         </div>
       </main>
       <SiteFooter onHome={false} />
