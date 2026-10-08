@@ -1,3 +1,4 @@
 Live:   https://artme-nx.github.io/artificial-media-v2/
 Repo:   https://github.com/artme-nx/artificial-media-v2
 Objava: 8. 10. 2026.
+Zadnji deploy: 8. 10. 2026. — F6–F9 + završetak (pregled za Kristiana: REVIEW.md)
