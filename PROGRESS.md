@@ -10,8 +10,8 @@ Zadatak: `brand/11-stranica-v2-zadatak.md` (8. 10. 2026.). Ovaj dokument se ažu
 
 | Faza | Stanje | Napomena |
 |---|---|---|
-| F0 Priprema i kostur | u tijeku | |
-| F1 Tokeni, tipografija, logo, kostur stranice | — | |
+| F0 Priprema i kostur | ✅ gotovo | live 200 |
+| F1 Tokeni, tipografija, logo, kostur stranice | ✅ gotovo | testovi 39/39 dev, 30/30 prod |
 | F2 Lutka: tijelo, materijali, mehanika | — | |
 | F3 Kostim, palica, roboti, pozornica | — | |
 | F4 Kazališni uvod (kadrovi 1–10) | — | |
@@ -22,7 +22,7 @@ Zadatak: `brand/11-stranica-v2-zadatak.md` (8. 10. 2026.). Ovaj dokument se ažu
 | F9 Nizovi slika, posteri, performanse, pristupačnost | — | |
 | Završetak (README, REVIEW.md) | — | |
 
-**Sljedeći korak:** —
+**Sljedeći korak:** F2 — lutka u visokoj rezoluciji (`/lab/lutka`): geometrija iz kanona, šake s 5 prstiju, satni zglobovi, javor i čelik, sustav poza.
 
 **Poznati problemi:** —
 
@@ -71,20 +71,20 @@ Redoslijed: F0 → F1 → F2 → … → F9 → završetak. Svaka faza: testovi 
 - [ ] Provjera §4 prolazi na svakom screenshotu s likom (F2–F8)
 
 **05-logo i 04-ime**
-- [ ] Logo runda 3 geometrija, jednobojno, lutka kao I; varijante naglaska ART/ME kao prekidač (F1)
-- [ ] Animacija loga 1–2 s + statična verzija (F1)
-- [ ] Favicon iz lutke, SVG + PNG 32/180/512 (F1)
+- [x] Logo runda 3 geometrija, jednobojno, lutka kao I; varijante naglaska ART/ME kao prekidač (F1)
+- [x] Animacija loga 1–2 s + statična verzija (F1)
+- [x] Favicon iz lutke, SVG + PNG 32/180/512 (F1)
 - [ ] ART ME se pokazuje, nigdje se ne objašnjava; priča imena nije na stranici (F1, F4)
 
 **03-nove-tvrdnje**
-- [ ] Nadnaslov, H1, manifest, svjetovi, otvaranje usluga, Why AI?, FAQ — točno iz navedenih odjeljaka, sa statusom (F1)
+- [x] Nadnaslov, H1, manifest, svjetovi, otvaranje usluga, Why AI?, FAQ — točno iz navedenih odjeljaka, sa statusom (F1)
 - [ ] Nijedna zabranjena riječ iz §13 i ništa iz §14 (F1, završni test grepom)
 
 **Brief §5 (pravila stranice)**
 - [ ] U prve 3 s jasno je što smo; navigacija s četiri linka i jednim CTA-om vidljiva od početka; nema "scroll for experience" (F0, F4)
 - [ ] Zasebna `/start` stranica u 3–4 koraka (F8)
 - [ ] Reelovi s filtrima Video / Web / AI tools, pravi omjeri, oznaka client / spec (F5)
-- [ ] FAQ (F7)
+- [ ] FAQ (F7) — accordion postoji od F1
 - [ ] Tokeni u tri sloja, smanjeni pokret, mobitel, brzo učitavanje, efekt nikad ne usporava put do CTA-a (F1, F9)
 - [ ] 4K video nikad u repou (F9)
 
@@ -92,3 +92,5 @@ Redoslijed: F0 → F1 → F2 → … → F9 → završetak. Svaka faza: testovi 
 
 - **8. 10. 2026.** Pročitani izvori iz §1 (brief, 10-lik, 07, 03, 05-logo, 04 §0, 01 §1/§7, 08, kanon, lutka-core, test_paritet, 09-blender, 07-web-proba, head-tracking-3d). Transkripti: u `~/.claude/projects/` jedina sesija od 4. 10. sa spomenom ključnih riječi je head-tracking-3d (bez odluka o brendu); Cowork transkripata u `~/Library/Application Support/Claude/` nema. Nastavljeno bez njih.
 - F0: Next.js kostur, tokeni (tri sloja + način dark/light), `sync-brand.mjs`, `content/site.ts` (izvor + status), prekidači (`config/switches.ts`), Playwright kostur (12/12 zeleno na dev serveru).
+- F0 objavljen: live 200 (drugi curl nakon 2 min).
+- F1: tokeni (tri sloja + dark/light), Bodoni Moda + Jost, logo s prekidačem naglaska, animacija loga (flipbook poza iz kanona), favicon, sve sekcije s copyjem, /start forma (4 koraka), axe AA 0 prekršaja, test slijepljenih riječi.

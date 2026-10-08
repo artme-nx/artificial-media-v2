@@ -41,3 +41,12 @@ test.describe("smoke", () => {
     }
   });
 });
+
+test("prekidač ?logo=sjena|tonski mijenja naglasak ART/ME", async ({ page }) => {
+  await page.goto("./?logo=sjena");
+  await expect(page.locator("footer svg[data-logo] [data-shadow]")).toHaveCount(1);
+  await page.goto("./?logo=tonski");
+  await expect(page.locator('footer svg[data-logo] [data-word="IFICIAL"]')).toHaveAttribute("opacity", "0.55");
+  await page.goto("./");
+  await expect(page.locator("footer svg[data-logo] [data-shadow]")).toHaveCount(0);
+});
