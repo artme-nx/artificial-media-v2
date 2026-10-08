@@ -28,7 +28,7 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
     envMapIntensity: 0.9,
   });
   return extendMaterial(m, {
-    key: "maple-v7",
+    key: "maple-v8",
     uniforms: { uTone: { value: tone } },
     fragmentPars: /* glsl */ `
       uniform float uTone;
@@ -95,6 +95,19 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
           float g2 = vnoise( vec3( gp.x * G2, gp.y * 2.6, gp.z * G2 ) + 7.0 );
           float fibers = smoothstep( 0.6, 0.88, g1 ) * 0.4 * aaFade( px * G1 * 1.4 ) + smoothstep( 0.62, 0.9, g2 ) * 0.28 * aaFade( px * G2 * 1.4 );
 
+          // ---- srednja skala ptičjeg oka: u srednjem kadru fina oka padnu ispod piksela, pa se pojavi krupnija (2×),
+          // meka "pjegavost" s tamnom jezgrom i svijetlim rubom — čita se kao ptičje oko i iz daljine
+          const float EYE_M = 13.0;
+          float aMid = aaFade( px * EYE_M * 1.3 ) * ( 1.0 - aE * 0.85 );
+          float hasM = 0.0;
+          vec4 eM = vec4( 9.0, 0.0, 0.0, 0.0 );
+          if ( aMid > 0.002 ) eM = eyeCells( vec3( sp.x * EYE_M, sp.y * EYE_M * 0.8, sp.z * EYE_M ) + 31.7, hasM );
+          float coreM = ( 1.0 - smoothstep( 0.12, 0.42, eM.x ) ) * hasM;
+          float haloM = smoothstep( 0.5, 0.75, eM.x ) * ( 1.0 - smoothstep( 0.75, 1.15, eM.x ) ) * hasM;
+          // široka žila uzduž uda (vidljiva u srednjem i širokom kadru)
+          float s0 = vnoise( vec3( sp.x * 9.0 + wave * 0.8, sp.y * 0.12, sp.z * 9.0 + wave * 0.8 ) );
+          float grain0 = smoothstep( 0.45, 0.9, s0 ) * aaFade( px * 7.0 * 1.1 );
+
           // ---- ton: polagane varijacije (tokareno iz grede) — vidljive i u širokom kadru
           float tone = fbm2o( vec3( sp.x * 1.2, sp.y * 0.25, sp.z * 1.2 ) );
           float tone2 = vnoise( vec3( sp.x * 4.0, sp.y * 0.9, sp.z * 4.0 ) );
@@ -109,6 +122,9 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
           vec3 col = mix( cBase, cLight, smoothstep( 0.55, 0.85, tone ) * 0.5 );
           col = mix( col, cWarm, smoothstep( 0.2, 0.5, 1.0 - tone ) * 0.45 + tone2 * 0.22 );
           col = mix( col, cStreak, streak * 0.45 );
+          col = mix( col, cStreak, grain0 * 0.14 );
+          col = mix( col, cCore * 1.2, coreM * 0.5 * aMid );
+          col = mix( col, cLight, haloM * 0.26 * aMid );
           col = mix( col, cFiber, min( 1.0, fibers * 1.5 ) );
           col = mix( col, cCore, core * 0.8 * aCore );
           col = mix( col, cLight * 1.08, glint * 0.35 * aE );
@@ -124,7 +140,7 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
           gChat = 0.5 + 0.5 * clamp( ( rip * aC * 0.7 + rip2 * aM * 0.6 ) * clamp( ax * 3.0 + 0.3 * sin( sp.y * 7.0 ), -1.0, 1.0 ), -1.0, 1.0 );
           col *= 0.96 + 0.08 * gChat;
 
-          gH = glint * 0.4 * aE - core * 0.7 * aCore - fibers * 0.35 - streak * 0.15;
+          gH = glint * 0.4 * aE - core * 0.7 * aCore - fibers * 0.35 - streak * 0.15 + ( haloM * 0.25 - coreM * 0.4 ) * aMid;
           gGlint = glint * aE;
           diffuseColor.rgb = col;
         }

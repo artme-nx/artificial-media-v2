@@ -89,6 +89,7 @@ export class NotebookView {
   private book: Book;
   private pencil: THREE.Group;
   private open = new Spring(1, 6); // 1 = otvorena, 0 = zatvorena
+  private bodyYaw = new Spring(-Math.PI / 2, 3.5);
   private pageTurn = 0; // 0..1 dok se list okreće
   private line = 0; // redak na stranici
   private col = 0; // položaj u retku 0..1
@@ -122,18 +123,30 @@ export class NotebookView {
     });
     this.scene.environmentIntensity = 0.7;
     // reflektor odozgo (topli), mekana ispuna, hladni rub straga
-    const spot = new THREE.SpotLight("#ffe9d2", 60, 0, THREE.MathUtils.degToRad(28), 0.75, 2);
-    spot.position.set(0.4, 5.2, 1.6);
+    const spot = new THREE.SpotLight("#ffe9d2", 70, 0, THREE.MathUtils.degToRad(28), 0.75, 2);
+    spot.position.set(1.2, 5.2, 1.4);
     spot.target.position.set(0, 1.0, 0);
+    // prava bačena sjena (lutka, ruke, bilježnica) na pod: meki PCF, prozirni materijal sjene
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    spot.castShadow = true;
+    spot.shadow.mapSize.set(1024, 1024);
+    spot.shadow.radius = 6;
+    spot.shadow.bias = -0.0004;
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.ShadowMaterial({ opacity: 0.28, color: "#3a2a1c" }));
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    this.scene.add(ground);
     const rim = new THREE.DirectionalLight("#eef2ff", 1.2);
     rim.position.set(1.6, 2.2, -2.2);
     this.scene.add(spot, spot.target, rim, new THREE.HemisphereLight("#fffaf2", "#b9b0a2", 0.55));
-    const sh = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.75), new THREE.MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false, toneMapped: false }));
+    const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.36), new THREE.MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false, toneMapped: false }));
     sh.rotation.x = -Math.PI / 2;
     sh.position.y = 0.002;
     this.scene.add(sh);
 
     this.figure = new Figure({ look: "wood" });
+    this.figure.setShadows(true);
     // profil: lutka gleda prema formi (lijevo na ekranu)
     this.figure.group.rotation.y = -Math.PI / 2;
     this.scene.add(this.figure.group);
@@ -144,6 +157,7 @@ export class NotebookView {
     this.book = makeBook();
     this.pencil = makePencil();
     this.figure.body.add(this.book.group, this.pencil);
+    for (const o of [this.book.group, this.pencil]) o.traverse((m) => ((m as THREE.Mesh).isMesh ? ((m as THREE.Mesh).castShadow = true) : null));
     this.book.group.matrixAutoUpdate = false;
     this.pencil.matrixAutoUpdate = false;
     this.camera.position.set(0.3, 1.22, 3.85);
@@ -194,14 +208,18 @@ export class NotebookView {
         this.animator.go(getPose("biljeznica_misli"), 0.7);
         break;
       case "newfield":
+        // novo polje: okretanje lista (uvijek vidljivo), pa olovka na prvi redak
         this.headMode = "book";
-        this.nextLine(true);
-        this.animator.go(getPose("biljeznica_pise"), 0.5);
+        this.line = 0;
+        this.col = 0.05;
+        this.pageTurn = 0.001;
+        this.book.page.visible = true;
+        this.animator.go(getPose("biljeznica_drzi"), 0.4);
         break;
       case "error":
         this.headMode = "form";
         this.shake = 1;
-        this.animator.go(getPose("biljeznica_drzi"), 0.4);
+        this.animator.go(getPose("biljeznica_greska"), 0.4);
         break;
       case "sent":
         // zatvori bilježnicu, révérence kao zahvala
@@ -246,14 +264,14 @@ export class NotebookView {
     const C = new THREE.Vector3(...chest.S), X = new THREE.Vector3(...chest.M.x), Y = new THREE.Vector3(...chest.M.y), Z = new THREE.Vector3(...chest.M.z);
     const pos = C.clone().addScaledVector(Y, 0.42).addScaledVector(Z, 1.18).addScaledVector(X, 0.05);
     // ravnina stranica: normala prema licu (gore i natrag)
-    const n = Y.clone().multiplyScalar(0.62).addScaledVector(Z, -0.78).normalize().negate();
+    const n = Y.clone().multiplyScalar(0.62).addScaledVector(Z, -0.78).normalize(); // stranice gledaju lutku (gore i natrag)
     const up = Z.clone().addScaledVector(Y, 0.55).normalize();
     const xAxis = new THREE.Vector3().crossVectors(up, n).normalize();
     const yAxis = new THREE.Vector3().crossVectors(n, xAxis).normalize();
     // skicirka ~A4 (1,35 × osnovna veličina): čita se kao bilježnica, ne kao mobitel
     const S = 1.35;
     // ~25° prema kameri oko okomite osi stranice: vidi se kožni uvez i krem rub bloka, sadržaj ostaje okrenut lutki
-    const turn = new THREE.Quaternion().setFromAxisAngle(yAxis, -0.44);
+    const turn = new THREE.Quaternion().setFromAxisAngle(yAxis, -0.06);
     xAxis.applyQuaternion(turn);
     n.applyQuaternion(turn);
     this.bookFrame.makeBasis(xAxis.multiplyScalar(S), yAxis.multiplyScalar(S), n.multiplyScalar(S)).setPosition(pos);
@@ -275,8 +293,8 @@ export class NotebookView {
       this.seqT += dt;
       while (this.seq.length && this.seqT >= this.seq[0].at) this.seq.shift()!.fn();
     }
-    // bilježnica: zatvara se u stanju "poslano"
-    this.open.step(this.state === "sent" && this.seqT > 0.4 ? 0 : 1, dt);
+    // bilježnica: zatvara se u stanju "poslano" i pri odlasku (prazne stranice se ne pokazuju gledatelju)
+    this.open.step((this.state === "sent" && this.seqT > 0.4) || this.state === "leave" ? 0 : 1, dt);
     const pose = this.animator.update(dt);
     if (!this.reduced) applySecondary(pose, this.t, { breath: 1, sway: 0.25 });
     // okviri i IK: šaka drži bilježnicu (donji rub uz hrbat), olovka prati redak
@@ -287,10 +305,19 @@ export class NotebookView {
       const holdBlend = this.state === "sent" && this.seqT > 1.0 && this.seqT < 2.9 ? 0 : 1;
       // dalja ruka (L, iza bilježnice gledano s kamere) drži bilježnicu uz hrbat
       reachTo(pose, parts, "L", this.bookPoint(-0.05, 0.82), holdBlend);
-      const writing = this.state === "typing" || this.state === "newfield";
+      const writing = this.state === "typing";
       this.penLift.step(0, dt);
+      // razmišlja: olovka uz bradu
+      if (this.state === "thinking") {
+        const head = this.figure.map.head as LathePart | undefined;
+        if (head) {
+          // zapešće ispod brade (šaka i olovka se dižu prema bradi)
+          const chin = new THREE.Vector3(...head.S).addScaledVector(new THREE.Vector3(...head.M.z), 0.36).addScaledVector(new THREE.Vector3(...head.M.y), -0.42);
+          reachTo(pose, parts, "R", [chin.x, chin.y, chin.z], 0.9);
+        }
+      }
       // bliža ruka (R) s olovkom: piše duž retka; inače olovka miruje uz stranicu (ne visi u zraku)
-      if (this.state !== "thinking" && !(this.state === "sent" && this.seqT > 0.3)) {
+      else if (this.state !== "error" && this.state !== "leave" && !(this.state === "sent" && this.seqT > 0.3)) {
         const v = 0.12 + this.line * 0.075;
         const tgt = writing ? this.bookPoint(Math.min(0.95, this.col), Math.min(0.92, v)) : this.bookPoint(0.78, 0.86);
         const lift = (writing ? this.penLift.x * 0.06 : 0.1);
@@ -302,8 +329,9 @@ export class NotebookView {
         const hc = new THREE.Vector3(...head.S);
         const target =
           this.headMode === "book" ? this.bookPoint(0.4, 0.4)
-          : this.headMode === "form" ? ([hc.x - 0.4, hc.y - 0.35, hc.z + 3] as Vec3)
-          : ([hc.x + 1.6, hc.y + 0.6, hc.z + 2] as Vec3);
+          : this.headMode === "form" ? ([hc.x - 0.2, hc.y - (this.state === "error" ? 1.6 : 0.35), hc.z + 3] as Vec3)
+          : this.state === "thinking" ? ([hc.x + 1.4, hc.y + 1.3, hc.z + 1.6] as Vec3)
+          : ([hc.x + 2.2, hc.y + 0.2, hc.z + 0.6] as Vec3);
         this.look.target = this.reduced ? null : target;
         this.look.update(parts, dt);
       }
@@ -313,13 +341,16 @@ export class NotebookView {
         this.shake = Math.max(0, this.shake - dt * 0.9);
       }
     }
+    const wantYaw = -Math.PI / 2 + (this.state === "leave" ? 0.75 : 0);
+    this.bodyYaw.step(wantYaw, dt);
+    this.figure.group.rotation.y = this.bodyYaw.x;
     this.figure.setPose(pose);
     // rekviziti: bilježnica u okviru prsa (otvorena/zatvorena), olovka u šaci L
     this.book.group.matrix.copy(this.bookFrame);
     this.book.group.matrixWorldNeedsUpdate = true;
     this.book.right.rotation.y = -(1 - this.open.x) * Math.PI * 0.97;
     if (this.pageTurn > 0) {
-      this.pageTurn = Math.min(1, this.pageTurn + dt / 0.6);
+      this.pageTurn = Math.min(1, this.pageTurn + dt / 0.9);
       this.book.page.rotation.y = -this.pageTurn * Math.PI;
       if (this.pageTurn >= 1) {
         this.pageTurn = 0;
@@ -364,6 +395,12 @@ export class NotebookView {
       cancelAnimationFrame(this.raf);
       this.raf = 0;
     }
+  }
+
+  /** poster (scripts/make-posters.mjs): trenutni kadar s prozirnom pozadinom */
+  snapshot() {
+    this.renderer.render(this.scene, this.camera);
+    return this.canvas.toDataURL("image/png");
   }
 
   dispose() {

@@ -203,6 +203,11 @@ export class IntroScene implements StageScene {
     return pose;
   }
 
+  /** render niza slika: napredak bez izglađivanja (deterministički kadar) */
+  snap() {
+    this.smoothP = this.progress;
+  }
+
   update(dt: number) {
     this.time += dt;
     // napredak mekano sustiže scroll (bez trzaja), ali bez kašnjenja unatrag
@@ -242,8 +247,13 @@ export class IntroScene implements StageScene {
     const ta: [number, number, number] = this.camera.aspect < 0.8 && a.p === 0 ? [0, 1.62, 0.4] : a.target;
     this.tmpPos.set(...pa).lerp(this.dir.set(...b.pos), u);
     this.tmpTarget.set(...ta).lerp(this.dir.set(...b.target), u);
-    // portret (mobitel): veći okomiti kut objektiva → kamera bliže cilju, da lik ne bude sitan
-    if (this.camera.aspect < 0.8) this.tmpPos.sub(this.tmpTarget).multiplyScalar(0.8).add(this.tmpTarget);
+    // portret (mobitel): uski kadar — cilj bliže dirigentu (ne izlazi iz ruba), kamera bliže, orkestar ostaje u pozadini
+    if (this.camera.aspect < 0.8) {
+      this.tmpTarget.x *= 0.3;
+      this.tmpTarget.z = this.tmpTarget.z * 0.5 + 0.2;
+      this.tmpPos.x *= 0.5;
+      this.tmpPos.sub(this.tmpTarget).multiplyScalar(0.8).add(this.tmpTarget);
+    }
     // vrlo blago "disanje" kamere (ručna kamera na stalku)
     this.tmpPos.y += Math.sin(this.time * 0.45) * 0.008;
     this.camera.position.copy(this.tmpPos);

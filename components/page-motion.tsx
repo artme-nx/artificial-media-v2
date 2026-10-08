@@ -73,6 +73,8 @@ export function PageMotion() {
             type: "lines",
             mask: "lines",
             autoSplit: true,
+            // dijele se samo reci (riječi ostaju cijele): tekst se čita normalno, bez aria-labela na <p>/<span> (axe)
+            aria: "none",
             onSplit(self) {
               return gsap.from(self.lines, {
                 yPercent: 108,

@@ -20,7 +20,7 @@ export interface StageScene {
   deactivate?(): void;
 }
 
-export type EngineOptions = { tier?: Tier | "auto"; mobile?: boolean; probe?: boolean; transparent?: boolean };
+export type EngineOptions = { tier?: Tier | "auto"; mobile?: boolean; probe?: boolean; transparent?: boolean; fixedDpr?: number };
 
 declare global {
   interface Window {
@@ -114,6 +114,7 @@ export class Engine {
   }
 
   private maxDpr() {
+    if (this.opts.fixedDpr) return this.opts.fixedDpr;
     return Math.min(window.devicePixelRatio || 1, TIERS[this.tier].dprMax, this.opts.mobile ? 1.5 : 2);
   }
 
@@ -181,7 +182,7 @@ export class Engine {
     void cpu;
     // dinamička rezolucija (nakon zagrijavanja): ispod ~57 fps smanji DPR, iznad ~70 fps povećaj (histereza, najviše jednom u 1,5 s)
     const now = performance.now();
-    if (this.frames > 90 && this.frameTimes.length >= 45 && now - this.lastDprChange > 1500) {
+    if (!this.opts.fixedDpr && this.frames > 90 && this.frameTimes.length >= 45 && now - this.lastDprChange > 1500) {
       const recent = this.frameTimes.slice(-45).reduce((a, b) => a + b, 0) / 45;
       const max = this.maxDpr();
       if (recent > 1 / 57 && this.dynDpr > this.dprMin + 0.01) {
@@ -201,7 +202,7 @@ export class Engine {
     }
     if (window.__fps) (window.__fps as unknown as { dpr: number }).dpr = this.dpr;
     // automatski pad kvalitete: tek kad je DPR već na minimumu, a i dalje ispod 45 fps
-    if (this.autoTier && this.frames > 240 && this.frameTimes.length >= 90 && fps < 45 && this.dynDpr <= this.dprMin + 0.01) {
+    if (!this.opts.fixedDpr && this.autoTier && this.frames > 240 && this.frameTimes.length >= 90 && fps < 45 && this.dynDpr <= this.dprMin + 0.01) {
       const next: Tier | null = this.tier === "high" ? "medium" : this.tier === "medium" ? "low" : null;
       if (next) {
         this.frameTimes = [];

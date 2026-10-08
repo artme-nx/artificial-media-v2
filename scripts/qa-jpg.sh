@@ -5,6 +5,8 @@ faza="$1"; shift
 for f in "$@"; do
   out="qa/faza-${faza}/$(basename "${f%.png}").jpg"
   q=78; w=1600
+  nw=$(sips -g pixelWidth "$f" | awk '/pixelWidth/ {print $2}')
+  [ "$nw" -lt "$w" ] && w="$nw" # bez povećavanja (mobilni screenshotovi su uži)
   while :; do
     sips -s format jpeg -s formatOptions "$q" --resampleWidth "$w" "$f" --out "$out" >/dev/null 2>&1 || sips -s format jpeg -s formatOptions "$q" "$f" --out "$out" >/dev/null
     size=$(stat -f%z "$out")

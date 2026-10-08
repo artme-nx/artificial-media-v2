@@ -1,7 +1,8 @@
 "use client";
 
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import logoData from "@/src/brand/logo-data.json";
+import logoDefault from "@/src/brand/logo-default.json";
+import type logoAll from "@/src/brand/logo-data.json";
 import { readSwitches, type LogoAccent } from "@/config/switches";
 import { asset } from "@/lib/asset";
 
@@ -13,7 +14,10 @@ import { asset } from "@/lib/asset";
  * Riječi su zasebne grupe (data-word = ART | IFICIAL | ME | DIA); lutka-I pripada riječi IFICIAL,
  * pa je uvod (F4) može ugasiti zajedno s njom.
  */
-type Variant = (typeof logoData.variants)[LogoAccent];
+type Variant = (typeof logoAll.variants)[LogoAccent];
+/** ostale varijante naglaska (prekidač ?logo=) učitavaju se na zahtjev */
+let allVariants: Promise<Record<LogoAccent, Variant>> | null = null;
+const loadVariants = () => (allVariants ??= import("@/src/brand/logo-data.json").then((m) => m.default.variants as Record<LogoAccent, Variant>));
 export type LogoHandle = { svg: SVGSVGElement | null; play: () => Promise<void> };
 
 const WORDS = ["ART", "IFICIAL", "ME", "DIA"] as const;
@@ -32,13 +36,17 @@ export const Logo = forwardRef<LogoHandle, {
   const figRef = useRef<SVGPathElement>(null);
   // Na poslužitelju i u prvom renderu uvijek zadana varijanta; prekidač ?logo= se primjenjuje nakon hidracije.
   const [auto, setAuto] = useState<LogoAccent>("podebljano");
+  const [extra, setExtra] = useState<Record<LogoAccent, Variant> | null>(null);
+  const key: LogoAccent = variant === "auto" ? auto : variant;
   useEffect(() => {
     if (variant !== "auto") return;
     const want = readSwitches().logo;
     if (want !== "podebljano") setAuto(want);
   }, [variant]);
-  const key: LogoAccent = variant === "auto" ? auto : variant;
-  const v = logoData.variants[key] as Variant;
+  useEffect(() => {
+    if (key !== "podebljano" && !extra) void loadVariants().then(setExtra);
+  }, [key, extra]);
+  const v = (key === "podebljano" || !extra ? logoDefault.variants.podebljano : extra[key]) as Variant;
 
   const play = useMemo(() => () => playAssembly(svgRef.current, figRef.current, v.figure.d), [v.figure.d]);
   useImperativeHandle(ref, () => ({ svg: svgRef.current, play }), [play]);

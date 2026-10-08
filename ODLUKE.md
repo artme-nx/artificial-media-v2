@@ -42,6 +42,19 @@ Pravilo (11 §0.2): kad odluka nedostaje, biram najrazumniju opciju, zapisujem j
 | R24 | Sekcije bez 3D scene imaju neprozirnu pozadinu | Sljedeća sekcija pri scrollu "pokrije" scenu umjesto da scena prosijava kroz nju. | `main > section:not([data-scene])` u `components.css` |
 | R25 | Aktivni reel = pod mišem/fokusom, inače najbliži sredini ekrana | Radova još nema; "video koji se pušta" (07) je aktivni slot. Kad stignu videi, aktivan je onaj koji svira. | `components/sections/reels.tsx` |
 | R26 | Ptičje oko: Worley u 2×2×2 ćelije + preskakanje kad su oči manje od piksela | Krupni kadar lutke preko cijelog ekrana: 23 → 54 fps na M5, bez vidljive razlike. | `src/three/materials/maple.ts` |
+| R27 | Drvo / robot: dva render targeta (MSAA, HalfFloat) i vlastiti kompozit s maskom, tonom (ACES), zrnom i vinjetom — bez lanca postprocessinga | Ista poza i isti kostur u istom frameu → u piksel poravnato; bez AO/volumetrije 60 fps i na mobitelu. | `src/three/scenes/cursor-scene.ts` |
+| R28 | Hi-tech robot: razdjelne linije su u shaderu (analitički AA), ne u geometriji; šav glave straga | Precizne tanke linije bez šuma; šav sprijeda u visini "očiju" čitao se kao vizir (10-lik: bez lica). | `hiTechSteel()` u `steel.ts` |
+| R29 | U petlji "drvo / robot" noge stoje mirno, ruke rade port de bras | Podignuto stopalo pokazivalo je donju plohu kao svijetlu mrlju. | `CursorScene.basePose()` |
+| R30 | /start: lutka s bilježnicom u zasebnom malom canvasu; stranice okrenute lutki (sadržaj se nikad ne vidi), prava meka sjena na prozirnom podu | 07: "sadržaj bilježnice se nikad ne vidi"; forma radi i bez lutke. | `src/three/doll/notebook-view.ts` |
+| R31 | Izvor scena (`?izvor=auto`): uživo na desktopima razine high/medium; nizovi slika na mobitelu (dodir, < 820 px), softverskom GPU-u i `?q=low`; bez WebGL2 → nizovi (2D canvas) + poster za "drvo / robot"; smanjeni pokret → posteri | 11 §3: realtime na jakim desktopima, frames na mobitelu i slabim. Nizovi rade i bez WebGL-a. | `components/stage/stage-canvas.tsx` |
+| R32 | Nizovi: uvod (kadrovi 6–10) 96 frameova, balet 96, ples (kadar 2) 24; WebP; 1600 × 900 i 720 × 1280; render 2× supersampling | Gladak scroll uz malu težinu (ukupno vidi PROGRESS); mobitel učitava postupno (svaki osmi, pa gušće). | `scripts/render-sequences.mjs` |
+| R33 | Male lutke u uslugama i CTA-u na mobitelu nisu prikazane | Dekoracija; na uskom ekranu prostor ide sadržaju (lutka u reelovima i podnožju ostaje). | `services.tsx`, `cta.tsx` |
+| R34 | Apostrofi u copyju su tipografski (’) | Ravni apostrof u Bodoniju izgleda kao greška (kontrola kvalitete); tekst je isti. | `content/site.ts`, `content/ui.ts` |
+| R35 | Kerning slova W u display fontu (span `.kw`) | "We", "Wh", "Wo" u Bodoniju na velikim veličinama čitali su se kao dvije riječi; `textContent` ostaje isti. | `components/t.tsx` |
+| R36 | three.js se ne učitava pri pokretanju: male lutke kad se sidro približi, lutka na /start na prvu interakciju ili nakon 4 s (do tada poster iste poze), u načinu "frames" 3D tek blizu sekcije "drvo / robot" | Lighthouse mobilni: TBT 2,6–6,2 s → 0 ms; "efekt nikad ne usporava put do CTA-a" (brief §5). | `doll-stage.tsx`, `notebook-stage.tsx`, `stage-canvas.tsx` |
+| R37 | H1 kadra 1 je jedan tekstni blok otkriven mekom maskom (slijeva nadesno) + izoštravanjem, umjesto animacije slovo po slovo iz neprozirnosti 0 | LCP je H1 nacrtan u prvom prikazu (prije je LCP bio drugi dio naslova u 2,5. sekundi); izgled ostaje "filmsko otkrivanje". | `components.css` (`intro-reveal`), `intro.tsx` |
+| R38 | Tri dodatne varijante naglaska loga učitavaju se samo kad ih `?logo=` zatraži | −100 KB početnog JS-a. | `components/logo.tsx`, `src/brand/logo-default.json` |
+| R39 | Lokalni `serve-out` šalje gzip (kao GitHub Pages) | Lokalni Lighthouse inače mjeri nekomprimirane veličine i podcjenjuje stranicu. | `scripts/serve-out.mjs` |
 
 
 ## Dizajn

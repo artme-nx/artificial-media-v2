@@ -125,8 +125,31 @@ export function ReelsSection() {
   );
 }
 
+/** Ugradnja streama (Bunny ili Cloudflare Stream): iframe se učitava lijeno, s posterom; 4K nikad nije u repou. */
+function streamSrc(st: NonNullable<Reel["stream"]>) {
+  if (st.provider === "bunny") return `https://iframe.mediadelivery.net/embed/${st.libraryId}/${st.id}?autoplay=false&preload=false&responsive=true`;
+  return `https://iframe.videodelivery.net/${st.id}?preload=none`;
+}
+
 function ReelSlot({ reel }: { reel: Reel }) {
   const cat = site.reels.filters.find((f) => f.id === reel.category)?.label.text ?? reel.category;
+  if (reel.stream) {
+    return (
+      <figure className="reel" style={{ aspectRatio: ASPECT[reel.aspect] }} data-reel={reel.id} data-status={reel.status}>
+        <iframe
+          src={streamSrc(reel.stream)}
+          title={reel.title ?? cat}
+          loading="lazy"
+          allow="accelerometer; gyroscope; encrypted-media; picture-in-picture; fullscreen"
+          className="absolute inset-0 h-full w-full border-0"
+        />
+        <figcaption className="reel-cap">
+          <span className="label">{reel.title}</span>
+          <span className="label muted" title="03 §7 R3">{reel.kind}</span>
+        </figcaption>
+      </figure>
+    );
+  }
   return (
     <figure className="reel reel-marks" style={{ aspectRatio: ASPECT[reel.aspect] }} data-reel={reel.id} data-status={reel.status}>
       <div className="reel-center">

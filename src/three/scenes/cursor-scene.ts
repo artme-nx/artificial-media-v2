@@ -31,6 +31,7 @@ const COMPOSITE_FRAG = /* glsl */ `
   uniform float ring;
   uniform float exposure;
   uniform float seed;
+  uniform float navPx;
   varying vec2 vUv;
   // ACES (Narkowicz) + sRGB — isti filmski ton kao ostale scene
   vec3 aces( vec3 x ) { return clamp( ( x * ( 2.51 * x + 0.03 ) ) / ( x * ( 2.43 * x + 0.59 ) + 0.14 ), 0.0, 1.0 ); }
@@ -53,7 +54,8 @@ const COMPOSITE_FRAG = /* glsl */ `
       float t = fract( ang / 6.2831853 * 60.0 );
       float tick = ( 1.0 - smoothstep( 0.04, 0.09, min( t, 1.0 - t ) ) ) * step( radius + 3.0, d ) * ( 1.0 - step( radius + 9.0, d ) );
       float major = step( 0.5, fract( ang / 6.2831853 * 12.0 + 0.5 / 12.0 * 0.0 ) ) * 0.0;
-      c = mix( c, vec3( 0.97, 0.96, 0.93 ), ring * ( line * 0.75 + tick * 0.45 + major ) );
+      float underNav = smoothstep( navPx * 0.85, navPx * 1.25, res.y - px.y );
+      c = mix( c, vec3( 0.97, 0.96, 0.93 ), ring * underNav * ( line * 0.75 + tick * 0.45 + major ) );
     }
     c = toSRGB( c );
     // blaga vinjeta i jednobojno zrno
@@ -152,6 +154,7 @@ export class CursorScene implements StageScene {
         ring: { value: 1 },
         exposure: { value: 1.0 },
         seed: { value: 0 },
+        navPx: { value: 0 },
       },
       vertexShader: /* glsl */ `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4( position.xy, 0.0, 1.0 ); }`,
       fragmentShader: COMPOSITE_FRAG,
@@ -171,7 +174,14 @@ export class CursorScene implements StageScene {
     // port de bras (zaobljene ruke, meke šake) u petlji: bras bas → à la seconde → natrag, s prijenosom težine
     const k = 0.5 - 0.5 * Math.cos((t / 10) * Math.PI * 2);
     const p = blendPose(getPose("b_bas_s"), getPose("b_seconde_s"), smootherstep(k) * 0.9);
-    applySecondary(p, t, { breath: 1, sway: 0.9 });
+    // noge mirno na podu (stopala ravna): podignuto stopalo pokazivalo je donju plohu kao svijetlu mrlju
+    const stand = getPose("mir");
+    p.legL = stand.legL;
+    p.legR = stand.legR;
+    p.pelvis = stand.pelvis;
+    p.support = stand.support;
+    p.touch = stand.touch;
+    applySecondary(p, t, { breath: 1, sway: 0.45 }); // manji njih: slobodno stopalo ne dira pod
     return p;
   }
 
@@ -213,7 +223,7 @@ export class CursorScene implements StageScene {
   resize(w: number, h: number) {
     // portret (mobitel): kamera dalje i malo više — cijela lutka i ispružene šake unutar margina
     const port = w / Math.max(1, h) < 0.8;
-    this.camera.position.set(port ? 0.25 : 0.35, port ? 1.1 : 1.0, port ? 7.4 : 4.9);
+    this.camera.position.set(port ? 0.25 : 0.35, port ? 1.1 : 1.0, port ? 8.3 : 4.9);
     this.camera.lookAt(0, port ? 0.95 : 0.98, 0);
     if (!this.engine) return;
     this.engine.renderer.getDrawingBufferSize(this.size);
@@ -345,6 +355,7 @@ export class CursorScene implements StageScene {
     u.radius.value = Math.max(0, this.mr.x);
     u.soft.value = 4.5 * dpr;
     u.ring.value = this.ringOn ? Math.min(1, this.mr.x / (R * 0.6 + 1e-3)) : 0;
+    u.navPx.value = 72 * dpr; // visina zaglavlja: prsten se ispod nje ne crta (ne prelazi preko navigacije)
     u.seed.value = (u.seed.value + 1.618) % 1000;
 
     if (this.engine) this.contact.update(this.engine.renderer, this.scene);

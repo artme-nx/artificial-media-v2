@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { notebook } from "@/lib/notebook";
+import { asset } from "@/lib/asset";
 
 /**
  * "Lutka bilježi" (/start, F8): lutka iz profila pod reflektorom s bilježnicom i olovkom. Sluša samo događaje forme
@@ -23,7 +24,20 @@ export function NotebookStage() {
     const ro = new ResizeObserver(fit);
     const io = new IntersectionObserver((e) => view?.setRunning(e.some((x) => x.isIntersecting)), { threshold: 0.01 });
     let off: (() => void) | null = null;
-    (async () => {
+    // lutka je dekoracija: three.js se učitava na prvu interakciju (pokazivač, dodir, tipka, scroll) ili nakon 4 s,
+    // da prvi prikaz i forma nikad ne čekaju; do tada poster iste poze
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
+      for (const ev of EVENTS) window.removeEventListener(ev, start);
+      clearTimeout(timer);
+      void boot();
+    };
+    const EVENTS = ["pointermove", "pointerdown", "keydown", "touchstart", "scroll", "focusin"] as const;
+    for (const ev of EVENTS) window.addEventListener(ev, start, { passive: true, once: true });
+    const timer = window.setTimeout(start, 4000);
+    const boot = async () => {
       const { NotebookView } = await import("@/src/three/doll/notebook-view");
       if (disposed) return;
       view = new NotebookView(canvas);
@@ -37,9 +51,12 @@ export function NotebookStage() {
       notebook.onSent(() => view!.waitSent());
       el.dataset.state = notebook.state;
       el.dataset.ready = "1";
-    })();
+      if (process.env.NODE_ENV !== "production") (window as unknown as { __notebookView?: unknown }).__notebookView = view;
+    };
     return () => {
       disposed = true;
+      clearTimeout(timer);
+      for (const ev of EVENTS) window.removeEventListener(ev, start);
       off?.();
       notebook.onSent(null);
       ro.disconnect();
@@ -48,5 +65,14 @@ export function NotebookStage() {
       canvas.remove();
     };
   }, []);
-  return <div ref={host} data-notebook-stage aria-hidden="true" className="notebook-stage" />;
+  return (
+    <div ref={host} data-notebook-stage aria-hidden="true" className="notebook-stage">
+      {/* poster (ista poza) dok se 3D ne učita; nestane kad lutka krene */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <picture>
+        <source media="(max-width: 767px)" srcSet={asset("/posters/start-mob.webp")} />
+        <img className="notebook-poster" src={asset("/posters/start-desk.webp")} alt="" width={640} height={900} decoding="async" fetchPriority="high" />
+      </picture>
+    </div>
+  );
 }

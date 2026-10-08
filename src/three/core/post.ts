@@ -108,6 +108,15 @@ export class Post {
     this.apply();
   }
 
+  /** offline render nizova slika (F9): više koraka dima i uzoraka AO, MSAA 4, bez obzira na razinu */
+  renderQuality() {
+    this.volumetric.setResolutionScale(0.6);
+    this.volumetric.setSteps(80);
+    Object.assign(this.n8ao.configuration, { halfRes: false, aoSamples: 24, denoiseSamples: 8 });
+    this.composer.multisampling = Math.min(4, this.renderer.capabilities.maxSamples);
+    this.dof.resolution.scale = 0.75;
+  }
+
   configure(cfg: PostConfig) {
     this.cfg = cfg;
     this.apply();

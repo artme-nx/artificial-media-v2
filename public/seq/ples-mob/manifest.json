@@ -1,0 +1,10 @@
+{
+  "name": "ples",
+  "variant": "mob",
+  "count": 24,
+  "width": 720,
+  "height": 1280,
+  "ext": "webp",
+  "source": "realtime-render",
+  "rendered": "2026-10-08"
+}

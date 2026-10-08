@@ -84,7 +84,7 @@ export const site = {
     items: [
       {
         id: "ads",
-        pose: "otvara",
+        pose: "usluga_film",
         name: s("Ads & Product Films", "03 §8 U1 (naziv)", "proposal"),
         body: s(
           "Description to come.",
@@ -95,7 +95,7 @@ export const site = {
       },
       {
         id: "websites",
-        pose: "seze",
+        pose: "usluga_web",
         name: s("Websites", "03 §8 U2 (naziv)", "proposal"),
         body: s(
           "The site your ad sends people to. Interactive, 3D, designed and built in-house. You are looking at one.",
@@ -106,13 +106,13 @@ export const site = {
       },
       {
         id: "characters",
-        pose: "kontrapost",
+        pose: "usluga_lik",
         name: s("AI Brand Characters", "03 §8 U3 (naziv)", "proposal"),
         body: s("One face for your brand, built once and directed in every campaign.", "03 §8 U3", "needs-confirmation", "Lik Sofia kao dokaz [TREBA POTVRDU javno]."),
       },
       {
         id: "tools",
-        pose: "b_seconde",
+        pose: "usluga_alat",
         name: s("AI Tools for Business", "03 §8 U4 (naziv); brief §1", "proposal"),
         body: s("Description to come.", "03 §8 U4 — brief §4 pitanje 6 (što su alati i za koga)", "placeholder"),
       },
@@ -130,7 +130,7 @@ export const site = {
   },
 
   cta: {
-    line: s("Tell us what you're selling.", "03 §10 B1 bez broja (11 §4 red 12)", "proposal"),
+    line: s("Tell us what you’re selling.", "03 §10 B1 bez broja (11 §4 red 12)", "proposal"),
     button: s("Brief us", "03 §5 C1", "proposal"),
   },
 
@@ -154,7 +154,7 @@ export const site = {
       },
       {
         id: "f4",
-        q: s("We're a small brand. Is this for us?", "03 §30 F4", "proposal"),
+        q: s("We’re a small brand. Is this for us?", "03 §30 F4", "proposal"),
         a: s("Yes. If you have a product to show, we can build its world.", "03 §30 F4 (odluka 2)", "proposal"),
       },
       {
@@ -198,8 +198,8 @@ export const site = {
   },
 
   start: {
-    heading: s("Tell us what you're selling.", "03 §10 B1 bez broja (11 §4 red 12)", "proposal"),
-    alt: s("Tell us what you're building.", "01-inventura G1 bez 'Same-day reply' (alternativa)", "proposal"),
+    heading: s("Tell us what you’re selling.", "03 §10 B1 bez broja (11 §4 red 12)", "proposal"),
+    alt: s("Tell us what you’re building.", "01-inventura G1 bez 'Same-day reply' (alternativa)", "proposal"),
     projectTypes: [
       { id: "ads", label: s("Ads & Product Films", "03 §8 U1", "proposal") },
       { id: "websites", label: s("Websites", "03 §8 U2", "proposal") },

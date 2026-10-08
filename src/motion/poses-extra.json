@@ -841,86 +841,86 @@
     "handR": "elegant"
   },
   "b_reverence_duboka": {
-    "_opis": "Balet (F5): révérence — klasični naklon: dubok plié na obje noge (prednja nosi, stražnja iza na prstima, koljeno savijeno), trup 28° iz kukova, glava se pokloni, ruke dolje kroz à la seconde (desna otvorena prema publici); dno se zadrži.",
+    "_opis": "Balet: révérence — demi-plié na obje noge (stražnja noga prekrižena iza, prsti na podu), trup blago naprijed iz kukova, glava se pokloni prema prednjem ramenu, ruke mekano otvorene nisko (demi-seconde), dlanovi prema publici.",
     "support": "L",
     "touch": -1,
     "pelvis": {
       "tilt": 0,
-      "pitch": 10,
-      "yaw": -4
-    },
-    "chest": {
-      "tilt": -2,
-      "pitch": 28,
+      "pitch": 8,
       "yaw": -6
     },
+    "chest": {
+      "tilt": -3,
+      "pitch": 24,
+      "yaw": -4
+    },
     "neck": {
-      "tilt": 0,
+      "tilt": 3,
       "pitch": 12,
       "yaw": 0
     },
     "head": {
-      "tilt": 4,
-      "pitch": 28,
-      "yaw": 6
+      "tilt": 10,
+      "pitch": 30,
+      "yaw": 8
     },
     "armL": {
       "th": [
-        -14,
-        6,
-        22
+        -35.2,
+        -38.9,
+        -37.4
       ],
       "ph": [
-        16,
-        34,
-        40
+        17.4,
+        37.0,
+        46.1
       ],
       "roll": [
         0,
         0,
-        -20
+        -60
       ]
     },
     "armR": {
       "th": [
-        52,
-        62,
-        70
+        35.2,
+        38.9,
+        37.4
       ],
       "ph": [
-        24,
-        34,
-        38
+        17.4,
+        37.0,
+        46.1
       ],
       "roll": [
         0,
         0,
-        80
+        60
       ]
     },
     "legL": {
       "th": [
-        4,
+        3,
         1
       ],
       "ph": [
-        38,
-        -44
+        36,
+        -34
       ],
-      "foot": -34,
+      "foot": -36,
       "fp": 0
     },
     "legR": {
       "th": [
-        -12,
-        -6
+        -8,
+        -4
       ],
       "ph": [
-        -6,
-        -58
+        -4,
+        -36
       ],
       "foot": 34,
-      "fp": 62
+      "fp": 60
     },
     "handL": "elegant",
     "handR": "elegant"
@@ -1519,8 +1519,8 @@
     },
     "chest": {
       "tilt": -2,
-      "pitch": 12,
-      "yaw": -6
+      "pitch": 6,
+      "yaw": -4
     },
     "neck": {
       "tilt": 0,
@@ -1529,19 +1529,511 @@
     },
     "head": {
       "tilt": 3,
-      "pitch": 0,
+      "pitch": 2,
       "yaw": 10
     },
     "armL": {
       "th": [
-        -60,
-        -74,
-        -84
+        -65.0,
+        -75.1,
+        -77.9
       ],
       "ph": [
-        18,
+        31.1,
+        37.7,
+        43.5
+      ],
+      "roll": [
+        0,
+        0,
+        -50
+      ]
+    },
+    "armR": {
+      "th": [
+        65.0,
+        75.1,
+        77.9
+      ],
+      "ph": [
+        31.1,
+        37.7,
+        43.5
+      ],
+      "roll": [
+        0,
+        0,
+        50
+      ]
+    },
+    "legL": {
+      "th": [
+        3,
+        1
+      ],
+      "ph": [
+        12,
+        -10
+      ],
+      "foot": -36,
+      "fp": 0
+    },
+    "legR": {
+      "th": [
+        -6,
+        -3
+      ],
+      "ph": [
+        -6,
+        -24
+      ],
+      "foot": 34,
+      "fp": 55
+    },
+    "handL": "elegant",
+    "handR": "elegant"
+  },
+  "usluga_film": {
+    "_opis": "F7: Ads & Product Films — predstavlja proizvod: ruka naprijed s otvorenim dlanom prema gore, tijelo i glava prate ruku.",
+    "pelvis": {
+      "tilt": 3,
+      "pitch": 0,
+      "yaw": 5
+    },
+    "chest": {
+      "tilt": -2,
+      "pitch": 5,
+      "yaw": 12
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": 5,
+      "yaw": 6
+    },
+    "head": {
+      "tilt": -3,
+      "pitch": 12,
+      "yaw": 16
+    },
+    "armL": {
+      "th": [
+        -14,
+        -6,
+        0
+      ],
+      "ph": [
+        8,
+        24,
+        24
+      ],
+      "roll": [
+        0,
+        0,
+        -20
+      ]
+    },
+    "armR": {
+      "th": [
+        42.5,
+        91.6,
+        94.0
+      ],
+      "ph": [
+        35.5,
+        45.4,
+        43.7
+      ],
+      "roll": [
+        0,
+        0,
+        85
+      ]
+    },
+    "legL": {
+      "th": [
+        -4,
+        -2
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -14
+    },
+    "legR": {
+      "th": [
+        6,
+        3
+      ],
+      "ph": [
+        8,
+        -6
+      ],
+      "foot": 20
+    },
+    "handL": "elegant",
+    "handR": "open",
+    "support": "L"
+  },
+  "usluga_web": {
+    "_opis": "F7: Websites — šake ispred lica uokviruju kadar (kao redatelj), laktovi dolje; težina na jednoj nozi.",
+    "pelvis": {
+      "tilt": 4,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 0,
+      "pitch": -2,
+      "yaw": 0
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": -2,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 0,
+      "pitch": -4,
+      "yaw": 0
+    },
+    "armL": {
+      "th": [
+        -34.1,
+        149.8,
+        157.4
+      ],
+      "ph": [
+        41.4,
+        50.4,
+        49.5
+      ],
+      "roll": [
+        0,
+        0,
+        -85
+      ]
+    },
+    "armR": {
+      "th": [
+        34.1,
+        -149.8,
+        -157.4
+      ],
+      "ph": [
+        41.4,
+        50.4,
+        49.5
+      ],
+      "roll": [
+        0,
+        0,
+        85
+      ]
+    },
+    "legL": {
+      "th": [
+        -4,
+        -2
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -14
+    },
+    "legR": {
+      "th": [
+        6,
+        3
+      ],
+      "ph": [
+        8,
+        -6
+      ],
+      "foot": 20
+    },
+    "handL": "open",
+    "handR": "open",
+    "support": "L"
+  },
+  "usluga_lik": {
+    "_opis": "F7: AI Brand Characters — lik: kontrapost, ruka na boku, glava nagnuta (karakter).",
+    "pelvis": {
+      "tilt": 8,
+      "pitch": 0,
+      "yaw": -6
+    },
+    "chest": {
+      "tilt": -6,
+      "pitch": -2,
+      "yaw": 8
+    },
+    "neck": {
+      "tilt": 4,
+      "pitch": 2,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": -8,
+      "pitch": 4,
+      "yaw": -14
+    },
+    "armL": {
+      "th": [
+        -4,
+        -2,
+        0
+      ],
+      "ph": [
+        -2,
+        8,
+        6
+      ],
+      "roll": [
+        0,
+        0,
+        30
+      ]
+    },
+    "armR": {
+      "th": [
         36,
-        44
+        -50,
+        -50
+      ],
+      "ph": [
+        -15,
+        30,
+        30
+      ],
+      "roll": [
+        0,
+        0,
+        20
+      ]
+    },
+    "legL": {
+      "th": [
+        6,
+        3
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -12
+    },
+    "legR": {
+      "th": [
+        2,
+        8
+      ],
+      "ph": [
+        6,
+        -8
+      ],
+      "foot": 26
+    },
+    "handL": "relaxed",
+    "handR": "relaxed"
+  },
+  "usluga_alat": {
+    "_opis": "F7: AI Tools for Business — seže prema gore i naprijed (posegne za alatom), druga ruka prati.",
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": -2,
+      "pitch": -6,
+      "yaw": 8
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": -6,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 0,
+      "pitch": -16,
+      "yaw": 10
+    },
+    "armL": {
+      "th": [
+        -18,
+        -20,
+        -16
+      ],
+      "ph": [
+        22,
+        40,
+        40
+      ],
+      "roll": [
+        0,
+        0,
+        -20
+      ]
+    },
+    "armR": {
+      "th": [
+        149.0,
+        164.6,
+        166.8
+      ],
+      "ph": [
+        54.3,
+        34.0,
+        28.8
+      ],
+      "roll": [
+        0,
+        0,
+        40
+      ]
+    },
+    "legL": {
+      "th": [
+        -3,
+        -1
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -14
+    },
+    "legR": {
+      "th": [
+        4,
+        2
+      ],
+      "ph": [
+        10,
+        -8
+      ],
+      "foot": 18
+    },
+    "handL": "elegant",
+    "handR": "open",
+    "support": "L"
+  },
+  "mir": {
+    "_opis": "F7: mirovanje male lutke — blagi kontrapost, meke ruke.",
+    "pelvis": {
+      "tilt": 4,
+      "pitch": 0,
+      "yaw": -3
+    },
+    "chest": {
+      "tilt": -3,
+      "pitch": 0,
+      "yaw": 4
+    },
+    "neck": {
+      "tilt": 2,
+      "pitch": 2,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": -5,
+      "pitch": 5,
+      "yaw": 8
+    },
+    "armL": {
+      "th": [
+        -8,
+        -2,
+        2
+      ],
+      "ph": [
+        2,
+        22,
+        20
+      ],
+      "roll": [
+        0,
+        0,
+        -30
+      ]
+    },
+    "armR": {
+      "th": [
+        18,
+        4,
+        -4
+      ],
+      "ph": [
+        10,
+        40,
+        36
+      ],
+      "roll": [
+        0,
+        0,
+        40
+      ]
+    },
+    "legL": {
+      "th": [
+        -3,
+        -1
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -14
+    },
+    "legR": {
+      "th": [
+        5,
+        3
+      ],
+      "ph": [
+        8,
+        -6
+      ],
+      "foot": 20
+    },
+    "handL": "elegant",
+    "handR": "elegant",
+    "support": "L"
+  },
+  "biljeznica_greska": {
+    "_opis": "F8 (/start): greška — pogleda polje (glava dolje i prema formi), bilježnica malo spuštena, olovka uz tijelo.",
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 2,
+      "pitch": 8,
+      "yaw": -8
+    },
+    "neck": {
+      "tilt": 3,
+      "pitch": 10,
+      "yaw": -6
+    },
+    "head": {
+      "tilt": 10,
+      "pitch": 22,
+      "yaw": -10
+    },
+    "armL": {
+      "th": [
+        -18,
+        40,
+        50
+      ],
+      "ph": [
+        30,
+        80,
+        70
       ],
       "roll": [
         0,
@@ -1551,46 +2043,44 @@
     },
     "armR": {
       "th": [
-        72,
-        82,
-        88
+        14,
+        -6,
+        -10
       ],
       "ph": [
-        20,
-        32,
-        38
+        10,
+        26,
+        26
       ],
       "roll": [
         0,
         0,
-        60
+        30
       ]
     },
     "legL": {
       "th": [
-        4,
-        1
+        -2.5,
+        -2.5
       ],
       "ph": [
-        38,
-        -44
+        0,
+        0
       ],
-      "foot": -34,
-      "fp": 0
+      "foot": -10
     },
     "legR": {
       "th": [
-        -12,
-        -6
+        2.5,
+        2.5
       ],
       "ph": [
-        -6,
-        -58
+        0,
+        0
       ],
-      "foot": 34,
-      "fp": 62
+      "foot": 10
     },
-    "handL": "elegant",
-    "handR": "elegant"
+    "handL": "hold",
+    "handR": "grip"
   }
 }

@@ -6,7 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { site } from "@/content/site";
 import { ui } from "@/content/ui";
-import { T } from "@/components/t";
+import { T, kernW } from "@/components/t";
 import { Logo, type LogoHandle } from "@/components/logo";
 import { readSwitches } from "@/config/switches";
 import { setStage } from "@/lib/stage-store";
@@ -37,35 +37,6 @@ function flicker(u: number, seed: number) {
   let v = 1;
   for (const [t, val] of cuts) if (u >= t + seed * 0.03) v = val;
   return v;
-}
-
-/**
- * Kadar 1: filmska animacija slova (kao SplitText, ali čistim CSS-om od prvog prikaza — H1 je vidljiv bez čekanja JS-a).
- * Riječi se ne lome; textContent ostaje točno rečenica iz site.ts (tražilice), a čitač zaslona čita aria-label H1.
- */
-/** Ručni kerning za display rez Bodonija: "W" ima široku desnu bočnu marginu pa "Wh" u naslovu djeluje kao "W h". */
-const KERN: Record<string, number> = { "Wh": -0.055, "We": -0.04, "Wa": -0.04 };
-const kern = (a: string, b?: string): React.CSSProperties => (b && KERN[a + b] ? { letterSpacing: `${KERN[a + b]}em` } : {});
-
-function SplitChars({ text }: { text: string }) {
-  let i = 0;
-  const words = text.split(" ");
-  return (
-    <>
-      {words.map((w, wi) => (
-        <span key={wi}>
-          <span className="intro-word">
-            {Array.from(w).map((ch, ci, arr) => (
-              <span key={ci} className="intro-ch" style={{ ["--i" as string]: i++, ...kern(ch, arr[ci + 1]) }}>
-                {ch}
-              </span>
-            ))}
-          </span>
-          {wi < words.length - 1 ? " " : null}
-        </span>
-      ))}
-    </>
-  );
 }
 
 export function IntroSection() {
@@ -133,7 +104,6 @@ export function IntroSection() {
     const dancer = { v: 0, phase: 0 };
     const auto = gsap.timeline({ paused: true, onComplete: () => finishAuto(false) });
     const titleOut = { opacity: 0, letterSpacing: "0.12em", filter: "blur(10px)", duration: 0.6, ease: "power2.in" };
-    const titleIn = { opacity: 1, letterSpacing: "0em", filter: "blur(0px)", duration: 1.1, ease: "power3.out" };
     if (sw.introAutoplay) {
       gsap.set(logoWrap.current, { autoAlpha: 0 });
       auto
@@ -141,7 +111,7 @@ export function IntroSection() {
         .to(dancer, { v: 1, duration: 1.0, ease: "power2.inOut", onUpdate: () => setStage({ dancerLevel: dancer.v }) }, 2.3)
         // port de bras: bras bas → à la seconde → en haut → poza slova I iz loga (kadar 3 je ta ista lutka u logu)
         .fromTo(dancer, { phase: 0 }, { phase: 1, duration: 2.15, ease: "power1.inOut", onUpdate: () => setStage({ dancerPhase: dancer.phase }) }, 2.3)
-        .fromTo(part2.current, { opacity: 0, letterSpacing: "0.3em", filter: "blur(12px)" }, { ...titleIn }, 2.55)
+        .fromTo(part2.current, { "--reveal": "100%", letterSpacing: "0.12em", filter: "blur(12px)" }, { "--reveal": "0%", letterSpacing: "0em", filter: "blur(0px)", duration: 1.3, ease: "power2.out" }, 2.55)
         .to(part2.current, { ...titleOut }, 4.35)
         // plesačica se ugasi prije loga (kadar 3 je samo logo; lutka-I je u logu)
         .to(dancer, { v: 0, duration: 0.55, ease: "power2.in", onUpdate: () => setStage({ dancerLevel: dancer.v }) }, 4.35)
@@ -227,7 +197,7 @@ export function IntroSection() {
           </p>
           <h1 id="h1" className="statement intro-h1" style={{ fontSize: "var(--fs-display-xl)" }} aria-label={site.hero.h1.text}>
             <span ref={part1} data-h1-part="1" className="intro-part">
-              <SplitChars text={site.hero.h1Part1.text} />
+              {kernW(site.hero.h1Part1.text)}
             </span>{" "}
             <span ref={part2} data-h1-part="2" className="intro-part italic">
               {site.hero.h1Part2.text}

@@ -10,7 +10,7 @@ import { shotPath, watch } from "./helpers";
 type St = { cursor: { partScreen: (n: string) => { x: number; y: number } | null } };
 
 async function ready(page: Page) {
-  await page.waitForFunction(() => document.documentElement.dataset.stage3d === "ready", null, { timeout: 30000 });
+  await page.waitForFunction(() => ["ready", "frames"].includes(document.documentElement.dataset.stage3d ?? ""), null, { timeout: 30000 });
   await page.waitForTimeout(800);
   await page.evaluate(() => {
     const el = document.getElementById("atelier")!;

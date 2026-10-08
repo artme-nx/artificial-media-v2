@@ -14,7 +14,8 @@ export function BaletLab() {
     (async () => {
       const [{ Engine }, { BalletScene }] = await Promise.all([import("@/src/three/core/engine"), import("@/src/three/scenes/ballet-scene")]);
       if (disposed || !canvas.current || !host.current) return;
-      engine = new Engine(canvas.current, { tier: (q.get("q") as "high") || "auto", probe: true });
+      const render = q.get("render") === "1";
+      engine = new Engine(canvas.current, { tier: render ? "high" : (q.get("q") as "high") || "auto", probe: true, fixedDpr: render ? window.devicePixelRatio : undefined });
       const s = new BalletScene();
       s.progress = Number(q.get("p") ?? 0);
       s.orbit = readSwitches().balletOrbit;
@@ -22,6 +23,17 @@ export function BaletLab() {
       engine.setScene(s);
       fit();
       window.addEventListener("resize", fit);
+      if (render) engine.post.renderQuality();
+      const eng = engine;
+      const frames = (n: number) => new Promise<void>((res) => { let k = 0; const f = () => (++k >= n ? res() : requestAnimationFrame(f)); requestAnimationFrame(f); });
+      (window as unknown as { __render: unknown }).__render = async (p: number) => {
+        s.progress = p;
+        s.snap();
+        eng.invalidate();
+        await frames(6);
+        s.snap();
+        await frames(4);
+      };
       (window as unknown as { __lab: unknown }).__lab = { scene: s, engine };
     })();
     return () => {

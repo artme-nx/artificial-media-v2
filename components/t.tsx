@@ -11,30 +11,29 @@ export function T({
   style,
   ...rest
 }: { s: Str; as?: React.ElementType; className?: string; style?: React.CSSProperties } & Record<`data-${string}`, string | boolean | undefined>) {
-  const display = typeof className === "string" && /\bstatement\b/.test(className);
   return (
     <Tag className={className} style={style} data-status={s.status} data-source={s.source} {...rest}>
-      {display ? kernDisplay(s.text) : s.text}
+      {kernW(s.text)}
     </Tag>
   );
 }
 
 /**
- * Ručni kerning za Bodoni u izjavama: "W" ima široku desnu bočnu marginu, pa "We", "Wh", "Wo" na velikim veličinama
- * djeluju kao dvije riječi. textContent ostaje isti (samo omotač oko slova W).
+ * Ručni kerning za Bodoni (izjave, nazivi usluga, FAQ): "W" ima široku desnu bočnu marginu, pa "We", "Wh", "Wo" na
+ * većim veličinama djeluju kao dvije riječi. Slovo W se omota u span.kw; razmak se primjenjuje samo u display fontu
+ * (CSS: .statement .kw, .faq-q .kw). textContent ostaje isti.
  */
-const PAIRS: Record<string, number> = { e: -0.05, h: -0.055, o: -0.05, a: -0.045, i: -0.03, r: -0.03 };
-function kernDisplay(text: string): React.ReactNode {
-  if (!text.includes("W")) return text;
+export function kernW(text: string): React.ReactNode {
+  if (!/W[a-z]/.test(text)) return text;
   const out: React.ReactNode[] = [];
   let buf = "";
   for (let i = 0; i < text.length; i++) {
     const ch = text[i], next = text[i + 1];
-    if (ch === "W" && next && PAIRS[next] !== undefined) {
+    if (ch === "W" && next && /[a-z]/.test(next)) {
       if (buf) out.push(buf);
       buf = "";
       out.push(
-        <span key={i} style={{ letterSpacing: `${PAIRS[next]}em` }}>
+        <span key={i} className="kw">
           W
         </span>,
       );

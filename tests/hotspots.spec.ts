@@ -44,7 +44,8 @@ async function hotspots(png: Buffer) {
       }
     }
     const w = x1 - x0 + 1, h = y1 - y0 + 1;
-    if (area < 12 || area > 1200 || Math.max(w, h) / Math.min(w, h) > 3.5) continue;
+    // < 24 px: sitni zrcalni odsjaj na poliranom rubu (ispravan za čelik); "LED" točke bile su 37–420 px
+    if (area < 24 || area > 1200 || Math.max(w, h) / Math.min(w, h) > 3.5) continue;
     // prsten oko mrlje: ako je okolina tamna, to je točkasti sjaj
     let sum = 0, cnt = 0;
     const r = Math.max(14, Math.max(w, h));

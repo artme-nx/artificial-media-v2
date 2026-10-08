@@ -21,11 +21,11 @@ export default function Start() {
               <T s={site.start.heading} />
             </h1>
             <T s={site.start.promise} as="p" className="muted mt-6 max-w-[36ch]" style={{ fontSize: "var(--fs-body)" }} />
-            <div className="mt-14">
+            <div className="mt-10">
               <BriefForm />
             </div>
           </div>
-          <div aria-hidden="true" className="start-figure order-first h-[34vh] md:order-none md:col-span-6 md:col-start-7 md:h-auto md:min-h-[70vh] lg:col-span-6 lg:col-start-7">
+          <div aria-hidden="true" className="start-figure order-first md:order-none md:col-span-6 md:col-start-7 lg:col-span-6 lg:col-start-7">
             <NotebookStage />
           </div>
         </div>

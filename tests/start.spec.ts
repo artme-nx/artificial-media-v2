@@ -24,8 +24,10 @@ test.describe("/start — lutka bilježi (F8)", () => {
     test.setTimeout(120000);
     const errors = watch(page);
     const requests: string[] = [];
+    // "ne šalje ništa": nijedan zahtjev s tijelom (POST/PUT/PATCH) ni s tekstom iz forme (HEAD/GET prefetch Next routera je u redu)
     page.on("request", (r) => {
-      if (r.method() !== "GET") requests.push(r.url());
+      const body = r.postData() ?? "";
+      if (["POST", "PUT", "PATCH"].includes(r.method()) || /Handmade|ana@/.test(body + r.url())) requests.push(`${r.method()} ${r.url()}`);
     });
     await page.goto("./start/");
     await page.waitForSelector(`${stage}[data-ready="1"]`, { timeout: 30000 });

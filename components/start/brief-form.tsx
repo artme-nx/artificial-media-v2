@@ -165,7 +165,7 @@ export function BriefForm() {
         {stepTitle}
       </h2>
 
-      <div className="mt-10 min-h-[22rem]">
+      <div className="mt-8 min-h-[15rem]">
         {step === 1 && (
           <fieldset aria-invalid={!!errors.type} aria-describedby={errors.type ? `${uid}-err-type` : undefined}>
             <legend className="field-label mb-5">{ui.form.typeLegend}</legend>
@@ -305,7 +305,7 @@ export function BriefForm() {
             {ui.form.back}
           </button>
         )}
-        <button type="submit" className="btn btn-primary" disabled={phase === "sending"}>
+        <button type="submit" className="btn btn-primary" disabled={phase === "sending"} aria-busy={phase === "sending"}>
           {phase === "sending" ? ui.form.sending : step < STEPS ? ui.form.next : ui.form.send}
         </button>
       </div>

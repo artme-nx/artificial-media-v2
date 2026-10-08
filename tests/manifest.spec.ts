@@ -15,7 +15,7 @@ const FRAMES: Array<[string, number]> = [
 
 async function ready(page: Page) {
   await page.waitForFunction(() => typeof (window as unknown as { __scrollTo?: unknown }).__scrollTo === "function");
-  await page.waitForFunction(() => document.documentElement.dataset.stage3d === "ready", null, { timeout: 30000 }).catch(() => {});
+  await page.waitForFunction(() => ["ready", "frames"].includes(document.documentElement.dataset.stage3d ?? ""), null, { timeout: 30000 }).catch(() => {});
   await page.waitForTimeout(600);
 }
 

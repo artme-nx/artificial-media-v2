@@ -244,6 +244,11 @@ export class BalletScene implements StageScene {
     if (Math.abs(this.camera.getFocalLength() - mm) > 0.01) this.camera.setFocalLength(mm);
   }
 
+  /** render niza slika: napredak bez izglađivanja (deterministički kadar) */
+  snap() {
+    this.smoothP = this.progress;
+  }
+
   update(dt: number) {
     this.time += dt;
     this.smoothP += (this.progress - this.smoothP) * Math.min(1, dt * 10);

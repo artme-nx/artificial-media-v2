@@ -112,5 +112,8 @@ function parseVariant(file) {
 const logo = { _sync: { izvor: rel(LOGO_DIR), datum_izvora: mtimeISO(path.join(LOGO_DIR, "r3b-podebljano-mono.svg")), napomena: NOTE }, variants: {} };
 for (const v of VARIANTS) logo.variants[v] = parseVariant(`r3b-${v}-mono.svg`);
 if (writeIfChanged(path.join(OUT, "logo-data.json"), JSON.stringify(logo) + "\n")) changed++;
+// zadana varijanta (podebljano) ide u početni JS; ostale se učitavaju tek kad ih ?logo= zatraži (manje JS-a na startu)
+const def = { _sync: logo._sync, variants: { podebljano: logo.variants.podebljano } };
+if (writeIfChanged(path.join(OUT, "logo-default.json"), JSON.stringify(def) + "\n")) changed++;
 
 console.log(`[sync-brand] src/brand/ ažuriran (${changed} promjena)`);

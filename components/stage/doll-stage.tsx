@@ -35,7 +35,7 @@ export function DollStage() {
           ro.observe(active);
           const mode = (active.dataset.dollAnchor || "reels") as DollMode;
           view.lookSource = mode === "reels" ? () => reelTarget() ?? mouseTarget() : mouseTarget;
-          view.setMode(mode, (active.dataset.dollPose as never) || "stoji");
+          view.setMode(mode, (active.dataset.dollPose as never) || (mode === "footer" ? "stoji" : "mir"));
           fit();
           if (mode === "footer" && pendingBow) {
             pendingBow = false;
@@ -54,7 +54,7 @@ export function DollStage() {
     const mouseTarget = () => mouse;
     // usluge: poza po usluzi (07, interakcija 2)
     const offIntent = onStageIntent((st) => {
-      if (view && active?.dataset.dollAnchor === "service") view.pose((st.servicePose as never) || "stoji");
+      if (view && active?.dataset.dollAnchor === "service") view.pose((st.servicePose as never) || "mir");
     });
     // podnožje: révérence kad korisnik stigne do dna (jednom po dolasku)
     let atBottom = false;
@@ -83,11 +83,21 @@ export function DollStage() {
       for (const el of document.querySelectorAll("[data-doll-anchor]")) io.observe(el);
       pick();
     };
-    const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
-    const id = ric ? ric(() => void boot(), { timeout: 2000 }) : window.setTimeout(() => void boot(), 800);
+    // three.js se učitava tek kad se prvo sidro male lutke približi (ne pri učitavanju stranice: bez dugih zadataka na startu)
+    let booted = false;
+    const near = new IntersectionObserver(
+      (e) => {
+        if (booted || !e.some((x) => x.isIntersecting)) return;
+        booted = true;
+        near.disconnect();
+        void boot();
+      },
+      { rootMargin: "120% 0px 120% 0px" },
+    );
+    for (const el of document.querySelectorAll("[data-doll-anchor]")) near.observe(el);
     return () => {
       disposed = true;
-      if (!ric) clearTimeout(id);
+      near.disconnect();
       io.disconnect();
       ro.disconnect();
       offIntent();

@@ -15,10 +15,11 @@ type Compilable = StageScene & { showAllForCompile?: () => () => void; prepareEn
  */
 export class Director {
   engine: Engine;
-  intro: IntroScene;
-  ballet: BalletScene;
+  ballet: BalletScene | null = null;
+  intro: IntroScene | null = null;
   cursor: CursorScene;
-  private scenes: Record<Zone, Compilable>;
+  private zones: Zone[];
+  private scenes: Partial<Record<Zone, Compilable>> = {};
   private offs: Array<() => void> = [];
   private zone: Zone | null = null;
   private unsub: () => void;
@@ -27,19 +28,25 @@ export class Director {
   private compiled = new Set<Zone>();
   private onResize = () => this.engine.resize(window.innerWidth, window.innerHeight);
 
-  constructor(private canvas: HTMLCanvasElement) {
+  constructor(private canvas: HTMLCanvasElement, opts: { zones?: Zone[] } = {}) {
+    this.zones = opts.zones ?? ["intro", "ballet", "cursor"];
     const sw = readSwitches();
     const mobile = window.matchMedia("(pointer: coarse)").matches && Math.min(window.innerWidth, window.innerHeight) < 820;
     const probe = new URLSearchParams(location.search).has("probe") || process.env.NODE_ENV !== "production";
     this.engine = new Engine(canvas, { tier: sw.quality, mobile, probe });
-    this.intro = new IntroScene();
-    this.ballet = new BalletScene();
-    this.ballet.orbit = sw.balletOrbit;
+    if (this.zones.includes("intro")) this.intro = new IntroScene();
+    if (this.zones.includes("ballet")) {
+      const b = new BalletScene();
+      b.orbit = sw.balletOrbit;
+      this.ballet = b;
+    }
     this.cursor = new CursorScene();
     this.cursor.ringOn = sw.maskRing;
     this.cursor.mobileMode = sw.cursorMobile;
     this.cursor.coarse = window.matchMedia("(pointer: coarse)").matches;
-    this.scenes = { intro: this.intro, ballet: this.ballet, cursor: this.cursor };
+    if (this.intro) this.scenes.intro = this.intro;
+    if (this.ballet) this.scenes.ballet = this.ballet;
+    this.scenes.cursor = this.cursor;
     this.bindCursor();
     // testovi i QA (dev ili ?probe=1): pristup scenama
     if (probe) (window as unknown as { __stage?: Director }).__stage = this;
@@ -61,10 +68,11 @@ export class Director {
     if (this.compiled.has(zone)) return;
     this.compiled.add(zone);
     const s = this.scenes[zone];
+    if (!s) return;
     const restore = s.showAllForCompile?.();
     try {
       // okruženje (i post) se postave u activate; za kompajliranje treba isto okruženje kao pri crtanju
-      if (zone === "intro") this.intro.scene.environment ??= this.intro.theatre.environment(this.engine.renderer);
+      if (zone === "intro" && this.intro) this.intro.scene.environment ??= this.intro.theatre.environment(this.engine.renderer);
       else s.prepareEnvironment?.(this.engine.renderer);
       await this.engine.renderer.compileAsync(s.scene, s.camera);
     } catch {
@@ -75,17 +83,20 @@ export class Director {
 
   /** Kompajliraj uvod prije prvog prikaza, baletnu scenu kad je preglednik slobodan. */
   async start() {
-    await this.compile("intro");
-    this.engine.setScene(this.intro);
-    this.zone = "intro";
+    const first: Zone = this.intro ? "intro" : "cursor";
+    await this.compile(first);
+    this.engine.setScene(this.scenes[first]!);
+    this.zone = first;
     this.sync(getStage());
     this.pickZone();
-    document.documentElement.dataset.stage3d = "ready";
-    window.dispatchEvent(new Event("stage3d-ready"));
+    // u načinu "frames" ScrollSequence javlja stage3d (uvod i balet su nizovi slika)
+    if (this.intro) {
+      document.documentElement.dataset.stage3d = "ready";
+      window.dispatchEvent(new Event("stage3d-ready"));
+    }
     const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
     const later = async () => {
-      await this.compile("ballet");
-      await this.compile("cursor");
+      for (const z of this.zones) await this.compile(z);
     };
     if (ric) ric(() => void later(), { timeout: 2500 });
     else setTimeout(() => void later(), 1200);
@@ -94,7 +105,7 @@ export class Director {
   private pickZone() {
     let best: Zone | null = null;
     let bestH = 0.5;
-    for (const z of ["intro", "ballet", "cursor"] as const) {
+    for (const z of this.zones) {
       const h = this.visible.get(z) ?? 0;
       if (h > bestH) {
         best = z;
@@ -106,16 +117,18 @@ export class Director {
     this.engine.setPaused(!on);
     if (best && best !== this.zone) {
       this.zone = best;
-      this.engine.setScene(this.scenes[best]);
+      this.engine.setScene(this.scenes[best]!);
       setStage({ zone: best });
     }
   }
 
   private sync(s: StageState) {
-    this.intro.progress = s.introProgress;
-    this.intro.dancerLevel = s.dancerLevel;
-    this.intro.dancerPhase = s.dancerPhase;
-    this.ballet.progress = s.balletProgress;
+    if (this.intro) {
+      this.intro.progress = s.introProgress;
+      this.intro.dancerLevel = s.dancerLevel;
+      this.intro.dancerPhase = s.dancerPhase;
+    }
+    if (this.ballet) this.ballet.progress = s.balletProgress;
     this.engine.invalidate();
   }
 

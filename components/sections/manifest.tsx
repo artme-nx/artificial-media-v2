@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { site } from "@/content/site";
 import { T } from "@/components/t";
 import { setStage } from "@/lib/stage-store";
+import { asset } from "@/lib/asset";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -43,7 +44,8 @@ export function ManifestSection() {
       show(lineB.current, window01(p, 0.44, 0.53, 0.76, 0.84));
     };
     const setup = () => {
-      if (st || document.documentElement.dataset.stage3d !== "ready") return;
+      const m = document.documentElement.dataset.stage3d;
+      if (st || (m !== "ready" && m !== "frames")) return;
       // visina sekcije se upravo promijenila (CSS uz data-stage3d) — preračunaj sve okidače
       ScrollTrigger.refresh();
       st = ScrollTrigger.create({
@@ -74,6 +76,9 @@ export function ManifestSection() {
           <div ref={lineB} className="manifest-b justify-self-end">
             <T s={b} as="p" className="statement manifest-line max-w-[15ch] text-right italic" data-reveal style={{ fontSize: "var(--fs-display-l)" }} />
           </div>
+          {/* poster baletne scene (smanjeni pokret): dekoracija */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="manifest-poster" src={asset("/posters/balet-desk.webp")} alt="" aria-hidden="true" loading="lazy" decoding="async" width={1600} height={900} />
         </div>
       </div>
       <div className="manifest-fade" aria-hidden="true" />

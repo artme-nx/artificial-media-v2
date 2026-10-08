@@ -29,6 +29,8 @@
   .btn-ghost { background: transparent; color: var(--button-ghost-fg); box-shadow: inset 0 0 0 1px var(--button-ghost-line); }
   .btn-ghost:hover { background: var(--fg); color: var(--bg); }
   .btn[aria-disabled="true"], .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  /* slanje u tijeku: pun kontrast (AA), samo kursor čekanja */
+  .btn[aria-busy="true"] { opacity: 1; cursor: progress; }
 
   /* ---------- navigacija ---------- */
   .site-nav { color: var(--fg); transition: color var(--mo-stage) var(--mo-ease-cine); }
@@ -39,7 +41,7 @@
     background: linear-gradient(to bottom, color-mix(in oklab, var(--bg) 72%, transparent) 0%, color-mix(in oklab, var(--bg) 38%, transparent) 50%, transparent 100%);
     transition: background var(--mo-stage) var(--mo-ease-cine);
   }
-  .nav-link { position: relative; display: inline-block; padding-block: 0.9rem; }
+  .nav-link { position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding-block: 0.6rem; }
   .nav-link::after {
     content: ""; position: absolute; left: 0; right: 0; bottom: 0.55rem; height: 1px; background: currentColor;
     transform: scaleX(0); transform-origin: right; transition: transform var(--mo-base) var(--mo-ease-out);
@@ -68,6 +70,11 @@
   .eyebrow { color: var(--fg-muted); }
   /* opsz 36: Bodoni bi na 80–100 px automatski uzeo display rez (opsz 96) čije najtanje crte na ekranu nestaju */
   .statement { font-family: var(--ff-display); font-weight: 400; letter-spacing: var(--tr-display); line-height: var(--lh-display); text-wrap: balance; font-variation-settings: "opsz" 36; }
+  /* manje display veličine (nazivi usluga, FAQ): niži optički rez = čvršće tanke crte */
+  .service-row .statement, .faq-q { font-variation-settings: "opsz" 18; }
+  .statement .kw, .faq-q .kw { letter-spacing: -0.06em; }
+  /* duljina retka 45–75 znakova */
+  .prose, .faq-a { max-width: 62ch; }
   .prose { max-width: var(--sp-measure); font-size: var(--fs-body-l); line-height: var(--lh-body); text-wrap: pretty; }
   .muted { color: var(--fg-muted); }
   .rule { height: 1px; background: var(--line); border: 0; }
@@ -87,8 +94,7 @@
   .chip {
     position: relative; display: inline-flex; align-items: center; min-height: 44px; padding-inline: 0.25rem;
     font-size: var(--fs-label); letter-spacing: var(--tr-label); text-transform: uppercase; font-weight: 500;
-    color: var(--fg-muted); transition: color var(--mo-base) var(--mo-ease-out);
-  }
+    color: var(--fg-muted); transition: color var(--mo-base) var(--mo-ease-out); min-width: 44px; justify-content: center; }
   .chip::after {
     content: ""; position: absolute; left: 0.25rem; right: 0.25rem; bottom: 0.6rem; height: 1px; background: currentColor;
     transform: scaleX(0); transition: transform var(--mo-base) var(--mo-ease-out);
@@ -167,6 +173,8 @@
     font-family: var(--ff-display); line-height: var(--lh-title); outline: none; border-radius: 0;
     transition: border-color var(--mo-base) var(--mo-ease-out);
   }
+  /* e-mail i ime u sansu: Bodoni lomi "@" i brojeve u adresi */
+  .field-input[type="email"], .field-input[autocomplete="name"] { font-family: var(--ff-sans); font-size: var(--fs-body-l); letter-spacing: 0.01em; }
   .field-input:focus { border-bottom-color: var(--field-line); }
   .field-input:focus-visible { outline: none; box-shadow: 0 1px 0 0 var(--field-line); }
   .field-input[aria-invalid="true"] { border-bottom-color: var(--field-error); }
@@ -206,7 +214,8 @@
   [data-intro="cinema"] .intro-part { position: relative; text-shadow: 0 0 28px rgb(0 0 0 / 0.5); }
   /* kadar 2: drugi dio naslova u donjoj trećini, ispod ruku plesačice (ne preko trupa) */
   /* kadar 2, portret: tekst u gornjoj trećini, plesačica u protusvjetlu ispod (ne preko tijela ni lokve svjetla) */
-  [data-intro="cinema"] [data-h1-part="2"] { position: absolute; left: 0; right: 0; top: 50%; translate: 0 calc(-50% - 20vh); }
+  [data-intro="cinema"] [data-h1-part="2"] { position: absolute; left: 0; right: 0; top: 50%; translate: 0 calc(-50% - 20vh); font-size: 0.93em; width: min-content; margin-inline: auto; }
+  /* (0,93em: drugi dio naslova nije veći od prvog — LCP ostaje prvi dio, vidljiv u prvoj sekundi) */
   /* desktop: plesačica je u desnoj trećini kadra, drugi dio naslova lijevo od nje (ne preko tijela ni lokve svjetla) */
   @media (min-aspect-ratio: 5/4) and (min-width: 900px) {
     [data-intro="cinema"] [data-h1-part="2"] { translate: -19vw calc(-50% + 2vh); }
@@ -232,20 +241,49 @@
      (filmsko "skupljanje slova": razmak slova + zamućenje); drugi dio i logo preuzima GSAP */
   /* fill: backwards — nakon animacije vrijede obična pravila (npr. nadnaslov se povuče nakon kadra 3) */
   [data-intro-live] .intro-eyebrow { animation: intro-fade 0.8s var(--mo-ease-out) 0.1s backwards; }
-  .intro-word { white-space: nowrap; }
-  /* slova su inline (ne inline-block): kerning ostaje kao u neprekinutom tekstu */
-  .intro-ch { display: inline; }
-  /* kadar 1: slovo po slovo izlazi iz zamućenja (filmski), ukupno ~1,3 s */
-  [data-intro-live] .intro-ch { animation: intro-ch 1s cubic-bezier(0.16, 1, 0.3, 1) calc(0.12s + var(--i) * 0.022s) both; }
-  @keyframes intro-ch {
-    from { opacity: 0; filter: blur(12px); }
-    to { opacity: 1; filter: blur(0); }
+  /* kadar 1: filmsko otkrivanje slijeva nadesno (meka maska + izoštravanje), čistim CSS-om od prvog prikaza.
+     Tekst je jedan blok s punom neprozirnošću (maska ne mijenja opacity): LCP je H1 u prvom prikazu, ne kasnije */
+  [data-intro-live] [data-h1-part="1"] {
+    -webkit-mask-image: linear-gradient(90deg, #000 42%, transparent 58%); mask-image: linear-gradient(90deg, #000 42%, transparent 58%);
+    -webkit-mask-size: 260% 100%; mask-size: 260% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    animation: intro-reveal 1.5s cubic-bezier(0.25, 0.6, 0.2, 1) 0.1s both;
   }
-  [data-intro-live] [data-h1-part="2"] { opacity: 0; }
+  @keyframes intro-reveal {
+    from { -webkit-mask-position: 100% 0; mask-position: 100% 0; filter: blur(9px); }
+    to { -webkit-mask-position: 0% 0; mask-position: 0% 0; filter: blur(0); }
+  }
+  /* kadar 2: drugi dio je od prvog prikaza naslikan (puna neprozirnost), ali skriven maskom — otkriva ga GSAP preko --reveal */
+  [data-intro-live] [data-h1-part="2"] {
+    --reveal: 100%;
+    -webkit-mask-image: linear-gradient(90deg, #000 42%, transparent 58%); mask-image: linear-gradient(90deg, #000 42%, transparent 58%);
+    -webkit-mask-size: 260% 100%; mask-size: 260% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-position: var(--reveal) 0; mask-position: var(--reveal) 0;
+  }
   [data-intro-live] .intro-logo { opacity: 0; }
   @keyframes intro-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   [data-intro="static"] .intro-logo { margin-top: 1rem; }
+}
+
+/* ---------- posteri (F9): smanjeni pokret, bez WebGL2 ---------- */
+@layer components {
+  /* uvod (statična verzija): dirigent pred orkestrom iza teksta, s tamnim prijelazom za čitljivost */
+  [data-source="off"] .intro {
+    background: linear-gradient(to bottom, rgb(11 11 12 / 0.94) 0%, rgb(11 11 12 / 0.7) 46%, rgb(11 11 12 / 0.35) 100%), var(--poster-uvod) center 70% / cover no-repeat;
+  }
+  /* "drvo / robot": mirna slika (lutka s krugom robota na prsima) */
+  [data-cursor="poster"] #atelier { background: var(--poster-kursor) center / cover no-repeat; }
+  .manifest-poster { display: none; }
+  [data-source="off"] .manifest-poster { display: block; width: min(100%, 34rem); aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--rad-frame); margin-top: var(--sp-stack-l); }
+  /* --poster-* postavlja StageCanvas (putanje kroz lib/asset.ts zbog basePatha) */
+}
+
+/* ---------- usluge: aktivni red (F7) ---------- */
+@layer components {
+  .service-row { transition: opacity var(--mo-base) var(--mo-ease-out); }
+  @media (hover: hover) {
+    .services ul:hover .service-row:not(:hover), .services ul:focus-within .service-row:not(:focus-within) { opacity: 0.42; }
+  }
 }
 
 /* ---------- drvo / robot ispod kursora (F6) ---------- */
@@ -259,34 +297,43 @@
 /* ---------- male lutke u sekcijama (F7) ---------- */
 @layer components {
   /* podnožje: mala lutka na dnu stranice, napravi révérence kad korisnik stigne do kraja (07, interakcija 5) */
-  .footer-figure { width: clamp(92px, 9vw, 130px); aspect-ratio: 3 / 5; margin: 2.5rem auto 0; pointer-events: none; }
+  .footer-figure { width: clamp(92px, 9vw, 130px); aspect-ratio: 3 / 5; margin: 2.5rem 0 0; pointer-events: none; }
 }
 
 /* ---------- /start: lutka bilježi (F8) ---------- */
 @layer components {
   /* reflektor: topla lokva svjetla na papirnoj pozadini, lutka u njoj (canvas je proziran) */
   .start-figure {
-    position: relative; border-radius: var(--rad-frame);
-    background: radial-gradient(60% 55% at 50% 42%, color-mix(in oklab, #fff8ee 85%, transparent) 0%, transparent 70%),
-      radial-gradient(120% 90% at 50% 100%, color-mix(in oklab, var(--fg) 7%, transparent) 0%, transparent 60%);
+    position: relative;
+    /* lokva reflektora bez rubova (gradijent završava unutar okvira) */
+    background: radial-gradient(48% 46% at 50% 44%, color-mix(in oklab, #fff8ee 90%, transparent) 0%, transparent 100%);
   }
-  @media (min-width: 768px) { .start-figure { position: sticky; top: calc(var(--nav-height) + 1rem); height: calc(100dvh - var(--nav-height) - 2rem); min-height: 0; } }
+  /* desktop: pozornica fiksne veličine (lutka ne mijenja mjerilo između koraka) */
+  @media (min-width: 768px) { .start-figure { position: sticky; top: calc(var(--nav-height) + 1rem); height: calc(100dvh - var(--nav-height) - 2rem); } }
+  /* mobitel: mala vinjeta s lutkom ostaje gore dok se forma ispunjava (lutka iznad polja) */
+  @media (max-width: 767px) {
+    .start-figure { position: sticky; top: var(--nav-height); z-index: 2; height: 26vh; background: radial-gradient(60% 70% at 50% 50%, #fbf6ee 0%, var(--bg) 100%); box-shadow: 0 12px 16px -12px rgb(0 0 0 / 0.08); }
+  }
+  /* /start: zaglavlje s punom pozadinom (forma se scrolla ispod njega) */
+  :root:has(.start) .site-nav::before { background: var(--bg); height: var(--nav-height); }
   .notebook-stage { position: absolute; inset: 0; }
+  .notebook-poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity 600ms var(--mo-ease-out); }
+  .notebook-stage[data-ready="1"] .notebook-poster { opacity: 0; }
 }
 
 /* ---------- manifest preko baletne scene (F5) ---------- */
 @layer components {
   /* bez 3D-a: obična sekcija; s 3D-om: visoka sekcija, sloj s tekstom je sticky, scroll vodi scenu */
-  [data-stage3d="ready"] .manifest { height: 440vh; padding-block: 0; }
-  [data-stage3d="ready"] .manifest-sticky { position: sticky; top: 0; height: 100dvh; }
-  [data-stage3d="ready"] .manifest-grid { position: relative; height: 100%; min-height: 0; display: block; }
-  [data-stage3d="ready"] .manifest-a { position: absolute; left: 0; top: calc(var(--nav-height) + 6vh); opacity: 0; }
-  [data-stage3d="ready"] .manifest-b { position: absolute; right: 0; bottom: 12vh; opacity: 0; }
+  [data-stage3d]:is([data-stage3d="ready"],[data-stage3d="frames"]) .manifest { height: 440vh; padding-block: 0; }
+  [data-stage3d]:is([data-stage3d="ready"],[data-stage3d="frames"]) .manifest-sticky { position: sticky; top: 0; height: 100dvh; }
+  [data-stage3d]:is([data-stage3d="ready"],[data-stage3d="frames"]) .manifest-grid { position: relative; height: 100%; min-height: 0; display: block; }
+  [data-stage3d]:is([data-stage3d="ready"],[data-stage3d="frames"]) .manifest-a { position: absolute; left: 0; top: calc(var(--nav-height) + 6vh); opacity: 0; }
+  [data-stage3d]:is([data-stage3d="ready"],[data-stage3d="frames"]) .manifest-b { position: absolute; right: 0; bottom: 12vh; opacity: 0; }
   .manifest-fade { display: none; }
-  [data-stage3d="ready"] .manifest-fade { display: block; position: absolute; inset: auto 0 0 0; height: 45vh; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--bg) 88%); }
+  [data-stage3d]:is([data-stage3d="ready"],[data-stage3d="frames"]) .manifest-fade { display: block; position: absolute; inset: auto 0 0 0; height: 45vh; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--bg) 88%); }
   @media (max-aspect-ratio: 4/5) {
     /* portret: drugi redak gore (lutka je u donjoj polovici kadra) */
-    [data-stage3d="ready"] .manifest-b { bottom: auto; top: calc(var(--nav-height) + 6vh); }
+    [data-stage3d]:is([data-stage3d="ready"],[data-stage3d="frames"]) .manifest-b { bottom: auto; top: calc(var(--nav-height) + 6vh); }
   }
 }
 

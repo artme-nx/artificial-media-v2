@@ -9,7 +9,15 @@ export function WhyAiSection() {
         <h2 id="why-h" className="label eyebrow">
           <T s={site.whyAi.heading} />
         </h2>
-        <T s={site.whyAi.lead} as="p" className="statement mt-8 max-w-[18ch]" data-reveal style={{ fontSize: "var(--fs-display-l)" }} />
+        <p className="statement mt-8 max-w-[22ch]" data-reveal data-status={site.whyAi.lead.status} data-source={site.whyAi.lead.source} style={{ fontSize: "var(--fs-display-l)" }}>
+          {/* prijelom po rečenicama (paralelizam); textContent je točno izvorni string */}
+          {site.whyAi.lead.text.split(/(?<=\.) /).map((part, i, all) => (
+            <span key={i} className="block">
+              {part}
+              {i < all.length - 1 ? " " : null}
+            </span>
+          ))}
+        </p>
         <dl className="mt-[var(--sp-stack-xl)] grid gap-10 md:grid-cols-3 md:gap-8">
           {site.whyAi.rows.map((r) => (
             <div key={r.label.text} className="border-t pt-6" style={{ borderColor: "var(--line-strong)" }}>

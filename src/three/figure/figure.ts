@@ -34,8 +34,9 @@ const matCache = new Map<Look, MatSet>();
 export function materialsFor(look: Look): MatSet {
   let m = matCache.get(look);
   if (!m) {
-    const brushed = brushedSteel({ brush: 0 });
-    const polished = polishedSteel({ roughness: 0.2 });
+    // robot: zglobovi s blažom anizotropijom (sitni rubovi inače bljesnu kao točkasti izvor svjetla)
+    const brushed = brushedSteel({ brush: 0, anisotropy: look === "wood" ? 0.85 : 0.4 });
+    const polished = polishedSteel({ roughness: look === "wood" ? 0.2 : 0.27 }); // robot: manje točkastih odsjaja (bez LED dojma)
     const perlage = perlageSteel();
     const neckBrushed = brushedSteel({ brush: 2, roughness: 0.34 });
     if (look === "wood") {

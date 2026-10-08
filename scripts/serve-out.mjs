@@ -3,6 +3,7 @@
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
+import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "out");
@@ -28,7 +29,13 @@ http
       res.writeHead(404, { "Content-Type": TYPES[".html"] });
       return res.end(fs.existsSync(nf) ? fs.readFileSync(nf) : "404");
     }
-    res.writeHead(200, { "Content-Type": TYPES[path.extname(p)] || "application/octet-stream", "Cache-Control": "no-cache" });
+    const type = TYPES[path.extname(p)] || "application/octet-stream";
+    // gzip za tekst (kao GitHub Pages), da lokalni Lighthouse mjeri iste veličine prijenosa
+    if (/text|javascript|json|svg/.test(type) && /gzip/.test(String(req.headers["accept-encoding"] || ""))) {
+      res.writeHead(200, { "Content-Type": type, "Cache-Control": "no-cache", "Content-Encoding": "gzip", Vary: "Accept-Encoding" });
+      return fs.createReadStream(p).pipe(zlib.createGzip({ level: 6 })).pipe(res);
+    }
+    res.writeHead(200, { "Content-Type": type, "Cache-Control": "no-cache" });
     fs.createReadStream(p).pipe(res);
   })
   .listen(PORT, () => console.log(`[serve-out] http://localhost:${PORT}${BASE}/`));
