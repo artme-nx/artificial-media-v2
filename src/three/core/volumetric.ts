@@ -219,7 +219,8 @@ const compositeFragment = /* glsl */ `
   }
 `;
 
-export type VolLight = { light: THREE.SpotLight; density?: number; shadow?: boolean; scale?: number };
+/** tint: boja snopa u dimu (množi boju svjetla) — npr. topliji tungsten snop dok površine ostaju neutralnije */
+export type VolLight = { light: THREE.SpotLight; density?: number; shadow?: boolean; scale?: number; tint?: THREE.ColorRepresentation };
 export type VolSettings = {
   density?: number;
   ambientDensity?: number;
@@ -235,6 +236,7 @@ export type VolSettings = {
 
 export class VolumetricPass extends Pass {
   lights: VolLight[] = [];
+  private tmpColor = new THREE.Color();
   resolutionScale = 0.5;
   intensity = 1;
   viewCamera: THREE.Camera | null = null;
@@ -346,6 +348,7 @@ export class VolumetricPass extends Pass {
         this.tmp.setFromMatrixPosition(L.target.matrixWorld);
         u.lightDir.value[i].subVectors(this.tmp, u.lightPos.value[i]).normalize();
         u.lightColor.value[i].copy(L.color).multiplyScalar(L.visible ? L.intensity * (vl.scale ?? 1) : 0);
+        if (vl.tint !== undefined) u.lightColor.value[i].multiply(this.tmpColor.set(vl.tint));
         u.cosOuter.value[i] = Math.cos(L.angle);
         u.cosInner.value[i] = Math.cos(L.angle * (1 - L.penumbra));
         u.range.value[i] = L.distance > 0 ? L.distance : 40;

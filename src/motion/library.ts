@@ -6,24 +6,24 @@
  */
 import lutkaV2 from "@/src/brand/lutka-v2.json";
 import extra from "./poses-extra.json";
-import { kanonPose, normalizePose, poseFromParts, HAND_RELAXED, HAND_OPEN, HAND_GRIP, HAND_HOLD, type Pose, type Part } from "@/src/figure/kanon";
+import { kanonPose, normalizePose, poseFromParts, HAND_RELAXED, HAND_OPEN, HAND_GRIP, HAND_HOLD, HAND_ELEGANT, type Pose, type Part, clonePose } from "@/src/figure/kanon";
 
 export const KANON_POSES = ["kontrapost", "seze", "otvara", "b_enhaut", "b_seconde", "b_bas", "b_reverence"] as const;
 export type PoseName = (typeof KANON_POSES)[number] | "dirigent" | keyof typeof extra;
 
-const HANDS = { relaxed: HAND_RELAXED, open: HAND_OPEN, grip: HAND_GRIP, hold: HAND_HOLD } as const;
+const HANDS = { relaxed: HAND_RELAXED, open: HAND_OPEN, grip: HAND_GRIP, hold: HAND_HOLD, elegant: HAND_ELEGANT } as const;
 type ExtraPose = Record<string, unknown> & { handL?: keyof typeof HANDS | object; handR?: keyof typeof HANDS | object; _base?: string };
 
 const cache = new Map<string, Pose>();
 
 function handOf(v: unknown) {
-  if (typeof v === "string") return JSON.parse(JSON.stringify(HANDS[v as keyof typeof HANDS]));
+  if (typeof v === "string") return clonePose(HANDS[v as keyof typeof HANDS]);
   return v;
 }
 
 export function getPose(name: PoseName): Pose {
   const hit = cache.get(name);
-  if (hit) return JSON.parse(JSON.stringify(hit));
+  if (hit) return clonePose(hit);
   let p: Pose;
   if ((KANON_POSES as readonly string[]).includes(name)) {
     const ballet = name.startsWith("b_");
@@ -43,7 +43,7 @@ export function getPose(name: PoseName): Pose {
     p = normalizePose(merged as unknown as Pose);
   }
   cache.set(name, p);
-  return JSON.parse(JSON.stringify(p));
+  return clonePose(p);
 }
 
 // lutka-v2.json zapisuje M kao 3 retka; lutka-core očekuje {x, y, z} stupce

@@ -9,6 +9,7 @@ export type Waist = "A" | "B";
 export type Quality = "auto" | "high" | "medium" | "low";
 export type CursorMobile = "oboje" | "prst" | "samo";
 export type SourcePref = "auto" | "realtime" | "frames";
+export type CostumeCut = "frak" | "smoking";
 
 export const DEFAULTS = {
   /** 05-logo runda 3b: naglasak ART/ME. Zadano 'podebljano' (jedina jednobojna). [ODLUKA KRISTIANA] · ?logo= */
@@ -29,6 +30,9 @@ export const DEFAULTS = {
   quality: "auto" as Quality,
   /** 11 §3: izvor scena uvoda i baleta. auto = realtime na jakim desktopima, frames na mobitelu i slabim · ?izvor= */
   source: "auto" as SourcePref,
+  /** 10-lik [SMOKING] kaže "tuxedo", 11 F3 traži "skut": frak (skuti straga, rez u struku — klasika dirigenta) ili
+   * smoking (sako do bokova). [PRETPOSTAVKA], zadano frak · ?kroj=frak|smoking */
+  cut: "frak" as CostumeCut,
 } as const;
 
 /** 10-lik §1: palica — tanka bijela. [PRIJEDLOG] (boja je u src/three/materials) */
@@ -47,6 +51,7 @@ type Switches = {
   maskRing: boolean;
   quality: Quality;
   source: SourcePref;
+  cut: CostumeCut;
 };
 
 const pick = <T extends string>(v: string | null, allowed: readonly T[], fallback: T): T =>
@@ -69,6 +74,7 @@ export function readSwitches(): Switches {
     maskRing: bool(q.get("prsten"), DEFAULTS.maskRing),
     quality: pick(q.get("q"), ["auto", "high", "medium", "low"] as const, DEFAULTS.quality),
     source: pick(q.get("izvor"), ["auto", "realtime", "frames"] as const, DEFAULTS.source),
+    cut: pick(q.get("kroj"), ["frak", "smoking"] as const, DEFAULTS.cut),
   };
   if (typeof window !== "undefined") cached = out;
   return out;

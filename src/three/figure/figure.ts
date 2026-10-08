@@ -5,6 +5,7 @@ import { palmGeometry, phalanxGeometry, handLocal, HAND_COUNTS, HAND_SCALE } fro
 import { mapleMaterial } from "../materials/maple";
 import { buildCostume, poseCostume, COVERED_PARTS, COVERED_JOINTS, type CostumeMeshes } from "./costume";
 import { Baton } from "./baton";
+import { readSwitches } from "@/config/switches";
 import { brushedSteel, polishedSteel, perlageSteel } from "../materials/steel";
 
 /**
@@ -26,21 +27,23 @@ const HINGE_FROM: Record<(typeof JOINTS)[number], string> = {
   hipL: "pelvis", hipR: "pelvis", kneeL: "thighL", kneeR: "thighR", ankleL: "footL", ankleR: "footR",
 };
 
-type MatSet = { body: THREE.Material; head: THREE.Material; brushed: THREE.Material; polished: THREE.Material; perlage: THREE.Material; neckBrushed: THREE.Material };
+/** fingers: šake (dlan, članci) — kod robota bez anizotropije: na sitnim člancima je nevidljiva, a daje vruće točke (izgledaju kao LED) */
+type MatSet = { body: THREE.Material; head: THREE.Material; fingers: THREE.Material; brushed: THREE.Material; polished: THREE.Material; perlage: THREE.Material; neckBrushed: THREE.Material };
 const matCache = new Map<Look, MatSet>();
 export function materialsFor(look: Look): MatSet {
   let m = matCache.get(look);
   if (!m) {
     const brushed = brushedSteel({ brush: 0 });
-    const polished = polishedSteel();
+    const polished = polishedSteel({ roughness: 0.2 });
     const perlage = perlageSteel();
-    const neckBrushed = brushedSteel({ brush: 2, roughness: 0.24 });
+    const neckBrushed = brushedSteel({ brush: 2, roughness: 0.34 });
     if (look === "wood") {
       const maple = mapleMaterial();
-      m = { body: maple, head: maple, brushed, polished, perlage, neckBrushed };
+      m = { body: maple, head: maple, fingers: maple, brushed, polished, perlage, neckBrushed };
     } else {
       const body = brushedSteel({ brush: 1, roughness: 0.3, anisotropy: 0.6, tint: 0.92 });
-      m = { body, head: body, brushed, polished, perlage, neckBrushed };
+      const fingers = brushedSteel({ brush: 1, roughness: 0.34, anisotropy: 0, tint: 0.92 });
+      m = { body, head: body, fingers, brushed, polished, perlage, neckBrushed };
     }
     matCache.set(look, m);
   }
@@ -132,8 +135,8 @@ export class Figure {
 
     // dlanovi
     this.palms = {
-      L: new THREE.Mesh(cachedGeo("palmL", () => palmGeometry(0.37, 1)), this.mats.body),
-      R: new THREE.Mesh(cachedGeo("palmR", () => palmGeometry(0.41, -1)), this.mats.body),
+      L: new THREE.Mesh(cachedGeo("palmL", () => palmGeometry(0.37, 1)), this.mats.fingers),
+      R: new THREE.Mesh(cachedGeo("palmR", () => palmGeometry(0.41, -1)), this.mats.fingers),
     };
     for (const p of Object.values(this.palms)) {
       p.matrixAutoUpdate = false;
@@ -153,10 +156,12 @@ export class Figure {
     waistBGeo ??= waistColumnGeometry(K.joints.waist);
     this.waistB = new THREE.Group();
     this.waistB.matrixAutoUpdate = false;
-    // struk B: satenski brušen (veća hrapavost) — mali reflektor inače daje točkaste odsjaje koji izgledaju kao LED
-    const waistMat = brushedSteel({ brush: 2, roughness: 0.6, anisotropy: 0.5 });
+    // struk B: satenski brušen, bez anizotropije — anizotropni odsjaj na malim prstenovima daje sjaj koji izgleda kao LED
+    // (10-lik: bez svjetla); brušenje ostaje kao fina varijacija hrapavosti
+    const waistMat = brushedSteel({ brush: 2, roughness: 0.5, anisotropy: 0 });
     waistMat.envMapIntensity = 0.75;
-    for (const [g, m] of [[waistBGeo.brushed, waistMat], [waistBGeo.polished, this.mats.brushed]] as const) {
+    const waistLip = brushedSteel({ brush: 2, roughness: 0.3, anisotropy: 0 });
+    for (const [g, m] of [[waistBGeo.brushed, waistMat], [waistBGeo.polished, waistLip]] as const) {
       const mesh = new THREE.Mesh(g, m);
       mesh.castShadow = mesh.receiveShadow = true;
       this.waistB.add(mesh);
@@ -164,8 +169,8 @@ export class Figure {
     this.body.add(this.waistB);
 
     // prsti
-    this.phal = new THREE.InstancedMesh(cachedGeo("phal", () => phalanxGeometry(false)), this.mats.body, HAND_COUNTS.phal * 2);
-    this.tips = new THREE.InstancedMesh(cachedGeo("tip", () => phalanxGeometry(true)), this.mats.body, HAND_COUNTS.tips * 2);
+    this.phal = new THREE.InstancedMesh(cachedGeo("phal", () => phalanxGeometry(false)), this.mats.fingers, HAND_COUNTS.phal * 2);
+    this.tips = new THREE.InstancedMesh(cachedGeo("tip", () => phalanxGeometry(true)), this.mats.fingers, HAND_COUNTS.tips * 2);
     // zglobovi prstiju: brušena jezgra + polirani prsten (bez tamne perlage udubine: na toj veličini čita se kao mrlja)
     this.knuckles = [
       new THREE.InstancedMesh(knuckleGeo.brushed, this.mats.brushed, HAND_COUNTS.knuckles * 2),
@@ -182,7 +187,7 @@ export class Figure {
 
   /** Smoking (10-lik [SMOKING]) kao sloj na istom tijelu; pokrivene drvene dijelove i zglobove skriva. */
   setCostume(on: boolean) {
-    if (on && !this.costume) this.costume = buildCostume(this.body);
+    if (on && !this.costume) this.costume = buildCostume(this.body, readSwitches().cut);
     if (this.costume) for (const m of this.costume.meshes) m.visible = on;
     for (const n of COVERED_PARTS) {
       const mesh = this.meshes.get(n);

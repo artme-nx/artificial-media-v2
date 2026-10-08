@@ -28,10 +28,13 @@ export class Baton {
     this.mesh = new THREE.Mesh(batonGeometry(), batonMaterial(BATON_COLOR));
     this.mesh.castShadow = true;
     this.mesh.matrixAutoUpdate = false;
-    // drška u dlanu (strana dlana +z), štap prema vrhovima prstiju i naprijed
-    const dir = new THREE.Vector3(0.12, 0.62, 0.78).normalize();
+    // hvat (okvir šake: y prema prstima, x prema palcu, z = strana dlana): drška leži u kanalu savijenih prstiju
+    // (iza temeljnih zglobova, ispred dlana), štap izlazi između palca i kažiprsta, prema naprijed i malo gore
+    const dir = new THREE.Vector3(0.8, 0.45, 0.4).normalize();
     const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
-    this.grip.compose(new THREE.Vector3(0.015, 0.12, 0.05), q, new THREE.Vector3(1, 1, 1));
+    const channel = new THREE.Vector3(-0.01, 0.355, 0.085);
+    const origin = channel.clone().addScaledVector(dir, -0.14);
+    this.grip.compose(origin, q, new THREE.Vector3(1, 1, 1));
   }
   /** Postavi palicu prema okviru šake (prostor lutke); camera + px po m za minimalnu vidljivu debljinu. */
   update(handFrame: THREE.Matrix4, bodyWorld: THREE.Matrix4, camera?: THREE.Camera, viewportH = 900) {

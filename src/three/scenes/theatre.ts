@@ -12,8 +12,8 @@ import { extendMaterial } from "../materials/extend";
  * topli tungsten reflektor (~3200 K) odozgo na dirigentu, hladno neutralno svjetlo na orkestru, prašina u snopovima.
  * Dijeli je kazališni uvod (F4); svjetla se pale/gase kroz razine (0..1) koje vodi redatelj.
  */
-export const TUNGSTEN = new THREE.Color("#ffc58c"); // ~3200 K uz dnevni balans bijele
-export const COOL = new THREE.Color("#dbe6ff"); // hladno neutralno
+export const TUNGSTEN = new THREE.Color("#ffe6cc"); // ~3200 K uz balans bijele blizu tungstena (filmski): toplo, ali javor ostaje blijedo medeni, palica bijela
+export const COOL = new THREE.Color("#cfdcff"); // hladno neutralno (uz tungsten balans bijele djeluje hladno, ne plavo sci-fi)
 
 function velvetMaterial() {
   const m = new THREE.MeshPhysicalMaterial({
@@ -35,10 +35,10 @@ function velvetMaterial() {
 function stageFloorMaterial() {
   const m = new THREE.MeshPhysicalMaterial({
     color: "#0a0909",
-    roughness: 0.32,
+    roughness: 0.42,
     metalness: 0,
-    clearcoat: 0.7,
-    clearcoatRoughness: 0.18,
+    clearcoat: 0.4,
+    clearcoatRoughness: 0.26,
     envMapIntensity: 0.9,
   });
   return extendMaterial(m, {
@@ -52,8 +52,8 @@ function stageFloorMaterial() {
           float plank = abs( fract( p.z * 4.0 ) - 0.5 );
           float seam = 1.0 - smoothstep( 0.47, 0.5, plank );
           float wear = fbm3( vec3( p.x * 0.6, 0.0, p.z * 0.6 ) );
-          float scr = vnoise( vec3( p.x * 60.0, p.z * 3.0, 1.0 ) );
-          gScuff = wear * 0.6 + scr * 0.4;
+          float scr = vnoise( vec3( p.x * 22.0, p.z * 7.0, 1.0 ) );
+          gScuff = wear * 0.8 + scr * 0.2;
           diffuseColor.rgb *= ( 0.85 + 0.25 * wear ) * ( 1.0 - ( 1.0 - seam ) * 0.5 );
         }
       `,
@@ -91,7 +91,9 @@ export class Theatre {
   floor: THREE.Mesh;
   /** razine svjetla 0..1 (vodi redatelj) */
   levels = { key: 1, rim: 1, rows: [1, 1, 1], curtain: 1, haze: 1 };
-  private base = { key: 320, rim: 260, row: 60, curtain: 40 };
+  private base = { key: 340, rim: 380, row: 46, curtain: 9, bounce: 1.6 };
+  /** topli odbljesak poda ispod reflektora (bez sjene): podiže prednju stranu, vrat i šake kao na pravoj pozornici */
+  bounce: THREE.PointLight;
 
   constructor() {
     // pod
@@ -116,6 +118,17 @@ export class Theatre {
       this.group.add(wing);
     }
 
+    // portal (proscenij): crni baršunasti okvir sprijeda — u širokom kadru pozornica nije prazna kutija
+    const portalMat = velvetMaterial();
+    const valance = new THREE.Mesh(curtainGeometry(16, 2.2, 14), portalMat);
+    valance.position.set(0, 5.2, 3.4);
+    this.group.add(valance);
+    for (const sx of [-1, 1]) {
+      const leg = new THREE.Mesh(curtainGeometry(2.6, 8, 3), portalMat);
+      leg.position.set(sx * 4.9, 4, 3.2);
+      this.group.add(leg);
+    }
+
     // dirigent: lutka u smokingu s palicom
     this.conductor = new Figure({ look: "wood", costume: true });
     this.conductor.setBaton(true);
@@ -128,14 +141,16 @@ export class Theatre {
     this.group.add(this.orchestra.group);
 
     // svjetla
-    this.key = new THREE.SpotLight(TUNGSTEN, this.base.key, 0, THREE.MathUtils.degToRad(11.5), 0.55, 2);
-    this.key.position.set(0.6, 8.2, 2.4);
+    this.key = new THREE.SpotLight(TUNGSTEN, this.base.key, 0, THREE.MathUtils.degToRad(9.5), 0.5, 2);
+    // odozgo, malo sprijeda i s desne strane: kiparsko svjetlo, sjena lutke pada na pod iza-lijevo (vidi se u kadru)
+    this.key.position.set(1.0, 8.2, 2.6);
     this.key.target.position.set(0, 0.9, 0.4);
     configurePCSSSpot(this.key, 0.45, 2048);
     // hladno kontra svjetlo iza dirigenta (sa strane orkestra, visoko): ocrtava siluetu smokinga i palicu
-    this.rim = new THREE.SpotLight(COOL, this.base.rim, 0, THREE.MathUtils.degToRad(10), 0.6, 2);
-    this.rim.position.set(1.4, 6.0, -4.2);
-    this.rim.target.position.set(0, 1.45, 0.4);
+    this.rim = new THREE.SpotLight(COOL, this.base.rim, 0, THREE.MathUtils.degToRad(8), 0.55, 2);
+    // strmo odozgo-straga: obrubljuje glavu i ramena, a krug svjetla na podu pada pod noge (ne u prvi plan kadra)
+    this.rim.position.set(0.8, 8.5, -2.2);
+    this.rim.target.position.set(0, 1.5, 0.4);
     // hladna svjetla po redovima orkestra (odozgo i straga)
     const rowZ = [-2.7, -4.2, -5.7];
     rowZ.forEach((z, i) => {
@@ -147,16 +162,20 @@ export class Theatre {
       }
       this.rows.push(L);
     });
-    // mekani topli sjaj na zavjesi iza (dubina)
-    this.curtainLight = new THREE.SpotLight("#ffd2a6", this.base.curtain, 0, THREE.MathUtils.degToRad(26), 1, 2);
-    this.curtainLight.position.set(0, 2.2, 1.5);
-    this.curtainLight.target.position.set(0, 3.5, -8.4);
+    // mek sjaj na naborima zavjese iza orkestra (dubina): odozdo straga, ne dira orkestar
+    this.curtainLight = new THREE.SpotLight("#c9d2e4", this.base.curtain, 0, THREE.MathUtils.degToRad(34), 1, 2);
+    this.curtainLight.position.set(0, 0.4, -6.9);
+    this.curtainLight.target.position.set(0, 4.2, -8.4);
     for (const L of [this.key, this.rim, ...this.rows, this.curtainLight]) this.group.add(L, L.target);
+    this.bounce = new THREE.PointLight("#ffd8b4", this.base.bounce, 3.2, 2);
+    this.bounce.position.set(0.1, -0.04, 1.3); // malo ispod poda: pod ga ne zrcali (bez vruće točke), lutka dobiva svjetlo odozdo
+    this.group.add(this.bounce);
     this.group.add(new THREE.HemisphereLight("#20232a", "#050505", 0.06));
 
     // prašina u snopovima
     this.dust = new DustMotes({ count: 1600, box: new THREE.Box3(new THREE.Vector3(-2.5, 0.2, -1.2), new THREE.Vector3(2.5, 5.5, 2.2)), size: 0.007 });
-    this.dust.setLights([this.key, this.rows[0], this.rim]);
+    // prašina svijetli samo u toplom snopu (u kontroli kvalitete je s više svjetala izgledala kao zvjezdano nebo)
+    this.dust.setLights([this.key]);
     this.group.add(this.dust.points);
   }
 
@@ -183,19 +202,23 @@ export class Theatre {
     this.rim.intensity = this.base.rim * L.rim;
     this.rows.forEach((r, i) => (r.intensity = this.base.row * (L.rows[i] ?? 0)));
     this.curtainLight.intensity = this.base.curtain * L.curtain;
-    this.key.visible = L.key > 0.001;
-    this.rim.visible = L.rim > 0.001;
-    this.rows.forEach((r, i) => (r.visible = (L.rows[i] ?? 0) > 0.001));
-    this.curtainLight.visible = L.curtain > 0.001;
+    this.bounce.intensity = this.base.bounce * L.key;
+    // svjetla se NE gase preko `visible`: promjena broja svjetala u three.js rekompajlira sve materijale (zastoj
+    // od stotina ms usred scrolla). Ugašeno svjetlo = jačina 0; sjena se tada ne crta (shadow.autoUpdate).
+    for (const [light, on] of [[this.key, L.key], [this.rows[0], L.rows[0] ?? 0]] as const) {
+      const live = on > 0.001;
+      if (live && !light.shadow.autoUpdate) light.shadow.needsUpdate = true;
+      light.shadow.autoUpdate = live;
+    }
     this.orchestra.rowLight = L.rows.slice();
   }
 
   volumetricLights() {
     return [
-      { light: this.key, density: 1.0, shadow: true },
-      { light: this.rim, density: 0.6 },
-      { light: this.rows[0], density: 0.5, shadow: true },
-      { light: this.rows[1], density: 0.4 },
+      { light: this.key, density: 1.9, shadow: true, tint: "#ffe1c0" }, // snop u dimu čita se kao tungsten
+      { light: this.rim, density: 0.4 },
+      { light: this.rows[0], density: 0.18, shadow: true },
+      { light: this.rows[1], density: 0.12 },
     ];
   }
 }

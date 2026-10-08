@@ -3,7 +3,7 @@ import { layout, partMap, type Pose, type LathePart, type BallPart } from "@/src
 import { latheGeometry, specOf, watchJointGeometry, neckGeometry } from "./geometry";
 import { palmGeometry, phalanxGeometry, handLocal, HAND_COUNTS, HAND_SCALE } from "./hands";
 import { materialsFor, UNIT } from "./figure";
-import { polishedSteel } from "../materials/steel";
+import { brushedSteel, polishedSteel } from "../materials/steel";
 
 /**
  * Robotski orkestar (10-lik [ROBOT]): isti kanon i oblici, sav brušeni čelik, ista mehanika zglobova; bez lica,
@@ -35,7 +35,13 @@ export class RobotCrowd {
   constructor(count: number) {
     this.count = count;
     this.roots = Array.from({ length: count }, () => new THREE.Matrix4());
-    const mats = materialsFor("robot");
+    // orkestar: vlastiti čelik bez anizotropije (pozadina izvan fokusa; anizotropni odsjaj na malim zakrivljenim
+    // dijelovima daje vruće točke koje izgledaju kao LED) i malo hrapaviji, da odsjaji ne nadjačaju dirigenta
+    const base = materialsFor("robot");
+    const crowdBody = brushedSteel({ brush: 1, roughness: 0.48, anisotropy: 0, tint: 0.98 });
+    // tamna pozornica: čelik bez jačih odraza izgleda kao crni krom; jači odraz okruženja = svijetli brušeni inox
+    crowdBody.envMapIntensity = 2.0;
+    const mats = { ...base, body: crowdBody, head: crowdBody, fingers: crowdBody, brushed: brushedSteel({ brush: 0, roughness: 0.38, anisotropy: 0 }), neckBrushed: brushedSteel({ brush: 2, roughness: 0.32, anisotropy: 0 }) };
     // orkestar je izvan fokusa: polirani dijelovi malo hrapaviji, da točkasti odsjaj reflektora ne izgleda kao LED (10-lik: bez svjetla)
     const polishedSoft = polishedSteel({ roughness: 0.32 });
     polishedSoft.envMapIntensity = 1.0;
@@ -55,9 +61,9 @@ export class RobotCrowd {
     this.neck = [add(new THREE.InstancedMesh(ng.brushed, mats.neckBrushed, count)), add(new THREE.InstancedMesh(ng.polished, polishedSoft, count))];
     const jg = watchJointGeometry("knuckle"); // orkestar je izvan fokusa: zglob bez sitnih zubaca
     this.joints = [add(new THREE.InstancedMesh(jg.brushed, mats.brushed, count * JOINTS.length)), add(new THREE.InstancedMesh(jg.polished, polishedSoft, count * JOINTS.length))];
-    this.palms = add(new THREE.InstancedMesh(palmGeometry(0.4), mats.body, count * 2));
-    this.phal = add(new THREE.InstancedMesh(phalanxGeometry(false), mats.body, count * HAND_COUNTS.phal * 2));
-    this.tips = add(new THREE.InstancedMesh(phalanxGeometry(true), mats.body, count * HAND_COUNTS.tips * 2));
+    this.palms = add(new THREE.InstancedMesh(palmGeometry(0.4), mats.fingers, count * 2));
+    this.phal = add(new THREE.InstancedMesh(phalanxGeometry(false), mats.fingers, count * HAND_COUNTS.phal * 2));
+    this.tips = add(new THREE.InstancedMesh(phalanxGeometry(true), mats.fingers, count * HAND_COUNTS.tips * 2));
     this.knuckles = add(new THREE.InstancedMesh(jg.polished, polishedSoft, count * HAND_COUNTS.knuckles * 2));
   }
 

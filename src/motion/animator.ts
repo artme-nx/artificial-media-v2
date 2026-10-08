@@ -1,4 +1,4 @@
-import { blendPose, type Pose } from "@/src/figure/kanon";
+import { blendPose, type Pose, clonePose } from "@/src/figure/kanon";
 
 /**
  * Pokret kao balet, ne kao lutka na koncu (11 §2): poze se mijenjaju glatko (interpolacija kutova kanona s easingom,
@@ -96,7 +96,7 @@ export class PoseAnimator {
     if (!this.staggered) return this.t >= 1 ? this.to : blendPose(this.from, this.to, this.ease(this.t));
     if (!this.busy) return this.to;
     // svaka skupina tijela ima svoj napredak (opruga + kašnjenje)
-    const out = JSON.parse(JSON.stringify(this.to)) as Record<string, unknown>;
+    const out = clonePose(this.to) as Record<string, unknown>;
     GROUPS.forEach((g, i) => {
       const u = this.springs[i].x;
       const b = blendPose(this.from, this.to, u) as unknown as Record<string, unknown>;
@@ -126,7 +126,7 @@ export class PoseAnimator {
         if (this.elapsed > g.delay) this.springs[i].step(dt, w);
       });
     }
-    const p = JSON.parse(JSON.stringify(this.sampleBase())) as Pose;
+    const p = clonePose(this.sampleBase()) as Pose;
     applySecondary(p, this.time, this.secondary);
     this.overlay?.(p, this.time);
     this.current = p;

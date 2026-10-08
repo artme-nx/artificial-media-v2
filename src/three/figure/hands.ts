@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import type { HandState } from "@/src/figure/kanon";
+import { tangentsAroundY } from "./geometry";
 
 /**
  * Šake s 5 prstiju (10-lik §1): po 3 metalna zgloba na prstu, 2 na palcu. Odstupa od kanona (šaka u jednom komadu);
@@ -75,6 +76,7 @@ export function palmGeometry(seed = 0, side: 1 | -1 = 1) {
   g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
   g.setIndex(idx);
   g.computeVertexNormals();
+  tangentsAroundY(g);
   g.setAttribute("aSeed", new THREE.BufferAttribute(new Float32Array(g.attributes.position.count).fill(seed), 1));
   return g;
 }
@@ -90,6 +92,7 @@ export function phalanxGeometry(tip: boolean) {
   const p = g.attributes.position;
   for (let i = 0; i < p.count; i++) if (p.getZ(i) > 0) p.setZ(i, p.getZ(i) * 0.86);
   g.computeVertexNormals();
+  tangentsAroundY(g);
   g.setAttribute("aSeed", new THREE.BufferAttribute(new Float32Array(g.attributes.position.count), 1));
   return g;
 }

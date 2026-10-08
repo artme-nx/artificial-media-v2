@@ -13,7 +13,7 @@ Zadatak: `brand/11-stranica-v2-zadatak.md` (8. 10. 2026.). Ovaj dokument se ažu
 | F0 Priprema i kostur | ✅ gotovo | live 200 |
 | F1 Tokeni, tipografija, logo, kostur stranice | ✅ gotovo | testovi 39/39 dev, 30/30 prod |
 | F2 Lutka: tijelo, materijali, mehanika | ✅ objavljeno (QC ispod praga) | QC 5,2 → 6,2 → 5,6; nadmašuje donju granicu; preostale mane ispod |
-| F3 Kostim, palica, roboti, pozornica | u tijeku (paralelno) | smoking (skinned), palica, orkestar, pozornica — /lab/scena |
+| F3 Kostim, palica, roboti, pozornica | ✅ objavljeno (QC ispod praga) | QC 5,0 → 5,0 → 5,0; nadmašuje donju granicu (krug 2 i 3); /lab/scena |
 | F4 Kazališni uvod (kadrovi 1–10) | — | |
 | F5 Manifest s baletom, reelovi, svjetovi | — | |
 | F6 Drvo / robot ispod kursora | — | |
@@ -22,11 +22,12 @@ Zadatak: `brand/11-stranica-v2-zadatak.md` (8. 10. 2026.). Ovaj dokument se ažu
 | F9 Nizovi slika, posteri, performanse, pristupačnost | — | |
 | Završetak (README, REVIEW.md) | — | |
 
-**Sljedeći korak:** F2 QC krug 2 (subagent) → commit/deploy F2; zatim dovršiti F3 (still dirigenta s orkestrom, QC).
+**Sljedeći korak:** F4 — vratiti radnu verziju uvoda (stash), uskladiti s pozornicom iz F3, mobitel, kadrovi 1–10 na screenshotovima, QC, commit/deploy.
 
 **Poznati problemi:**
 - F2 QC (3 kruga, prosjek 5,6–6,2, prag 8 nije dostignut). Preostalo prema subagentu: (1) drvo u širokim kadrovima čita se kao mat bež, u makrou "pluto/pjegava ljuska" — kandidat: pečena 4K tekstura ptičjeg oka s mipmapama umjesto čistog proceduralnog shadera; (2) točkasti odsjaji malog reflektora na poliranim dijelovima (struk B, tjeme) — hrapaviji polirani dijelovi ili veći izvori svjetla; (3) amplituda pogleda glave se ne čita dovoljno; (4) poze en haut/dirigent/"seže" još krute; (5) mehanika prstiju i dlan; (6) mehanizam ramena "grub". Ponovna ocjena u F3–F8.
-- Performanse: s punim efektima na DPR 2 scena je preteška (21 fps); dinamička rezolucija drži ~60 fps spuštanjem DPR-a do ~1,4. Dorada u F9.
+- F3 QC (3 kruga, prosjek 5,0; prag 8 nije dostignut; od kruga 2 "nadmašuje donju granicu: da"). Preostalo prema subagentu: (1) drvo — glava "glatka plastika", oči kao mjehurići, šake tamnije/porozne → kandidat i dalje pečena tekstura ptičjeg oka s mipmapama; (2) šaka i palica — dlan blok, prsti ne obuhvaćaju dršku u krupnom kadru, palica na 3/4 kadrovima zrnata; (3) zapešće i vrat čitaju se tamno umjesto svijetlog brušenog čelika; (4) snop bez jasne sjene lutke i ovala na podu u glavnom kadru, slaba kontaktna sjena; (5) aura/rub oko glave i šake (DOF/bloom); (6) pruge sjena na rukavima i leđima (PCSS na tkanini), šljokice; (7) kroj: revers bez debljine, rukavi kao cijevi, ovratnik; (8) poza stilla "ta-da", noge paralelne; (9) logika stilla (dirigent okrenut kameri — namjerno, kao kadar 10/Blender, ali QC traži 3/4 prema orkestru s podijem i pultom); (10) široki kadar slabo čita kazalište; (11) orkestar u istoj pozi, bijeli odsjaji na zglobovima; (12) šake pod toplim svjetlom djeluju zlatno.
+- Performanse: s punim efektima na DPR 2 scena je preteška (21 fps); dinamička rezolucija drži ~60 fps spuštanjem DPR-a do ~1,4. Razina high smanjena (MSAA 2, volumetrija 0,4/36, AO 12) → ~70–86 fps na DPR 1. Dorada u F9.
 
 ## Plan
 
@@ -55,10 +56,10 @@ Redoslijed: F0 → F1 → F2 → … → F9 → završetak. Svaka faza: testovi 
 - [ ] Interakcija 4: lutka gleda reel (F5)
 - [ ] Interakcija 5: révérence na dnu stranice (F7)
 - [ ] Kazališni uvod, kadrovi 1–6, titranje vezano za scroll i unatrag, skip, statična verzija, pravi tekst (F4)
-- [ ] Dirigent u smokingu, tri takta 4/4, kimanje na prvi udarac (F3, F4)
-- [ ] Robotski orkestar, kadrovi 7–10 (F3, F4)
+- [~] Dirigent u smokingu, tri takta 4/4, kimanje na prvi udarac (F3, F4) — kostim i poze u F3; takt u uvodu F4
+- [~] Robotski orkestar, kadrovi 7–10 (F3, F4) — orkestar gotov (F3), kadrovi u F4
 - [ ] Mrak → svijetli ostatak stranice (F4)
-- [ ] Smoking dorađen: reveri, skut, gumbi; palica vidljiva (F3)
+- [x] Smoking dorađen: reveri, skut, gumbi; palica vidljiva (F3) — frak sa skutovima, 2×3 gumba, studovi, pojas; `?kroj=frak|smoking`
 - [ ] Drvo / robot ispod kursora, poravnato i u pokretu; mobitel prst i samostalno kretanje (F6)
 - [ ] Niz slika umjesto videa, `ScrollSequence`, skripta video → frameovi, rezolucija po uređaju (F9)
 - [ ] Ne šteka, izgleda kao 4K video (F9, §6)
@@ -67,9 +68,9 @@ Redoslijed: F0 → F1 → F2 → … → F9 → završetak. Svaka faza: testovi 
 **10-lik**
 - [~] Ptičje oko javor, brušeni čelik, mehanika sata na svim navedenim zglobovima, 5 prstiju s 3/2 zgloba (F2) — napravljeno; QC ocjenjuje drvo i mehaniku prstiju ispod praga
 - [x] Struk A i B kao prekidač (F2)
-- [ ] Kostim, palica, ljubičasta samo na leptir-mašni i maramici (F3)
-- [ ] Roboti po [ROBOT], orkestar u pozadini i izvan fokusa (F3)
-- [ ] Toplo svjetlo na dirigentu, hladno na orkestru (F3)
+- [x] Kostim, palica, ljubičasta samo na leptir-mašni i maramici (F3)
+- [x] Roboti po [ROBOT], orkestar u pozadini i izvan fokusa (F3) — bez vrućih točaka (test `hotspots.spec.ts`)
+- [x] Toplo svjetlo na dirigentu, hladno na orkestru (F3)
 - [ ] Provjera §4 prolazi na svakom screenshotu s likom (F2–F8)
 
 **05-logo i 04-ime**
@@ -100,3 +101,4 @@ Redoslijed: F0 → F1 → F2 → … → F9 → završetak. Svaka faza: testovi 
 - QC F2 krug 1 (subagent): 5,2 — mane: ptičje oko, moiré, krom zglobovi, uzemljenje, plitka mehanika, šaka, izgorjeli rubovi, poze, kadriranje → popravljeno.
 - Uvoz snimljenog pokreta: scripts/import-motion.mjs (glTF RIG_lutka → kanon-parts-frames), samoprovjera 1,5·10⁻⁵.
 - F2 QC krug 2: 6,2; krug 3: 5,6 → F2 zatvoren s popisom preostalih mana (gore). Commit + deploy F2.
+- F3: frak (skinned) sa skutovima i rezom u struku, gumbi, studovi, pojas, krilati ovratnik, leptir-mašna i maramica; vuna s naborima; palica u šaci; robotski orkestar (instanciran) s instrumentima; pozornica (pod, baršun, portal), tungsten snop s bojom u dimu, hladni orkestar, kontra svjetlo, odbljesak poda; jednobojno zrno; prašina samo u snopu. Pronađen i uklonjen uzrok "LED" točaka (anizotropni GGX na sitnim dijelovima) + test vrućih točaka. Svjetla se više ne gase preko `visible` (rekompajliranje usred scrolla). Razina high ubrzana (~53 → ~70–86 fps). QC 3 kruga: 5,0 / 5,0 / 5,0 (krug 2–3: nadmašuje donju granicu) → F3 zatvoren s popisom preostalih mana.

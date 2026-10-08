@@ -122,6 +122,25 @@ function addSeed(g: THREE.BufferGeometry, seed: number) {
   return g;
 }
 
+/** Tangente za tijela tokarena oko osi y (prsti, dlan): anizotropni čelik bez tangenti daje vruće točke (NaN/∞ u GGX-u). */
+export function tangentsAroundY(g: THREE.BufferGeometry) {
+  const p = g.attributes.position, n = g.attributes.normal;
+  const t = new Float32Array(p.count * 4);
+  const P = new THREE.Vector3(), N = new THREE.Vector3(), T = new THREE.Vector3();
+  for (let i = 0; i < p.count; i++) {
+    P.fromBufferAttribute(p, i);
+    N.fromBufferAttribute(n, i);
+    T.set(P.z, 0, -P.x); // kružnica oko y
+    if (T.lengthSq() < 1e-12) T.set(1, 0, 0);
+    T.addScaledVector(N, -T.dot(N));
+    if (T.lengthSq() < 1e-10) T.set(1, 0, 0).addScaledVector(N, -N.x);
+    T.normalize();
+    t.set([T.x, T.y, T.z, 1], i * 4);
+  }
+  g.setAttribute("tangent", new THREE.BufferAttribute(t, 4));
+  return g;
+}
+
 /** Tangente za kružno brušenje oko osi x: smjer anizotropije okomit na linije brušenja. */
 export function tangentsAroundX(g: THREE.BufferGeometry) {
   const p = g.attributes.position, n = g.attributes.normal;

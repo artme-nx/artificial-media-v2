@@ -39,7 +39,7 @@ const CAM: CamKey[] = [
   { p: 0.46, pos: [2.6, 1.6, 4.6], target: [-0.2, 1.4, -0.6], mm: 50 }, // 7→8: kamera obilazi na 3/4 iza dirigenta
   { p: 0.6, pos: [1.7, 1.7, 5.3], target: [-0.1, 1.4, -1.6], mm: 45 }, // 8→9: preko ramena, orkestar u dubini
   { p: 0.86, pos: [1.2, 1.6, 4.9], target: [-0.1, 1.45, -1.2], mm: 50 }, // 9
-  { p: 1.0, pos: [0.0, 1.45, 5.4], target: [0.0, 1.3, 0.4], mm: 55 }, // 10: naklon prema gledatelju
+  { p: 1.0, pos: [2.3, 1.3, 5.0], target: [0.0, 1.15, 0.4], mm: 50 }, // 10: naklon prema gledatelju (3/4, da se pregib vidi)
 ];
 
 export class IntroScene implements StageScene {
@@ -80,10 +80,18 @@ export class IntroScene implements StageScene {
     this.apply(0);
   }
 
+  /** Za compileAsync: sve skriveno privremeno vidljivo (inače se shaderi kompajliraju tek usred scrolla). */
+  showAllForCompile() {
+    const objs = [this.dancer.group, this.theatre.conductor.group, this.theatre.orchestra.group];
+    const prev = objs.map((o) => o.visible);
+    objs.forEach((o) => (o.visible = true));
+    return () => objs.forEach((o, i) => (o.visible = prev[i]));
+  }
+
   activate(engine: Engine) {
     this.engine = engine;
-    this.scene.environment = this.theatre.environment(engine.renderer);
-    this.scene.environmentIntensity = 0.7;
+    this.scene.environment ??= this.theatre.environment(engine.renderer);
+    this.scene.environmentIntensity = 0.85;
     this.theatre.conductor.viewCamera = this.camera;
     this.configurePost();
   }
@@ -92,15 +100,15 @@ export class IntroScene implements StageScene {
     if (!this.engine) return;
     this.engine.post.configure({
       exposure: 1.0,
-      ao: { radius: 0.25, falloff: 0.6, intensity: 2.0 },
+      ao: { radius: 0.12, falloff: 0.6, intensity: 1.4 },
       volumetric: {
         lights: [
-          { light: this.theatre.key, density: 1.0, shadow: true },
+          ...this.theatre.volumetricLights().slice(0, 1),
           { light: this.backlight, density: 0.55, shadow: true },
-          { light: this.theatre.rim, density: 0.6 },
-          { light: this.theatre.rows[0], density: 0.5 },
+          { light: this.theatre.rim, density: 0.4 },
+          { light: this.theatre.rows[0], density: 0.18 },
         ],
-        settings: { density: 0.09, ambientDensity: 0.0015, ambientColor: "#8a96b0", heightFalloff: 0.1, floorY: 0, noiseScale: 0.32, noiseAmount: 0.9, g: 0.6, intensity: 1 },
+        settings: { density: 0.09, ambientDensity: 0.0006, ambientColor: "#7d8088", heightFalloff: 0.1, floorY: 0, noiseScale: 0.32, noiseAmount: 0.9, g: 0.42, intensity: 1 },
       },
       dof: { focus: 5, range: 1.2, bokeh: 4 },
       bloom: { intensity: 0.35, threshold: 4.0, smoothing: 0.4, radius: 0.6 },
@@ -129,8 +137,9 @@ export class IntroScene implements StageScene {
     // plesačica (kadar 2) je vidljiva samo prije otkrivanja dirigenta
     const dancerOn = this.dancerLevel > 0.001 && reveal < 0.01;
     this.dancer.group.visible = dancerOn;
-    this.backlight.intensity = 70 * this.dancerLevel;
-    this.backlight.visible = dancerOn;
+    this.backlight.intensity = dancerOn ? 70 * this.dancerLevel : 0; // bez `visible` (vidi Theatre.applyLevels)
+    if (dancerOn && !this.backlight.shadow.autoUpdate) this.backlight.shadow.needsUpdate = true;
+    this.backlight.shadow.autoUpdate = dancerOn;
     this.theatre.conductor.group.visible = p >= F.reveal[0];
     // orkestar: drži instrumente od kadra 8, svira u kadru 9, spušta u kadru 10
     T.orchestra.group.visible = rows > 0.001;
@@ -171,11 +180,12 @@ export class IntroScene implements StageScene {
   /** Naklon dirigenta prema publici: dubok naklon iz struka, ruka s palicom uz tijelo, druga na prsima. */
   private bowPose(): Pose {
     const b = getPose("stoji");
-    b.pelvis.pitch = 8;
-    b.chest.pitch = 30;
-    b.neck.pitch = 10;
-    b.head.pitch = 14;
-    b.armL = { th: [-8, -4, 0], ph: [20, 30, 30], roll: [0, 0, 0] };
+    b.pelvis.pitch = 14;
+    b.chest.pitch = 40;
+    b.neck.pitch = 12;
+    b.head.pitch = 18;
+    // ruka s palicom ispružena dolje uz tijelo, palica prema podu; druga ruka na prsima
+    b.armL = { th: [-14, -8, -4], ph: [12, 26, 30], roll: [0, 0, 0] };
     b.armR = { th: [30, -60, -70], ph: [30, 55, 50], roll: [0, 0, 80] };
     return normalizePose(b);
   }

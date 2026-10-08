@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { RobotCrowd } from "../figure/crowd";
 import { UNIT } from "../figure/figure";
 import { getPose } from "@/src/motion/library";
-import { armIK, dirToAngles, layout, partMap, normalizePose, HAND_GRIP, HAND_HOLD, type Pose, type BallPart, type LathePart, type Vec3 } from "@/src/figure/kanon";
+import { armIK, dirToAngles, layout, partMap, normalizePose, clonePose, HAND_GRIP, HAND_HOLD, type Pose, type BallPart, type LathePart, type Vec3 } from "@/src/figure/kanon";
 import { brushedSteel, polishedSteel } from "../materials/steel";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 
@@ -14,7 +14,7 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 type Kind = "violina" | "violoncelo" | "timpani";
 type Seat = { kind: Kind; pos: THREE.Vector3; yaw: number; row: number; phase: number };
 
-const LACQUER = new THREE.MeshPhysicalMaterial({ color: "#070708", roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.1 });
+const LACQUER = new THREE.MeshPhysicalMaterial({ color: "#0b0b0d", roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.18, envMapIntensity: 1.7 });
 const STRING = new THREE.MeshPhysicalMaterial({ color: "#e8e4dc", roughness: 0.5, sheen: 0.6, sheenColor: new THREE.Color("#ffffff"), envMapIntensity: 0.6 });
 const SILVER = new THREE.MeshPhysicalMaterial({ color: "#b9bcc0", metalness: 1, roughness: 0.4, envMapIntensity: 0.9 });
 const HEAD_SKIN = new THREE.MeshPhysicalMaterial({ color: "#d9d4ca", roughness: 0.65, sheen: 0.3, envMapIntensity: 0.5 });
@@ -161,7 +161,7 @@ export class Orchestra {
       40,
     );
     kettle.translate(0, 0.38, 0);
-    add(kettle, brushedSteel({ brush: 2, roughness: 0.3 }), "timpani", nTim);
+    add(kettle, brushedSteel({ brush: 2, roughness: 0.32, anisotropy: 0 }), "timpani", nTim);
     const head = new THREE.CircleGeometry(0.355, 40).rotateX(-Math.PI / 2).translate(0, 0.79, 0);
     add(head, HEAD_SKIN, "timpani", nTim);
     const legsT = new THREE.CylinderGeometry(0.015, 0.015, 0.4, 6).translate(0, 0.2, 0);
@@ -194,7 +194,7 @@ export class Orchestra {
     const bowMs: THREE.Matrix4[] = [], malletMs: THREE.Matrix4[] = [];
     this.seats.forEach((s, i) => {
       const root = new THREE.Matrix4().compose(s.pos, q.setFromEuler(new THREE.Euler(0, s.yaw, 0)), new THREE.Vector3(1, 1, 1));
-      const pose = JSON.parse(JSON.stringify(this.base)) as Pose;
+      const pose = clonePose(this.base);
       const pl = this.playing;
       const sway = Math.sin(t * 1.3 + s.phase * 6.28) * 2 * pl;
       pose.chest.tilt += sway;

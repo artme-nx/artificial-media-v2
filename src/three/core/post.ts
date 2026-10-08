@@ -10,12 +10,11 @@ import {
   SMAAPreset,
   EdgeDetectionMode,
   VignetteEffect,
-  NoiseEffect,
-  BlendFunction,
   DepthOfFieldEffect,
 } from "postprocessing";
 import { N8AOPostPass } from "n8ao";
 import { VolumetricPass, type VolLight, type VolSettings } from "./volumetric";
+import { FilmGrainEffect } from "./grain";
 
 /**
  * Lanac efekata (11 §2): RenderPass → N8AO (AO) → volumetrijski snopovi → dubina polja → bloom + AgX
@@ -23,7 +22,9 @@ import { VolumetricPass, type VolLight, type VolSettings } from "./volumetric";
  */
 export type Tier = "high" | "medium" | "low";
 export const TIERS: Record<Tier, { msaa: number; dprMax: number; ao: boolean; aoHalf: boolean; aoSamples: number; volScale: number; volSteps: number; dof: boolean; dofScale: number; bloom: boolean; shadowMap: number; smaa: SMAAPreset }> = {
-  high: { msaa: 4, dprMax: 2, ao: true, aoHalf: false, aoSamples: 16, volScale: 0.5, volSteps: 44, dof: true, dofScale: 0.5, bloom: true, shadowMap: 2048, smaa: SMAAPreset.HIGH },
+  // high: izmjereno na M5 (1440×900, DPR 1, puni orkestar): MSAA 4 → 2, volumetrija 0,5/44 → 0,4/36, AO 16 → 12 uzoraka
+  // podiže kadar s 53 na ~70 fps bez vidljive razlike (SMAA ostaje HIGH, volumetrija se bilateralno skalira)
+  high: { msaa: 2, dprMax: 2, ao: true, aoHalf: false, aoSamples: 12, volScale: 0.4, volSteps: 36, dof: true, dofScale: 0.5, bloom: true, shadowMap: 2048, smaa: SMAAPreset.HIGH },
   medium: { msaa: 0, dprMax: 1.5, ao: true, aoHalf: true, aoSamples: 8, volScale: 0.35, volSteps: 28, dof: true, dofScale: 0.35, bloom: false, shadowMap: 1024, smaa: SMAAPreset.MEDIUM },
   low: { msaa: 0, dprMax: 1, ao: false, aoHalf: true, aoSamples: 6, volScale: 0.25, volSteps: 16, dof: false, dofScale: 0.25, bloom: false, shadowMap: 1024, smaa: SMAAPreset.LOW },
 };
@@ -51,7 +52,7 @@ export class Post {
   gradePass: EffectPass;
   smaa: SMAAEffect;
   vignette: VignetteEffect;
-  grain: NoiseEffect;
+  grain: FilmGrainEffect;
   finishPass: EffectPass;
   tier: Tier = "high";
   private cfg: PostConfig = {};
@@ -81,8 +82,7 @@ export class Post {
     this.gradePass = new EffectPass(camera, this.bloom, this.tone);
     this.smaa = new SMAAEffect({ preset: SMAAPreset.HIGH, edgeDetectionMode: EdgeDetectionMode.COLOR });
     this.vignette = new VignetteEffect({ offset: 0.3, darkness: 0.5 });
-    this.grain = new NoiseEffect({ blendFunction: BlendFunction.OVERLAY, premultiply: false });
-    this.grain.blendMode.opacity.value = 0.06;
+    this.grain = new FilmGrainEffect(0.02);
     this.finishPass = new EffectPass(camera, this.smaa, this.vignette, this.grain);
     for (const p of [this.renderPass, this.n8ao, this.volumetric, this.dofPass, this.gradePass, this.finishPass]) this.composer.addPass(p as never);
   }
@@ -100,7 +100,7 @@ export class Post {
   setTier(tier: Tier) {
     this.tier = tier;
     const q = TIERS[tier];
-    Object.assign(this.n8ao.configuration, { halfRes: q.aoHalf, aoSamples: q.aoSamples, denoiseSamples: q.aoHalf ? 4 : 8 });
+    Object.assign(this.n8ao.configuration, { halfRes: q.aoHalf, aoSamples: q.aoSamples, denoiseSamples: q.aoHalf ? 4 : 6 });
     this.volumetric.setResolutionScale(q.volScale);
     this.volumetric.setSteps(q.volSteps);
     this.dof.resolution.scale = q.dofScale;
@@ -150,7 +150,8 @@ export class Post {
       if (c.vignette.darkness !== undefined) this.vignette.darkness = c.vignette.darkness;
       if (c.vignette.offset !== undefined) this.vignette.offset = c.vignette.offset;
     }
-    this.grain.blendMode.opacity.value = c.grain ?? 0.06;
+    // c.grain je jačina u istom rasponu kao prije (0,06–0,14); jednobojno zrno je jače po jedinici
+    this.grain.amount = (c.grain ?? 0.06) * 0.22;
   }
 
   /** w, h u CSS pikselima; dpr = trenutni omjer piksela (dinamička rezolucija). */

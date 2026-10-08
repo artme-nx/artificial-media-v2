@@ -18,10 +18,19 @@ export function ScenaLab() {
       engine = new Engine(canvas.current, { tier: (q.get("q") as "high") || "auto", probe: true });
       const s = new StageLabScene(host.current, {
         cam: (q.get("cam") as StageCam) || "still",
-        pose: (q.get("pose") as PoseName) || "dirigent_rad",
-        yaw: q.has("okret") ? Number(q.get("okret")) : 180,
+        pose: (q.get("pose") as PoseName) || undefined,
+        yaw: q.has("okret") ? Number(q.get("okret")) : undefined,
         rows: q.has("redovi") ? Number(q.get("redovi")) : 3,
-        play: q.get("svira") === "1",
+        play: q.has("svira") ? q.get("svira") === "1" : undefined,
+        custom: q.has("cpos")
+          ? {
+              pos: q.get("cpos")!.split(",").map(Number) as [number, number, number],
+              target: (q.get("ctgt") ?? "0,1.45,0.4").split(",").map(Number) as [number, number, number],
+              mm: Number(q.get("mm") ?? 50),
+              fStop: Number(q.get("f") ?? 2),
+              focus: q.has("cfoc") ? (q.get("cfoc")!.split(",").map(Number) as [number, number, number]) : [0, 1.5, 0.4],
+            }
+          : undefined,
       });
       const fit = () => engine!.resize(host.current!.clientWidth, host.current!.clientHeight);
       engine.setScene(s);

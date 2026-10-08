@@ -1,431 +1,514 @@
 {
- "stoji": {
-  "_opis": "Mirovanje: simetrično, ruke malo od tijela (kao REST u brand/09-blender/prep2.py).",
-  "pelvis": {
-   "tilt": 0,
-   "pitch": 0,
-   "yaw": 0
+  "stoji": {
+    "_opis": "Mirovanje: simetrično, ruke malo od tijela (kao REST u brand/09-blender/prep2.py).",
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "armL": {
+      "th": [
+        -16,
+        -10,
+        -8
+      ],
+      "ph": [
+        0,
+        6,
+        6
+      ],
+      "roll": [
+        0,
+        0,
+        0
+      ]
+    },
+    "armR": {
+      "th": [
+        16,
+        10,
+        8
+      ],
+      "ph": [
+        0,
+        6,
+        6
+      ],
+      "roll": [
+        0,
+        0,
+        0
+      ]
+    },
+    "legL": {
+      "th": [
+        -2.5,
+        -2.5
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -10
+    },
+    "legR": {
+      "th": [
+        2.5,
+        2.5
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 10
+    },
+    "handL": "relaxed",
+    "handR": "relaxed"
   },
-  "chest": {
-   "tilt": 0,
-   "pitch": 0,
-   "yaw": 0
+  "kontrapost_s": {
+    "_opis": "Scenski kontrapost (iznad kanona): jači nagib zdjelice i protunagib ramena, glava prati liniju.",
+    "pelvis": {
+      "tilt": 9,
+      "pitch": 0,
+      "yaw": -8
+    },
+    "chest": {
+      "tilt": -7,
+      "pitch": -1,
+      "yaw": 10
+    },
+    "neck": {
+      "tilt": 4,
+      "pitch": 3,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": -7,
+      "pitch": 6,
+      "yaw": -18
+    },
+    "armL": {
+      "th": [
+        -4,
+        -2,
+        0
+      ],
+      "ph": [
+        -2,
+        8,
+        6
+      ],
+      "roll": [
+        0,
+        0,
+        30
+      ]
+    },
+    "armR": {
+      "th": [
+        36,
+        -50,
+        -50
+      ],
+      "ph": [
+        -15,
+        30,
+        30
+      ],
+      "roll": [
+        0,
+        0,
+        20
+      ]
+    },
+    "legL": {
+      "th": [
+        6,
+        3
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -12
+    },
+    "legR": {
+      "th": [
+        2,
+        8
+      ],
+      "ph": [
+        6,
+        -8
+      ],
+      "foot": 26
+    },
+    "handL": "relaxed",
+    "handR": "relaxed"
   },
-  "neck": {
-   "tilt": 0,
-   "pitch": 0,
-   "yaw": 0
+  "b1_enhaut": {
+    "_opis": "Balet 1 (scena): obje ruke en haut u ovalu iznad glave, pete zajedno (prva pozicija), stopala prema van.",
+    "support": "L",
+    "touch": -1,
+    "pelvis": {
+      "tilt": 0,
+      "pitch": 0,
+      "yaw": 0
+    },
+    "chest": {
+      "tilt": 0,
+      "pitch": -4,
+      "yaw": 0
+    },
+    "neck": {
+      "tilt": 0,
+      "pitch": -4,
+      "yaw": 0
+    },
+    "head": {
+      "tilt": -6,
+      "pitch": -10,
+      "yaw": -14
+    },
+    "armL": {
+      "th": [
+        -160,
+        -212,
+        -236
+      ],
+      "ph": [
+        -4,
+        -2,
+        0
+      ],
+      "roll": [
+        0,
+        0,
+        -70
+      ]
+    },
+    "armR": {
+      "th": [
+        160,
+        212,
+        236
+      ],
+      "ph": [
+        -4,
+        -2,
+        0
+      ],
+      "roll": [
+        0,
+        0,
+        70
+      ]
+    },
+    "legL": {
+      "th": [
+        2.3,
+        2.3
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -38,
+      "fp": 0
+    },
+    "legR": {
+      "th": [
+        -2.3,
+        -2.3
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 38,
+      "fp": 0
+    },
+    "handL": {
+      "curl": [
+        0.2,
+        0.12,
+        0.16,
+        0.2,
+        0.26
+      ],
+      "spread": 0.05,
+      "thumb": 0.25
+    },
+    "handR": {
+      "curl": [
+        0.2,
+        0.12,
+        0.16,
+        0.2,
+        0.26
+      ],
+      "spread": 0.05,
+      "thumb": 0.25
+    }
   },
-  "head": {
-   "tilt": 0,
-   "pitch": 0,
-   "yaw": 0
+  "dirigent_rad": {
+    "_opis": "Radna poza dirigenta (F3, popravljeno po QC): lakat s palicom van i dolje, podlaktica prema gore-naprijed (ruka s palicom ispred ramena), slobodna ruka podignuta otvorenog dlana prema sekciji; prsa nagnuta prema orkestru i zakrenuta, glava prati slobodnu ruku; težina na jednoj nozi.",
+    "support": "L",
+    "pelvis": {
+      "tilt": 4,
+      "pitch": 0,
+      "yaw": -4
+    },
+    "chest": {
+      "tilt": -3,
+      "pitch": 6,
+      "yaw": -9
+    },
+    "neck": {
+      "tilt": 2,
+      "pitch": 2,
+      "yaw": 8
+    },
+    "head": {
+      "tilt": 4,
+      "pitch": -4,
+      "yaw": 16
+    },
+    "armL": {
+      "th": [
+        -62,
+        135,
+        112
+      ],
+      "ph": [
+        35,
+        60,
+        30
+      ],
+      "roll": [
+        0,
+        0,
+        -35
+      ]
+    },
+    "armR": {
+      "th": [
+        55,
+        -160,
+        -165
+      ],
+      "ph": [
+        40,
+        54,
+        40
+      ],
+      "roll": [
+        0,
+        0,
+        70
+      ]
+    },
+    "legL": {
+      "th": [
+        -5,
+        -2
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -20
+    },
+    "legR": {
+      "th": [
+        9,
+        4
+      ],
+      "ph": [
+        12,
+        -9
+      ],
+      "foot": 28
+    },
+    "handL": "grip",
+    "handR": "elegant"
   },
-  "armL": {
-   "th": [
-    -16,
-    -10,
-    -8
-   ],
-   "ph": [
-    0,
-    6,
-    6
-   ],
-   "roll": [
-    0,
-    0,
-    0
-   ]
+  "seze_s": {
+    "_opis": "Scenski 'seže' (iznad kanona): cijelo tijelo sudjeluje — zdjelica i prsa se nagnu prema ruci, rame se podigne, glava prati šaku.",
+    "pelvis": {
+      "tilt": -4,
+      "pitch": 0,
+      "yaw": 8
+    },
+    "chest": {
+      "tilt": 8,
+      "pitch": -6,
+      "yaw": 12
+    },
+    "neck": {
+      "tilt": 3,
+      "pitch": -8,
+      "yaw": 4
+    },
+    "head": {
+      "tilt": 8,
+      "pitch": -16,
+      "yaw": 24
+    },
+    "armL": {
+      "th": [
+        -10,
+        -6,
+        0
+      ],
+      "ph": [
+        -6,
+        6,
+        8
+      ],
+      "roll": [
+        0,
+        0,
+        30
+      ]
+    },
+    "armR": {
+      "th": [
+        150,
+        162,
+        168
+      ],
+      "ph": [
+        14,
+        16,
+        12
+      ],
+      "roll": [
+        0,
+        0,
+        0
+      ]
+    },
+    "legL": {
+      "th": [
+        3,
+        -1
+      ],
+      "ph": [
+        4,
+        -4
+      ],
+      "foot": -18
+    },
+    "legR": {
+      "th": [
+        -5,
+        -2
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": 10
+    },
+    "handL": "relaxed",
+    "handR": "open"
   },
-  "armR": {
-   "th": [
-    16,
-    10,
-    8
-   ],
-   "ph": [
-    0,
-    6,
-    6
-   ],
-   "roll": [
-    0,
-    0,
-    0
-   ]
-  },
-  "legL": {
-   "th": [
-    -2.5,
-    -2.5
-   ],
-   "ph": [
-    0,
-    0
-   ],
-   "foot": -10
-  },
-  "legR": {
-   "th": [
-    2.5,
-    2.5
-   ],
-   "ph": [
-    0,
-    0
-   ],
-   "foot": 10
-  },
-  "handL": "relaxed",
-  "handR": "relaxed"
- },
- "kontrapost_s": {
-  "_opis": "Scenski kontrapost (iznad kanona): jači nagib zdjelice i protunagib ramena, glava prati liniju.",
-  "pelvis": {
-   "tilt": 9,
-   "pitch": 0,
-   "yaw": -8
-  },
-  "chest": {
-   "tilt": -7,
-   "pitch": -1,
-   "yaw": 10
-  },
-  "neck": {
-   "tilt": 4,
-   "pitch": 3,
-   "yaw": 0
-  },
-  "head": {
-   "tilt": -7,
-   "pitch": 6,
-   "yaw": -18
-  },
-  "armL": {
-   "th": [
-    -4,
-    -2,
-    0
-   ],
-   "ph": [
-    -2,
-    8,
-    6
-   ],
-   "roll": [
-    0,
-    0,
-    30
-   ]
-  },
-  "armR": {
-   "th": [
-    36,
-    -50,
-    -50
-   ],
-   "ph": [
-    -15,
-    30,
-    30
-   ],
-   "roll": [
-    0,
-    0,
-    20
-   ]
-  },
-  "legL": {
-   "th": [
-    6,
-    3
-   ],
-   "ph": [
-    0,
-    0
-   ],
-   "foot": -12
-  },
-  "legR": {
-   "th": [
-    2,
-    8
-   ],
-   "ph": [
-    6,
-    -8
-   ],
-   "foot": 26
-  },
-  "handL": "relaxed",
-  "handR": "relaxed"
- },
- "b1_enhaut": {
-  "_opis": "Balet 1 (scena): obje ruke en haut u ovalu iznad glave, pete zajedno (prva pozicija), stopala prema van.",
-  "support": "L",
-  "touch": -1,
-  "pelvis": {
-   "tilt": 0,
-   "pitch": 0,
-   "yaw": 0
-  },
-  "chest": {
-   "tilt": 0,
-   "pitch": -4,
-   "yaw": 0
-  },
-  "neck": {
-   "tilt": 0,
-   "pitch": -4,
-   "yaw": 0
-  },
-  "head": {
-   "tilt": -6,
-   "pitch": -10,
-   "yaw": -14
-  },
-  "armL": {
-   "th": [
-    -160,
-    -212,
-    -236
-   ],
-   "ph": [
-    -4,
-    -2,
-    0
-   ],
-   "roll": [
-    0,
-    0,
-    -70
-   ]
-  },
-  "armR": {
-   "th": [
-    160,
-    212,
-    236
-   ],
-   "ph": [
-    -4,
-    -2,
-    0
-   ],
-   "roll": [
-    0,
-    0,
-    70
-   ]
-  },
-  "legL": {
-   "th": [
-    2.3,
-    2.3
-   ],
-   "ph": [
-    0,
-    0
-   ],
-   "foot": -38,
-   "fp": 0
-  },
-  "legR": {
-   "th": [
-    -2.3,
-    -2.3
-   ],
-   "ph": [
-    0,
-    0
-   ],
-   "foot": 38,
-   "fp": 0
-  },
-  "handL": {
-   "curl": [
-    0.2,
-    0.12,
-    0.16,
-    0.2,
-    0.26
-   ],
-   "spread": 0.05,
-   "thumb": 0.25
-  },
-  "handR": {
-   "curl": [
-    0.2,
-    0.12,
-    0.16,
-    0.2,
-    0.26
-   ],
-   "spread": 0.05,
-   "thumb": 0.25
+  "dirigent_poziv": {
+    "_opis": "Still (F3): trenutak prije prvog udarca — palica visoko, slobodna ruka ispružena naprijed prema sekciji otvorenim dlanom, glava prati ruku; prsa blago naprijed.",
+    "support": "L",
+    "pelvis": {
+      "tilt": 6,
+      "pitch": 0,
+      "yaw": -5
+    },
+    "chest": {
+      "tilt": -4,
+      "pitch": 5,
+      "yaw": -8
+    },
+    "neck": {
+      "tilt": 2,
+      "pitch": 1,
+      "yaw": 6
+    },
+    "head": {
+      "tilt": 5,
+      "pitch": -6,
+      "yaw": 14
+    },
+    "armL": {
+      "th": [
+        -70,
+        -160,
+        -170
+      ],
+      "ph": [
+        20,
+        25,
+        20
+      ],
+      "roll": [
+        0,
+        0,
+        -30
+      ]
+    },
+    "armR": {
+      "th": [
+        40,
+        72,
+        86
+      ],
+      "ph": [
+        28,
+        62,
+        52
+      ],
+      "roll": [
+        0,
+        0,
+        80
+      ]
+    },
+    "legL": {
+      "th": [
+        -5,
+        -2
+      ],
+      "ph": [
+        0,
+        0
+      ],
+      "foot": -22
+    },
+    "legR": {
+      "th": [
+        9,
+        4
+      ],
+      "ph": [
+        14,
+        -10
+      ],
+      "foot": 30
+    },
+    "handL": "grip",
+    "handR": "elegant"
   }
- },
- "dirigent_rad": {
-  "_opis": "Radna poza dirigenta: ruka s palicom (L, desna ruka lutke) naprijed u visini prsa, lakat van; druga ruka otvorenog dlana.",
-  "pelvis": {
-   "tilt": 0,
-   "pitch": 0,
-   "yaw": 0
-  },
-  "chest": {
-   "tilt": 1,
-   "pitch": -3,
-   "yaw": -5
-  },
-  "neck": {
-   "tilt": 0,
-   "pitch": -2,
-   "yaw": -4
-  },
-  "head": {
-   "tilt": 2,
-   "pitch": -4,
-   "yaw": -8
-  },
-  "armL": {
-   "th": [
-    -48,
-    22,
-    32
-   ],
-   "ph": [
-    38,
-    62,
-    64
-   ],
-   "roll": [
-    0,
-    0,
-    -10
-   ]
-  },
-  "armR": {
-   "th": [
-    40,
-    -12,
-    -20
-   ],
-   "ph": [
-    30,
-    52,
-    48
-   ],
-   "roll": [
-    0,
-    0,
-    70
-   ]
-  },
-  "legL": {
-   "th": [
-    -7,
-    -3
-   ],
-   "ph": [
-    -2,
-    2
-   ],
-   "foot": -14
-  },
-  "legR": {
-   "th": [
-    4,
-    1
-   ],
-   "ph": [
-    8,
-    -2
-   ],
-   "foot": 20
-  },
-  "handL": "grip",
-  "handR": "open"
- },
- "seze_s": {
-  "_opis": "Scenski 'seže' (iznad kanona): cijelo tijelo sudjeluje — zdjelica i prsa se nagnu prema ruci, rame se podigne, glava prati šaku.",
-  "pelvis": {
-   "tilt": -4,
-   "pitch": 0,
-   "yaw": 8
-  },
-  "chest": {
-   "tilt": 8,
-   "pitch": -6,
-   "yaw": 12
-  },
-  "neck": {
-   "tilt": 3,
-   "pitch": -8,
-   "yaw": 4
-  },
-  "head": {
-   "tilt": 8,
-   "pitch": -16,
-   "yaw": 24
-  },
-  "armL": {
-   "th": [
-    -10,
-    -6,
-    0
-   ],
-   "ph": [
-    -6,
-    6,
-    8
-   ],
-   "roll": [
-    0,
-    0,
-    30
-   ]
-  },
-  "armR": {
-   "th": [
-    150,
-    162,
-    168
-   ],
-   "ph": [
-    14,
-    16,
-    12
-   ],
-   "roll": [
-    0,
-    0,
-    0
-   ]
-  },
-  "legL": {
-   "th": [
-    3,
-    -1
-   ],
-   "ph": [
-    4,
-    -4
-   ],
-   "foot": -18
-  },
-  "legR": {
-   "th": [
-    -5,
-    -2
-   ],
-   "ph": [
-    0,
-    0
-   ],
-   "foot": 10
-  },
-  "handL": "relaxed",
-  "handR": "open"
- }
 }

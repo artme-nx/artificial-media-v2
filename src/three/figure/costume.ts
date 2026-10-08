@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { layout, partMap, type LathePart, type BallPart, type Part } from "@/src/figure/kanon";
 import { getPose } from "@/src/motion/library";
+import type { CostumeCut } from "@/config/switches";
 import { latheGeometry, specOf } from "./geometry";
 import { woolMaterial, satinMaterial, shirtMaterial, silkMaterial, patentMaterial } from "../materials/fabric";
 
@@ -47,7 +48,9 @@ class Builder {
   skinW: number[] = [];
   idx: number[] = [];
   satin: number[] = [];
-  v(p: THREE.Vector3, w: W, satin = 0) {
+  fold: number[] = [];
+  /** satin: 1 = satenska pruga (hlače); fold: jačina nabora (lakat, pazuh, struk straga) */
+  v(p: THREE.Vector3, w: W, satin = 0, fold = 0) {
     this.pos.push(p.x, p.y, p.z);
     const ws = w.filter(([, x]) => x > 1e-4).sort((a, b) => b[1] - a[1]).slice(0, 4);
     const sum = ws.reduce((a, [, x]) => a + x, 0) || 1;
@@ -56,6 +59,7 @@ class Builder {
       this.skinW.push(ws[k] ? ws[k][1] / sum : 0);
     }
     this.satin.push(satin);
+    this.fold.push(fold);
     return this.pos.length / 3 - 1;
   }
   quad(a: number, b: number, c: number, d: number) {
@@ -94,6 +98,7 @@ class Builder {
     g.setAttribute("skinIndex", new THREE.Uint16BufferAttribute(this.skinI, 4));
     g.setAttribute("skinWeight", new THREE.Float32BufferAttribute(this.skinW, 4));
     g.setAttribute("aSatin", new THREE.Float32BufferAttribute(this.satin, 1));
+    g.setAttribute("aFold", new THREE.Float32BufferAttribute(this.fold, 1));
     g.setIndex(this.idx);
     g.computeVertexNormals();
     for (const [i, n] of this.nrm) g.attributes.normal.setXYZ(i, n.x, n.y, n.z);
@@ -136,7 +141,7 @@ function transportFrames(pts: THREE.Vector3[], up0: THREE.Vector3) {
 }
 
 /** Cijev uzduž polilinije (rukav, nogavica, manšeta). r(s), dubina presjeka, težine po s. */
-function tube(b: Builder, pts: THREE.Vector3[], radius: (s: number) => number, weights: (s: number) => W, opts: { radial?: number; depth?: number; front?: THREE.Vector3; satin?: (dir: THREE.Vector3) => number; flip?: boolean } = {}) {
+function tube(b: Builder, pts: THREE.Vector3[], radius: (s: number) => number, weights: (s: number) => W, opts: { radial?: number; depth?: number; front?: THREE.Vector3; satin?: (dir: THREE.Vector3) => number; fold?: (s: number, dir: THREE.Vector3) => number; flip?: boolean } = {}) {
   const radial = opts.radial ?? 40;
   const { N, B } = transportFrames(pts, opts.front ?? new THREE.Vector3(0, 0, 1));
   const rows: number[][] = [];
@@ -148,7 +153,8 @@ function tube(b: Builder, pts: THREE.Vector3[], radius: (s: number) => number, w
     for (let j = 0; j < radial; j++) {
       const a = (j / radial) * Math.PI * 2;
       const dir = N[i].clone().multiplyScalar(Math.cos(a) * (opts.depth ?? 1)).add(B[i].clone().multiplyScalar(Math.sin(a)));
-      row.push(b.v(c.clone().add(dir.clone().multiplyScalar(r)), w, opts.satin ? opts.satin(dir.normalize()) : 0));
+      const dn = dir.clone().normalize();
+      row.push(b.v(c.clone().add(dir.clone().multiplyScalar(r)), w, opts.satin ? opts.satin(dn) : 0, opts.fold ? opts.fold(s, dn) : 0));
     }
     rows.push(row);
   });
@@ -173,16 +179,16 @@ function polyline(points: THREE.Vector3[], n: number) {
 
 // --------------------------------------------------------------------------------- sako: trup
 // Visina (y, jedinice glave od poda) → poluširina / poludubina presjeka. Struk je stegnut (krojeno).
-type Torso = { waistY: number; hemY: number; collarY: number; buttonY: number; shoulderY: number };
+type Torso = { waistY: number; hemY: number; collarY: number; buttonY: number; shoulderY: number; tailY: number };
 
 function torsoDims(T: Torso) {
   const y0 = T.hemY, ys = T.shoulderY;
   const W: Array<[number, number]> = [
-    [y0, 0.7], [y0 + 0.5, 0.67], [T.waistY - 0.35, 0.63], [T.waistY + 0.05, 0.6], [T.waistY + 0.75, 0.73], [ys - 0.38, 0.82],
+    [T.tailY, 0.6], [y0 - 0.35, 0.66], [y0, 0.69], [y0 + 0.5, 0.67], [T.waistY - 0.35, 0.63], [T.waistY + 0.05, 0.6], [T.waistY + 0.75, 0.73], [ys - 0.38, 0.82],
     [ys - 0.1, 0.86], [ys + 0.06, 0.8], [ys + 0.17, 0.6], [T.collarY - 0.06, 0.3], [T.collarY, 0.225],
   ];
   const D: Array<[number, number]> = [
-    [y0, 0.54], [y0 + 0.5, 0.52], [T.waistY - 0.35, 0.47], [T.waistY + 0.05, 0.44], [T.waistY + 0.75, 0.5], [ys - 0.38, 0.5],
+    [T.tailY, 0.5], [y0 - 0.35, 0.53], [y0, 0.55], [y0 + 0.5, 0.52], [T.waistY - 0.35, 0.47], [T.waistY + 0.05, 0.44], [T.waistY + 0.75, 0.5], [ys - 0.38, 0.5],
     [ys - 0.1, 0.47], [ys + 0.06, 0.42], [ys + 0.17, 0.34], [T.collarY - 0.06, 0.25], [T.collarY, 0.21],
   ];
   return { w: (y: number) => table(W, y), d: (y: number) => table(D, y) };
@@ -213,11 +219,26 @@ function phiOpen(y: number, T: Torso, w: number) {
   const x = Math.min(openingX(y, T), w * 0.98);
   return Math.asin(Math.min(1, Math.pow(x / w, EXP / 2)));
 }
+/**
+ * Frak (dirigentski): sprijeda je rezan u struku (strmo ispod gumba), sa strane se linija spušta u dva skuta straga
+ * do iznad koljena. Vraća kut φ prednjeg ruba (0 = sprijeda).
+ */
+function tailOpen(y: number, T: Torso) {
+  const k1 = smooth(T.buttonY, T.buttonY - 0.14, y);
+  const k2 = smooth(T.buttonY - 0.14, T.tailY, y);
+  return 1.75 * k1 + (2.55 - 1.75) * Math.pow(k2, 0.75);
+}
+/** Polovica razreza između skutova (rad), od donjeg dijela leđa nadolje. */
+function ventHalf(y: number, T: Torso) {
+  const top = T.waistY - 0.3;
+  return 0.11 * smooth(top, top - 0.3, y);
+}
 
 export type CostumeMeshes = { meshes: THREE.SkinnedMesh[]; skeleton: THREE.Skeleton; bones: Record<BoneName, THREE.Bone>; baton: THREE.Object3D | null };
 
 /** Gradi kostim u pozi vezanja ("stoji") i vraća SkinnedMesh-eve s kosturom. */
-export function buildCostume(parent: THREE.Object3D): CostumeMeshes {
+export function buildCostume(parent: THREE.Object3D, cut: CostumeCut = "frak"): CostumeMeshes {
+  const frak = cut === "frak";
   const bindParts = layout(getPose("stoji"));
   const P = partMap(bindParts);
   const L = (n: string) => P[n] as LathePart;
@@ -229,35 +250,45 @@ export function buildCostume(parent: THREE.Object3D): CostumeMeshes {
   const waistY = Bc("waist").y;
   const shoulderY = (Bc("shoulderL").y + Bc("shoulderR").y) / 2 + 0.05;
   const neck = L("neck");
-  const T: Torso = { waistY, hemY: Bc("hipL").y - 0.62, collarY: neck.S[1] + 0.11, buttonY: waistY + 0.08, shoulderY };
+  const hemY = Bc("hipL").y - 0.62;
+  const T: Torso = { waistY, hemY, collarY: neck.S[1] + 0.11, buttonY: waistY + 0.08, shoulderY, tailY: frak ? Bc("kneeL").y + 0.3 : hemY };
   const dims = torsoDims(T);
   const torsoW = (y: number): W => {
     const c = smooth(waistY - 0.25, waistY + 0.35, y);
     return [["chest", c], ["pelvis", 1 - c]];
   };
   {
-    const ny = 90, nphi = 96;
-    const rows: number[][] = [];
-    for (let i = 0; i <= ny; i++) {
-      const y = T.hemY + ((T.collarY - T.hemY) * i) / ny;
-      const w = dims.w(y), d = dims.d(y);
-      const p0 = phiOpen(y, T, w);
-      const row: number[] = [];
-      for (let j = 0; j <= nphi; j++) {
-        const phi = p0 + ((Math.PI * 2 - 2 * p0) * j) / nphi;
-        const p = torsoPoint(y, phi, w, d);
-        // rame: dio težine na nadlakticu, da se linija ramena malo pomakne s podignutom rukom
-        const sideX = Math.abs(p.x);
-        const armW = y > shoulderY - 0.45 ? smooth(0.62, 1.0, sideX) * 0.3 : 0;
-        const tw = torsoW(y).map(([b, x]) => [b, x * (1 - armW)] as [BoneName, number]);
-        if (armW > 0) tw.push([p.x < 0 ? "upperL" : "upperR", armW]);
-        const vi = wool.v(p, tw);
-        wool.nrm.set(vi, torsoNormal(y, phi, dims));
-        row.push(vi);
+    // dvije polovice (desna i lijeva) koje se straga spajaju iznad razreza skutova
+    const ny = 120, nh = 48;
+    for (const half of [0, 1]) {
+      const rows: number[][] = [];
+      for (let i = 0; i <= ny; i++) {
+        const y = T.tailY + ((T.collarY - T.tailY) * i) / ny;
+        const w = dims.w(y), d = dims.d(y);
+        const p0 = y >= T.buttonY || !frak ? phiOpen(y, T, w) : tailOpen(y, T);
+        const v = frak ? ventHalf(y, T) : 0;
+        const a = half === 0 ? p0 : Math.PI + v;
+        const b = half === 0 ? Math.PI - v : Math.PI * 2 - p0;
+        const row: number[] = [];
+        for (let j = 0; j <= nh; j++) {
+          const phi = a + ((b - a) * j) / nh;
+          const p = torsoPoint(y, phi, w, d);
+          // rame: dio težine na nadlakticu, da se linija ramena malo pomakne s podignutom rukom
+          const sideX = Math.abs(p.x);
+          const armW = y > shoulderY - 0.45 ? smooth(0.62, 1.0, sideX) * 0.3 : 0;
+          const tw = torsoW(y).map(([bn, x]) => [bn, x * (1 - armW)] as [BoneName, number]);
+          if (armW > 0) tw.push([p.x < 0 ? "upperL" : "upperR", armW]);
+          // nabori u struku straga (frak je stegnut) i blago ispod pazuha
+          const back = Math.max(0, -Math.cos(phi));
+          const fold = Math.exp(-(((y - waistY) / 0.2) ** 2)) * back * back * 0.45 + Math.exp(-(((y - (shoulderY - 0.42)) / 0.12) ** 2)) * smooth(0.55, 0.95, Math.abs(Math.sin(phi))) * 0.5;
+          const vi = wool.v(p, tw, 0, fold);
+          wool.nrm.set(vi, torsoNormal(y, phi, dims));
+          row.push(vi);
+        }
+        rows.push(row);
       }
-      rows.push(row);
+      wool.grid(rows, false, false);
     }
-    wool.grid(rows, false, false);
   }
 
   // ---------------- reveri (saten, špicasti): unutarnji rub = rub V-otvora (gumb → G), vanjski rub = krivulja
@@ -277,7 +308,7 @@ export function buildCostume(parent: THREE.Object3D): CostumeMeshes {
       return [outer[i][0] + (outer[i + 1][0] - outer[i][0]) * t, outer[i][1] + (outer[i + 1][1] - outer[i][1]) * t];
     };
     for (const side of [1, -1]) {
-      const nv = 60, nu = 12;
+      const nv = 90, nu = 24;
       const rows: number[][] = [];
       for (let i = 0; i <= nv; i++) {
         const v = i / nv;
@@ -314,6 +345,29 @@ export function buildCostume(parent: THREE.Object3D): CostumeMeshes {
     addStatic(satin, disc, [["chest", 1]]);
   }
 
+  // ---------------- frak: 2 × 3 satenska gumba na prednjim dijelovima (izvan revera)
+  for (const side of frak ? [1, -1] : []) {
+    [[0.03, 0.33], [0.22, 0.39], [0.41, 0.45]].forEach(([dy, x]) => {
+      const y = T.buttonY + dy, w = dims.w(y), d = dims.d(y);
+      const phi = Math.asin(Math.min(1, Math.pow(Math.min(x / w, 0.98), EXP / 2))) * side;
+      const c = torsoPoint(y, phi, w + 0.01, d + 0.01);
+      const n = torsoNormal(y, phi, dims, 0.01);
+      const disc = new THREE.CylinderGeometry(0.034, 0.03, 0.018, 24);
+      disc.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), n));
+      disc.translate(c.x + n.x * 0.006, c.y + n.y * 0.006, c.z + n.z * 0.006);
+      addStatic(satin, disc, torsoW(y));
+    });
+  }
+  // studovi na prsima košulje (crni oniks, sitni)
+  for (const dy of [-0.34, -0.56, -0.78]) {
+    const y = shoulderY + dy, w = dims.w(y), d = dims.d(y);
+    const c = torsoPoint(y, 0, w - 0.035, d - 0.035);
+    const stud = new THREE.SphereGeometry(0.017, 14, 10);
+    stud.scale(1, 1, 0.55);
+    stud.translate(c.x, c.y, c.z + 0.006);
+    addStatic(satin, stud, [["chest", 1]]);
+  }
+
   // ---------------- košulja: prsni dio u V-otvoru, ovratnik
   {
     const ny = 50, nphi = 24;
@@ -338,38 +392,109 @@ export function buildCostume(parent: THREE.Object3D): CostumeMeshes {
     tube(shirt, polyline(collarPts, 6), (s) => 0.176 + 0.016 * (1 - s), () => [["chest", 1]], { radial: 56 });
   }
 
+  // ---------------- pojas (cummerbund): crni saten s vodoravnim naborima ispod gumba — prijelaz košulja → hlače
+  // (frak je sprijeda rezan u struku, pa se pojas vidi između prednjih rubova)
+  {
+    const ny = 24, nphi = 44;
+    const y0 = waistY - 0.14, y1 = T.buttonY + 0.02;
+    const rows: number[][] = [];
+    for (let i = 0; i <= ny; i++) {
+      const v = i / ny;
+      const y = y0 + (y1 - y0) * v;
+      const w = dims.w(y), d = dims.d(y);
+      const pleat = 0.007 * Math.pow(Math.abs(Math.sin(v * Math.PI * 4)), 0.7);
+      const off = -0.006 + pleat;
+      const row: number[] = [];
+      for (let j = 0; j <= nphi; j++) {
+        const phi = -1.55 + (3.1 * j) / nphi;
+        const vi = satin.v(torsoPoint(y, phi, w + off, d + off), torsoW(y));
+        satin.nrm.set(vi, torsoNormal(y, phi, dims, off));
+        row.push(vi);
+      }
+      rows.push(row);
+    }
+    satin.grid(rows, false, false);
+  }
+
   // ---------------- leptir-mašna (ljubičasta svila) i maramica
   {
     const y = neck.S[1] + 0.12;
     const front = 0.2;
-    const knot = new THREE.SphereGeometry(0.038, 18, 12);
-    knot.scale(1, 1.25, 0.8);
-    knot.translate(0, y, front);
+    // čvor: zaobljeni "jastučić" (superelipsoid), krila: leptir — stisnuta uz čvor, šira prema van, tupi kraj s naborom
+    const superBlob = (rx: number, ry: number, rz: number, ex = 0.6, seg = 28) => {
+      const g = new THREE.SphereGeometry(1, seg, Math.round(seg * 0.7));
+      const p = g.attributes.position;
+      const sp = (v: number, e: number) => Math.sign(v) * Math.pow(Math.abs(v), e);
+      for (let i = 0; i < p.count; i++) p.setXYZ(i, sp(p.getX(i), ex) * rx, sp(p.getY(i), ex) * ry, sp(p.getZ(i), 0.8) * rz);
+      g.computeVertexNormals();
+      return g;
+    };
+    // krilati ovratnik košulje: dva mala bijela vrha ispod krila mašne
+    for (const sx of [1, -1]) {
+      const g = new THREE.BufferGeometry();
+      const pts = [
+        [sx * 0.035, y + 0.035, front - 0.012], [sx * 0.125, y - 0.012, front - 0.03], [sx * 0.05, y - 0.05, front - 0.014],
+      ];
+      g.setAttribute("position", new THREE.Float32BufferAttribute(pts.flat(), 3));
+      g.setIndex([0, 1, 2]);
+      addStatic(shirt, g, [["chest", 1]]);
+    }
+    const knot = superBlob(0.03, 0.04, 0.026, 0.55);
+    knot.translate(0, y, front + 0.004);
     addStatic(silk, knot, [["chest", 1]]);
     for (const s of [1, -1]) {
-      // krilo: jastučić stisnut prema čvoru
-      const g = new THREE.SphereGeometry(1, 28, 18);
+      const g = new THREE.SphereGeometry(1, 44, 28);
       const p = g.attributes.position;
+      const sp = (v: number, e: number) => Math.sign(v) * Math.pow(Math.abs(v), e);
       for (let i = 0; i < p.count; i++) {
-        const x = (p.getX(i) + 1) * 0.5; // 0 = čvor, 1 = vanjski kraj
-        const pinch = 0.32 + 0.68 * Math.sin(Math.min(1, x * 1.15) * Math.PI * 0.5);
-        p.setXYZ(i, s * (0.025 + x * 0.15), p.getY(i) * 0.062 * pinch, p.getZ(i) * 0.028 * (0.7 + 0.3 * pinch));
+        const px = sp(p.getX(i), 0.42); // tupi krajevi
+        const py = sp(p.getY(i), 0.75);
+        const pz = p.getZ(i);
+        const x = (px + 1) * 0.5; // 0 = čvor, 1 = vanjski kraj
+        const H = 0.026 + 0.05 * (1 - Math.pow(1 - Math.min(1, x / 0.82), 2)); // poluvisina
+        const D = 0.014 + 0.008 * x; // poludebljina
+        // vodoravni nabor po sredini krila (dva režnja), jači uz čvor
+        const crease = 1 - 0.38 * Math.exp(-((py / 0.28) ** 2)) * (1 - 0.55 * x);
+        // blago udubljen vanjski rub (leptir)
+        const notch = x > 0.9 ? 0.012 * Math.exp(-((py / 0.45) ** 2)) * ((x - 0.9) / 0.1) : 0;
+        p.setXYZ(i, s * (0.026 + x * 0.152 - notch), py * H, pz * D * crease);
       }
       g.computeVertexNormals();
-      g.translate(0, y, front - 0.004);
+      g.translate(0, y, front - 0.002);
       addStatic(silk, g, [["chest", 1]]);
     }
-    // maramica u prsnom džepu (lijeva strana lutke = desno na ekranu, +x)
+    // maramica u prsnom džepu (lijeva strana lutke = desno na ekranu, +x): ravni "predsjednički" preklop —
+    // tanka svilena traka iznad obruba džepa (suzdržano; čita se kao ljubičasta crta i iz daljine)
     const py = shoulderY - 0.5;
     const pw = dims.w(py), pd = dims.d(py);
-    for (const [dx, h] of [[0.0, 0.085], [0.06, 0.11], [0.12, 0.075]] as Array<[number, number]>) {
-      const tri = new THREE.ConeGeometry(0.045, h, 4, 1);
-      tri.rotateY(Math.PI / 4);
-      tri.scale(1, 1, 0.35);
-      const phi = Math.asin(Math.min(1, Math.pow((0.4 + dx) / pw, EXP / 2)));
-      const at = torsoPoint(py, phi, pw + 0.02, pd + 0.02);
-      tri.translate(at.x, py + h * 0.5, at.z);
-      addStatic(silk, tri, [["chest", 1]]);
+    {
+      const xa = 0.375, xb = 0.585, hgt = 0.055, nx = 14, nyq = 6;
+      const phiAt = (x: number) => Math.asin(Math.min(1, Math.pow(x / pw, EXP / 2)));
+      // prednja ploha, gornji rub (zaobljen prema natrag) i stražnja ploha → zatvorena traka
+      const rows: number[][] = [];
+      const prof: Array<[number, number]> = [];
+      for (let k = 0; k <= nyq; k++) prof.push([(k / nyq) * hgt, 0.024]);
+      for (let k = 1; k <= 4; k++) {
+        const a = (k / 4) * Math.PI;
+        prof.push([hgt + Math.sin(a) * 0.006, 0.018 + Math.cos(a) * 0.006]);
+      }
+      prof.push([0, 0.012]);
+      for (const [dy, off] of prof) {
+        const row: number[] = [];
+        for (let k = 0; k <= nx; k++) {
+          // gornji rub lagano valovit (svila nije ravna letvica)
+          const xk = xa + ((xb - xa) * k) / nx;
+          // gornji rub: dva meka vrha (presavijena svila), ne ravna letvica
+          const kk = k / nx;
+          const wob = dy > hgt * 0.5 ? 0.028 * Math.pow(Math.sin(kk * Math.PI * 2 + 0.25), 2) * (kk < 0.62 ? 1 : 0.7) * Math.min(1, (dy - hgt * 0.5) / (hgt * 0.5)) : 0;
+          const ph = phiAt(xk);
+          const vi = silk.v(torsoPoint(py + dy + wob, ph, pw + off, pd + off), [["chest", 1]]);
+          if (off === 0.024) silk.nrm.set(vi, torsoNormal(py + dy, ph, dims, off));
+          row.push(vi);
+        }
+        rows.push(row);
+      }
+      silk.grid(rows, false, false);
     }
     // obrub džepa (vuna)
     {
@@ -399,10 +524,21 @@ export function buildCostume(parent: THREE.Object3D): CostumeMeshes {
       const top = 1 - smooth(0.04, 0.2, u);
       return [["chest", top * 0.6], ["upper" + s as BoneName, (1 - b) * (1 - top * 0.6)], ["fore" + s as BoneName, b * (1 - top * 0.6)]];
     };
-    tube(wool, pts, (u) => table([[0, 0.21], [0.07, 0.25], [0.16, 0.245], [sE - 0.05, 0.218], [sE, 0.212], [sE + 0.2, 0.198], [0.96, 0.178], [1, 0.176]], u), sleeveW, { radial: 44, depth: 0.95, front: new THREE.Vector3(0, 0, 1) });
+    // nabori: lakat (jače s unutarnje strane), pazuh, malo iznad manšete
+    const sleeveFold = (u: number) => Math.exp(-(((u - sE) / 0.11) ** 2)) + 0.55 * Math.exp(-(((u - 0.1) / 0.07) ** 2)) + 0.35 * Math.exp(-(((u - 0.9) / 0.06) ** 2));
+    tube(wool, pts, (u) => table([[0, 0.21], [0.07, 0.25], [0.16, 0.245], [sE - 0.05, 0.218], [sE, 0.212], [sE + 0.2, 0.198], [0.96, 0.178], [1, 0.176]], u), sleeveW, { radial: 44, depth: 0.95, front: new THREE.Vector3(0, 0, 1), fold: sleeveFold });
     // manšeta košulje malo izviruje iz rukava
-    const cuff = polyline([Wr.clone().add(dirF.clone().multiplyScalar(-0.16)), Wr.clone().add(dirF.clone().multiplyScalar(0.012))], 6);
-    tube(shirt, cuff, () => 0.142, () => [["fore" + s as BoneName, 1]], { radial: 36 });
+    const cuff = polyline([Wr.clone().add(dirF.clone().multiplyScalar(-0.1)), Wr.clone().add(dirF.clone().multiplyScalar(0.012))], 6);
+    tube(shirt, cuff, () => 0.13, () => [["fore" + s as BoneName, 1]], { radial: 36 });
+    // rub manšete zatvoren prstenom do zgloba (iz krupnog kadra se ne vidi u praznu cijev)
+    {
+      const ring = new THREE.RingGeometry(0.07, 0.13, 36, 1);
+      const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), dirF);
+      ring.applyQuaternion(q);
+      const c = Wr.clone().add(dirF.clone().multiplyScalar(0.012));
+      ring.translate(c.x, c.y, c.z);
+      addStatic(shirt, ring, [["fore" + s as BoneName, 1]]);
+    }
     // tri gumba s vanjske strane rukava
     const out = new THREE.Vector3(s === "L" ? -1 : 1, 0, 0);
     for (let k = 0; k < 3; k++) {
@@ -418,7 +554,7 @@ export function buildCostume(parent: THREE.Object3D): CostumeMeshes {
   {
     // sjedalo: od struka do međunožja
     const ny = 26, nphi = 64;
-    const yTop = waistY + 0.05, yBot = Bc("hipL").y - 0.3;
+    const yTop = waistY - 0.12, yBot = Bc("hipL").y - 0.3;
     const rows: number[][] = [];
     for (let i = 0; i <= ny; i++) {
       const y = yTop + ((yBot - yTop) * i) / ny;

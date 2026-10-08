@@ -38,8 +38,20 @@ export const HAND_RELAXED: HandState = { curl: [0.25, 0.22, 0.28, 0.34, 0.4], sp
 export const HAND_OPEN: HandState = { curl: [0.05, 0.04, 0.05, 0.07, 0.1], spread: 0.6, thumb: 0.1 };
 export const HAND_GRIP: HandState = { curl: [0.55, 0.62, 0.78, 0.86, 0.9], spread: 0.1, thumb: 0.7 }; // palica, olovka
 export const HAND_HOLD: HandState = { curl: [0.35, 0.5, 0.55, 0.6, 0.62], spread: 0.08, thumb: 0.5 }; // bilježnica
+/** Otvorena šaka dirigenta: prsti skupljeni i blago savijeni (ne raširena "zvijezda", ne kažiprst) */
+export const HAND_ELEGANT: HandState = { curl: [0.12, 0.14, 0.18, 0.24, 0.3], spread: 0.12, thumb: 0.25 };
 
-const clone = <T,>(o: T): T => JSON.parse(JSON.stringify(o));
+/** Brza duboka kopija poze (obični objekti, nizovi brojeva); bez JSON-a jer se zove za svakog robota u svakom frameu. */
+const clone = <T,>(o: T): T => {
+  if (Array.isArray(o)) return o.map((x) => clone(x)) as unknown as T;
+  if (o && typeof o === "object") {
+    const out: Record<string, unknown> = {};
+    for (const k in o) out[k] = clone((o as Record<string, unknown>)[k]);
+    return out as T;
+  }
+  return o;
+};
+export const clonePose = <T,>(p: T): T => clone(p);
 
 /** Kanonska poza (+ zadane šake) po imenu iz kanon.json. */
 export function kanonPose(name: string, hands: Partial<Pick<Pose, "handL" | "handR">> = {}): Pose {

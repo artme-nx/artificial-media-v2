@@ -19,8 +19,8 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
     color: "#ffffff",
     roughness: 0.42,
     metalness: 0,
-    clearcoat: 0.22,
-    clearcoatRoughness: 0.34,
+    clearcoat: 0.45,
+    clearcoatRoughness: 0.3,
     specularIntensity: 0.45,
     sheen: 0.08,
     sheenRoughness: 0.5,
@@ -28,7 +28,7 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
     envMapIntensity: 0.9,
   });
   return extendMaterial(m, {
-    key: "maple-v4",
+    key: "maple-v5",
     uniforms: { uTone: { value: tone } },
     fragmentPars: /* glsl */ `
       uniform float uTone;
@@ -68,6 +68,8 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
           vec4 e = eyeCells( vec3( sp.x * EYE_F, sp.y * EYE_F * 0.8, sp.z * EYE_F ), has );
           float d = e.x;
           float aE = aaFade( px * EYE_F * 1.6 );
+          // tamna jezgra se gasi ranije od svijetlog prstena: u srednjem kadru oči su svjetlucanje, ne tamne mrlje
+          float aCore = aaFade( px * EYE_F * 2.6 );
           float core = ( 1.0 - smoothstep( 0.25, 0.6, d ) ) * has;            // tamna točka s mekim rubom
           float glint = smoothstep( 0.55, 0.7, d ) * ( 1.0 - smoothstep( 0.7, 1.0, d ) ) * has;  // tanki svijetli sjaj oko točke (samo u odsjaju)
           float swirl = ( 1.0 - smoothstep( 0.6, 2.6, d ) ) * has;
@@ -95,24 +97,28 @@ export function mapleMaterial({ tone = 1 }: MapleOptions = {}) {
           vec3 cWarm  = vec3( 0.56, 0.36, 0.15 ) * uTone;
           vec3 cStreak = vec3( 0.40, 0.235, 0.085 ) * uTone;
           vec3 cFiber = vec3( 0.36, 0.205, 0.072 ) * uTone;
-          vec3 cCore  = vec3( 0.17, 0.085, 0.028 ) * uTone;
+          vec3 cCore  = vec3( 0.34, 0.19, 0.065 ) * uTone;
           vec3 cLight = vec3( 0.80, 0.60, 0.33 ) * uTone;
 
           vec3 col = mix( cBase, cLight, smoothstep( 0.55, 0.85, tone ) * 0.5 );
           col = mix( col, cWarm, smoothstep( 0.2, 0.5, 1.0 - tone ) * 0.45 + tone2 * 0.12 );
           col = mix( col, cStreak, streak * 0.3 );
           col = mix( col, cFiber, min( 1.0, fibers * 1.5 ) );
-          col = mix( col, cCore, core * 0.92 * aE );
+          col = mix( col, cCore, core * 0.8 * aCore );
+          col = mix( col, cLight * 1.08, glint * 0.35 * aE );
 
           // ---- chatoyance: pruge kovrče poprijeko osi mijenjaju sjaj s kutom pogleda
           float aC = aaFade( px * 60.0 * 1.2 );
           float rip = sin( sp.y * 60.0 + fbm2o( vec3( sp.x * 2.5, sp.y * 0.9, sp.z * 2.5 ) ) * 7.0 + swirl * 1.5 );
+          // srednja skala kovrče (~1,5 cm): vidi se i u srednjem kadru kao pruge sjaja koje putuju s kutom
+          float aM = aaFade( px * 14.0 * 1.3 );
+          float rip2 = sin( sp.y * 14.0 + fbm2o( vec3( sp.x * 1.5, sp.y * 0.6, sp.z * 1.5 ) ) * 5.0 );
           vec3 V = normalize( vViewPosition );
           float ax = dot( V, vAxisV );
-          gChat = 0.5 + 0.5 * rip * clamp( ax * 3.0 + 0.3 * sin( sp.y * 7.0 ), -1.0, 1.0 ) * aC;
-          col *= 0.97 + 0.06 * gChat;
+          gChat = 0.5 + 0.5 * clamp( ( rip * aC * 0.7 + rip2 * aM * 0.6 ) * clamp( ax * 3.0 + 0.3 * sin( sp.y * 7.0 ), -1.0, 1.0 ), -1.0, 1.0 );
+          col *= 0.96 + 0.08 * gChat;
 
-          gH = ( glint * 0.4 - core * 0.7 ) * aE - fibers * 0.35 - streak * 0.15;
+          gH = glint * 0.4 * aE - core * 0.7 * aCore - fibers * 0.35 - streak * 0.15;
           gGlint = glint * aE;
           diffuseColor.rgb = col;
         }
