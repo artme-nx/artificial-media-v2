@@ -6,6 +6,7 @@ import { HeadLook, Spring } from "@/src/motion/look";
 import { PoseAnimator, applySecondary } from "@/src/motion/animator";
 import { getPose, type PoseName } from "@/src/motion/library";
 import { type LathePart, type Vec3 } from "@/src/figure/kanon";
+import { isCalm } from "@/lib/calm";
 
 /**
  * Mala lutka u sekcijama (11 §4: reelovi — gleda video koji se pušta; F7: usluge, CTA, podnožje).
@@ -48,6 +49,11 @@ export class DollView {
   private running = false;
   private v = new THREE.Vector3();
   private w = new THREE.Vector3();
+  /** shaderi prevedeni (paralelno, KHR_parallel_shader_compile); do tada se ne crta — prvo crtanje bi ih prevodilo
+   *  sinkrono (~70 ms trzaja usred scrolla, izmjereno scripts/perf-scroll.mjs) */
+  ready: Promise<void>;
+  private isReady = false;
+  private skip = false;
 
   constructor(public canvas: HTMLCanvasElement) {
     this.reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -77,7 +83,9 @@ export class DollView {
     sh.position.y = 0.002;
     this.scene.add(sh);
 
-    this.figure = new Figure({ look: "wood" });
+    // mala lutka (~300–400 px): srednja gustoća mreže — puna (≈300 tisuća vrhova) se pri prvom crtanju u novi
+    // kontekst šalje na GPU ~30 ms, usred scrolla
+    this.figure = new Figure({ look: "wood", detail: "mid" });
     this.scene.add(this.figure.group);
     const start = getPose("stoji");
     this.animator = new PoseAnimator(start);
@@ -86,6 +94,16 @@ export class DollView {
     // kadar: cijela lutka, malo odozdo (lik dominira, "statueta")
     this.camera.position.set(0.42, 1.0, 3.55);
     this.camera.lookAt(0, 0.9, 0);
+    // prevođenje u zasebnom zadatku (konstruktor je već ~40 ms: novi WebGL kontekst + okruženje)
+    this.ready = new Promise<void>((r) => setTimeout(r, 0))
+      .then(() => {
+        return this.renderer.compileAsync(this.scene, this.camera);
+      })
+      .catch(() => undefined)
+      .then(() => {
+        this.isReady = true;
+        this.kick();
+      });
   }
 
   private seq: Array<{ at: number; pose: PoseName; dur: number }> = [];
@@ -156,7 +174,14 @@ export class DollView {
 
   private frame = (now: number) => {
     this.raf = 0;
-    if (!this.running) return;
+    if (!this.running || !this.isReady) return;
+    // mirovanje (bez unosa, bez koreografije): svaki drugi frame (lib/calm.ts)
+    const calm = !this.seq.length && isCalm(now);
+    this.skip = calm && !this.skip;
+    if (this.skip) {
+      this.raf = requestAnimationFrame(this.frame);
+      return;
+    }
     const dt = this.last ? Math.min(0.1, (now - this.last) / 1000) : 1 / 60;
     this.last = now;
     this.t += dt;
@@ -191,6 +216,7 @@ export class DollView {
   };
 
   kick() {
+    if (!this.isReady) return;
     if (this.running && !this.raf) this.raf = requestAnimationFrame(this.frame);
     if (this.reduced && !this.running) {
       // smanjeni pokret: jedan mirni kadar

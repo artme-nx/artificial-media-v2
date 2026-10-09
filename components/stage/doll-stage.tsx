@@ -79,6 +79,11 @@ export function DollStage() {
     const boot = async () => {
       const { DollView } = await import("@/src/three/doll/doll-view");
       if (disposed) return;
+      // novi WebGL kontekst je najskuplji korak pokretanja (~25–50 ms): zaseban zadatak, pa tek onda lutka
+      // (isti atributi kao WebGLRenderer u DollView; drugi getContext vraća ovaj kontekst)
+      canvas.getContext("webgl2", { alpha: true, antialias: true, powerPreference: "low-power", stencil: false, depth: true, premultipliedAlpha: true, preserveDrawingBuffer: false });
+      await new Promise((r) => setTimeout(r, 0));
+      if (disposed) return;
       view = new DollView(canvas);
       for (const el of document.querySelectorAll("[data-doll-anchor]")) io.observe(el);
       pick();

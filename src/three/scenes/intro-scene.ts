@@ -87,6 +87,11 @@ export class IntroScene implements StageScene {
     return () => objs.forEach((o, i) => (o.visible = prev[i]));
   }
 
+  /** kontaktne sjene (redatelj ih jednom nacrta unaprijed da se njihovi shaderi prevedu prije scrolla) */
+  get contactShadows() {
+    return this.theatre.contact;
+  }
+
   activate(engine: Engine) {
     this.engine = engine;
     this.scene.environment ??= this.theatre.environment(engine.renderer);

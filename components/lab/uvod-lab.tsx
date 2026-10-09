@@ -14,7 +14,7 @@ export function UvodLab() {
       const [{ Engine }, { IntroScene }] = await Promise.all([import("@/src/three/core/engine"), import("@/src/three/scenes/intro-scene")]);
       if (disposed || !canvas.current || !host.current) return;
       const render = q.get("render") === "1";
-      engine = new Engine(canvas.current, { tier: render ? "high" : (q.get("q") as "high") || "auto", probe: true, fixedDpr: render ? window.devicePixelRatio : undefined });
+      engine = new Engine(canvas.current, { tier: render ? "high" : (q.get("q") as "high") || "auto", probe: true, budget: false, fixedDpr: render ? window.devicePixelRatio : undefined });
       const s = new IntroScene();
       s.progress = Number(q.get("p") ?? 0.25);
       s.dancerLevel = q.get("ples") === "1" ? 1 : 0;

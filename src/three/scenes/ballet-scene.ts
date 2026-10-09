@@ -96,6 +96,8 @@ export class BalletScene implements StageScene {
   top: THREE.SpotLight;
   /** dva visoka snopa u pozadini (koncertni dim): vidljivi stupovi svjetla iza lutke */
   beams: THREE.SpotLight[] = [];
+  /** svijetla pozornica i krupni kadrovi drva: više piksela (scena je lakša od uvoda; Engine.PIXEL_BUDGET) */
+  readonly pixelScale = 1.7;
   contact = new ContactShadows({ width: 3, depth: 3, far: 1.2, blur: 2.2, opacity: 0.85, darkness: 1.9 });
   dust: DustMotes;
   /** napredak scrolla kroz manifest */

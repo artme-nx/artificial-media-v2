@@ -41,6 +41,8 @@ export function NotebookStage() {
       const { NotebookView } = await import("@/src/three/doll/notebook-view");
       if (disposed) return;
       view = new NotebookView(canvas);
+      await view.ready; // shaderi prevedeni paralelno; poster ostaje dok lutka ne može crtati
+      if (disposed) return;
       fit();
       ro.observe(el);
       io.observe(el);

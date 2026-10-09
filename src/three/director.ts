@@ -1,12 +1,22 @@
+import { HalfFloatType, WebGLRenderTarget } from "three";
 import { Engine, type StageScene } from "./core/engine";
 import { IntroScene } from "./scenes/intro-scene";
 import { BalletScene } from "./scenes/ballet-scene";
 import { CursorScene } from "./scenes/cursor-scene";
 import { onStage, getStage, setStage, type StageState } from "@/lib/stage-store";
 import { readSwitches } from "@/config/switches";
+import { keepBusy } from "@/lib/calm";
 
 type Zone = "intro" | "ballet" | "cursor";
-type Compilable = StageScene & { showAllForCompile?: () => () => void; prepareEnvironment?: (r: import("three").WebGLRenderer) => void };
+type CompileJob = { scene: import("three").Scene; camera: import("three").Camera; target: import("three").WebGLRenderTarget | null };
+type Compilable = StageScene & {
+  showAllForCompile?: () => () => void;
+  prepareEnvironment?: (r: import("three").WebGLRenderer) => void;
+  /** scene koje crtaju u vlastite spremnike (drvo / robot) kažu u koje */
+  compileJobs?: () => CompileJob[];
+  contact?: { update(r: import("three").WebGLRenderer, scene: import("three").Scene): void };
+  contactShadows?: { update(r: import("three").WebGLRenderer, scene: import("three").Scene): void };
+};
 
 /**
  * Redatelj jednog trajnog canvasa (11 §3): bira scenu po sekciji koja zauzima najviše ekrana (data-scene),
@@ -32,8 +42,11 @@ export class Director {
     this.zones = opts.zones ?? ["intro", "ballet", "cursor"];
     const sw = readSwitches();
     const mobile = window.matchMedia("(pointer: coarse)").matches && Math.min(window.innerWidth, window.innerHeight) < 820;
-    const probe = new URLSearchParams(location.search).has("probe") || process.env.NODE_ENV !== "production";
-    this.engine = new Engine(canvas, { tier: sw.quality, mobile, probe });
+    const qs = new URLSearchParams(location.search);
+    const probe = qs.has("probe") || process.env.NODE_ENV !== "production";
+    // ?dpr= (mjerenje, scripts/perf-*.mjs): stalni omjer piksela bez dinamičke rezolucije
+    const fixedDpr = Number(qs.get("dpr")) || undefined;
+    this.engine = new Engine(canvas, { tier: sw.quality, mobile, probe, fixedDpr });
     if (this.zones.includes("intro")) this.intro = new IntroScene();
     if (this.zones.includes("ballet")) {
       const b = new BalletScene();
@@ -69,16 +82,62 @@ export class Director {
     this.compiled.add(zone);
     const s = this.scenes[zone];
     if (!s) return;
-    const restore = s.showAllForCompile?.();
     try {
       // okruženje (i post) se postave u activate; za kompajliranje treba isto okruženje kao pri crtanju
-      if (zone === "intro" && this.intro) this.intro.scene.environment ??= this.intro.theatre.environment(this.engine.renderer);
-      else s.prepareEnvironment?.(this.engine.renderer);
-      await this.engine.renderer.compileAsync(s.scene, s.camera);
+      const r = this.engine.renderer;
+      if (zone === "intro" && this.intro) this.intro.scene.environment ??= this.intro.theatre.environment(r);
+      else s.prepareEnvironment?.(r);
+      // shaderi se prevode za cilj u koji scena stvarno crta: RenderPass crta u ulazni spremnik composera (linearni
+      // izlaz, bez tonskog mapiranja), drvo / robot u vlastite spremnike. Prevedeni za ekran (sRGB) bili bi drugi
+      // programi i sve bi se prevodilo iznova pri prvom crtanju — trzaji od 60–130 ms usred scrolla (perf-scroll).
+      const jobs = s.compileJobs?.() ?? [{ scene: s.scene, camera: s.camera, target: this.engine.post.composer.inputBuffer }];
+      const prev = r.getRenderTarget();
+      // skriveni objekti (likovi koji se pojave kasnije, prašina) moraju biti vidljivi samo dok traje sinkroni dio
+      let restore = revealAll(s);
+      const waits = jobs.map((j) => {
+        r.setRenderTarget(j.target);
+        return r.compileAsync(j.scene, j.camera); // compile() je sinkron, čeka se samo da programi budu spremni
+      });
+      r.setRenderTarget(prev);
+      restore();
+      await Promise.all(waits);
+      restore = revealAll(s);
+      this.warm(s, jobs[0].target);
+      restore();
     } catch {
       /* stariji preglednici: kompajlira se pri prvom crtanju */
     }
-    restore?.();
+  }
+
+  /**
+   * Jedan frame scene (svi likovi vidljivi) u mali spremnik dok je preglednik slobodan: prevedu se shaderi sjena,
+   * kontaktnih sjena i dubine, koji se inače prevode sinkrono pri prvom crtanju — trzaj 40–80 ms kad se scena ili
+   * novi lik (orkestar, plesačica) prvi put pojavi usred scrolla.
+   */
+  private warm(s: Compilable, like: import("three").WebGLRenderTarget | null) {
+    const r = this.engine.renderer;
+    const prev = r.getRenderTarget();
+    const tiny = new WebGLRenderTarget(4, 4, { type: like?.texture.type ?? HalfFloatType, depthBuffer: true });
+    // bez odsijecanja izvan kadra (kamera scene još nije postavljena): crtaju se svi objekti, pa se i sve teksture
+    // pošalju na GPU sada, a ne u prvom pravom frameu (izmjereno: 57 ms trzaja na ulasku u baletnu scenu)
+    const culled: import("three").Object3D[] = [];
+    s.scene.traverse((o) => {
+      if (o.frustumCulled) {
+        o.frustumCulled = false;
+        culled.push(o);
+      }
+    });
+    try {
+      (s.contactShadows ?? s.contact)?.update(r, s.scene);
+      r.setRenderTarget(tiny);
+      r.render(s.scene, s.camera);
+    } catch {
+      /* zagrijavanje nije nužno */
+    } finally {
+      r.setRenderTarget(prev);
+      tiny.dispose();
+      for (const o of culled) o.frustumCulled = true;
+    }
   }
 
   /** Kompajliraj uvod prije prvog prikaza, baletnu scenu kad je preglednik slobodan. */
@@ -127,6 +186,8 @@ export class Director {
       this.intro.progress = s.introProgress;
       this.intro.dancerLevel = s.dancerLevel;
       this.intro.dancerPhase = s.dancerPhase;
+      // kadar 2 (plesačica) ide sam od sebe: puni ritam i bez scrolla
+      if (s.dancerLevel > 0.001 && s.introProgress < 0.2) keepBusy(250);
     }
     if (this.ballet) this.ballet.progress = s.balletProgress;
     this.engine.invalidate();
@@ -166,4 +227,20 @@ export class Director {
     window.removeEventListener("resize", this.onResize);
     this.engine.dispose();
   }
+}
+
+/** sve skriveno u sceni privremeno vidljivo (osim svjetala: njihov broj je dio ključa shadera); vraća poništenje */
+function revealAll(s: Compilable) {
+  const undoScene = s.showAllForCompile?.();
+  const hidden: import("three").Object3D[] = [];
+  s.scene.traverse((o) => {
+    if (!o.visible && !(o as import("three").Light).isLight) {
+      o.visible = true;
+      hidden.push(o);
+    }
+  });
+  return () => {
+    for (const o of hidden) o.visible = false;
+    undoScene?.();
+  };
 }

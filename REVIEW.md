@@ -32,7 +32,7 @@ Oznake: **gotovo** · **djelomično** · **nije**. Uz svaku stavku: gdje se vidi
 | Smoking dorađen: reveri, skut, gumbi; palica vidljiva | **gotovo** | Uvod 6–10, `/lab/scena?cam=detalj` (špicasti satenski reveri, skuti, 2×3 gumba, studovi, pojas, leptir-mašna, maramica) |
 | Drvo / robot ispod kursora, poravnato i u pokretu; mobitel prst i samostalno kretanje | **gotovo** | Sekcija ispod "We build worlds."; test mjeri čelik točno ispod kursora na glavi, ramenu i koljenu; mobitel `?krug=` |
 | Niz slika umjesto videa, `ScrollSequence`, skripta video → frameovi, rezolucija po uređaju | **gotovo** | Mobitel (ili `?izvor=frames` na desktopu); `scripts/video-to-frames.mjs`, `scripts/render-sequences.mjs`; desk 1600×900, mob 720×1280 |
-| Ne šteka, izgleda kao 4K video | **djelomično** | Desktop M5: uvod 54–60 fps, manifest 60, "drvo / robot" 60, bez dugih zadataka tijekom scrolla; Lighthouse mobilni: Performance 91 (`/`) i 94 (`/start`), TBT 0 ms, CLS ≈ 0, ali LCP 3,1–3,5 s (cilj 2,5 s). Kontrola kvalitete: materijali još ne izgledaju kao 4K video |
+| Ne šteka, izgleda kao 4K video | **djelomično** | Scroll cijele početne: 60 fps i na Retini (MacBook Air M5, DPR 2), nijedan frame duži od 25 ms ni pri brzom scrollu (`node scripts/perf-scroll.mjs`); 3D se crta po proračunu piksela, ne u punom DPR-u (R40). Lighthouse mobilni: Performance 91 (`/`) i 94 (`/start`), TBT 0 ms, CLS ≈ 0, ali LCP 3,1–3,5 s (cilj 2,5 s). Kontrola kvalitete: materijali još ne izgledaju kao 4K video; 3D je na Retini nešto mekši nego u punoj rezoluciji |
 | Format pokreta spreman za snimljeni pokret balerine | **gotovo** | `scripts/import-motion.mjs` + `src/motion/clip.ts` (README) |
 
 **10-lik**
@@ -179,7 +179,7 @@ Kontrola kvalitete (zasebni subagent, samo screenshotovi + letvica §2 + 10-lik 
 2. **Mehanika sata na zglobovima** modelirana je (prsten s kosim rubom, kotač s 30 zubaca, most, vijci), ali se u srednjem kadru vidi samo u profilu.
 3. **Révérence** više nije korak natrag, ali se ne čita kao dubok, gracilan naklon; pomogao bi snimljeni pokret balerine (lanac je spreman, README).
 4. **Svjetlo na svijetloj pozornici** (balet): snop kroz dim slabije se vidi nego u staroj probi na tamnoj; na tamnoj pozornici (uvod) je jasan.
-5. **Performanse**: na M5 60 fps uz dinamičku rezoluciju; na DPR 2 bez nje scena bi bila preteška. Mobitel koristi nizove slika. Lighthouse (mobilni): Performance 91 / 94, Accessibility 100, Best Practices 100, TBT 0 ms, CLS ≈ 0 — **LCP 3,1–3,5 s nije ispod 2,5 s** (H1 se crta odmah, ali simulacija sporog 4G-a broji i fontove i početni JS; sljedeći korak: manje početnog JS-a ili kasnije učitavanje GSAP-a).
+5. **Performanse**: prva verzija je na Retini (DPR 2) štekala — uvod 6,6 fps pri scrollu, jer se 3D crtao u punoj rezoluciji zaslona, a shaderi su se prevodili usred scrolla. Popravljeno (R40, R41): 60 fps cijelom stranicom, bez trzaja; jedan trzaj ~90 ms ostaje pri samom pokretanju 3D-a, prije prvog scrolla. Cijena: 3D je na Retini nešto mekši (uvod ~1 piksel po CSS pikselu, balet i "drvo / robot" ~1,2). Mobitel koristi nizove slika. Lighthouse (mobilni): Performance 91 / 94, Accessibility 100, Best Practices 100, TBT 0 ms, CLS ≈ 0 — **LCP 3,1–3,5 s nije ispod 2,5 s**.
 6. Šake i palica u krupnom kadru (hvat), kostim straga (nabori), orkestar u istoj pozi — vidi `PROGRESS.md`.
 
 ## 5. Screenshotovi

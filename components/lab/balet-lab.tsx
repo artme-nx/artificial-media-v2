@@ -15,7 +15,7 @@ export function BaletLab() {
       const [{ Engine }, { BalletScene }] = await Promise.all([import("@/src/three/core/engine"), import("@/src/three/scenes/ballet-scene")]);
       if (disposed || !canvas.current || !host.current) return;
       const render = q.get("render") === "1";
-      engine = new Engine(canvas.current, { tier: render ? "high" : (q.get("q") as "high") || "auto", probe: true, fixedDpr: render ? window.devicePixelRatio : undefined });
+      engine = new Engine(canvas.current, { tier: render ? "high" : (q.get("q") as "high") || "auto", probe: true, budget: false, fixedDpr: render ? window.devicePixelRatio : undefined });
       const s = new BalletScene();
       s.progress = Number(q.get("p") ?? 0);
       s.orbit = readSwitches().balletOrbit;

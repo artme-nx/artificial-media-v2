@@ -7,6 +7,7 @@ import { PoseAnimator, applySecondary } from "@/src/motion/animator";
 import { getPose, type PoseName } from "@/src/motion/library";
 import { type LathePart, type Vec3 } from "@/src/figure/kanon";
 import type { NotebookEvent, NotebookState } from "@/lib/notebook";
+import { isCalm } from "@/lib/calm";
 
 /**
  * "Lutka bilježi" (/start, 07 tablica stanja; 11 F8). Lutka iz profila pod reflektorom, s bilježnicom i olovkom
@@ -104,6 +105,10 @@ export class NotebookView {
   private running = false;
   private tmpM = new THREE.Matrix4();
   private bookFrame = new THREE.Matrix4();
+  /** shaderi prevedeni paralelno prije prvog crtanja (vidi DollView.ready) */
+  ready!: Promise<void>;
+  private isReady = false;
+  private skip = false;
 
   constructor(public canvas: HTMLCanvasElement) {
     this.reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -128,7 +133,7 @@ export class NotebookView {
     spot.target.position.set(0, 1.0, 0);
     // prava bačena sjena (lutka, ruke, bilježnica) na pod: meki PCF, prozirni materijal sjene
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap; // r18x: PCFSoftShadowMap uklonjen, meki rub daje shadow.radius
     spot.castShadow = true;
     spot.shadow.mapSize.set(1024, 1024);
     spot.shadow.radius = 6;
@@ -163,6 +168,13 @@ export class NotebookView {
     this.camera.position.set(0.3, 1.22, 3.85);
     this.camera.lookAt(0, 0.98, 0);
     this.look.limit = 35;
+    this.ready = this.renderer
+      .compileAsync(this.scene, this.camera)
+      .catch(() => undefined)
+      .then(() => {
+        this.isReady = true;
+        this.kick();
+      });
   }
 
   resize(w: number, h: number) {
@@ -285,7 +297,14 @@ export class NotebookView {
 
   private frame = (now: number) => {
     this.raf = 0;
-    if (!this.running) return;
+    if (!this.running || !this.isReady) return;
+    // mirovanje (bez tipkanja i pokazivača, bez koreografije): svaki drugi frame (lib/calm.ts)
+    const calm = !this.seq.length && isCalm(now);
+    this.skip = calm && !this.skip;
+    if (this.skip) {
+      this.raf = requestAnimationFrame(this.frame);
+      return;
+    }
     const dt = this.last ? Math.min(0.1, (now - this.last) / 1000) : 1 / 60;
     this.last = now;
     this.t += dt;
@@ -372,6 +391,7 @@ export class NotebookView {
   };
 
   kick() {
+    if (!this.isReady) return;
     if (this.running && !this.raf) this.raf = requestAnimationFrame(this.frame);
     if (this.reduced && !this.running) {
       this.running = true;

@@ -103,7 +103,8 @@ export class Figure {
   viewCamera: THREE.Camera | null = null;
   viewportH = 900;
 
-  constructor({ look = "wood", waist = "A", detail = "full", costume = false }: { look?: Look; waist?: Waist; detail?: "full" | "lod"; costume?: boolean } = {}) {
+  /** detail: full (veliki kadrovi), mid (male lutke u sekcijama: ~6× manje vrhova, isti obris na ~400 px), lod (orkestar) */
+  constructor({ look = "wood", waist = "A", detail = "full", costume = false }: { look?: Look; waist?: Waist; detail?: "full" | "mid" | "lod"; costume?: boolean } = {}) {
     this.look = look;
     this.waist = waist;
     this.mats = materialsFor(look);
@@ -111,14 +112,16 @@ export class Figure {
     this.group.add(this.body);
     this.body.scale.setScalar(UNIT);
     const lod = detail === "lod";
+    const mid = detail === "mid";
 
     for (const name of WOOD_PARTS) {
       const spec = specOf(name);
-      const key = `${name}|${lod ? "lod" : "full"}`;
+      const key = `${name}|${detail}`;
+      const big = name === "head" || name === "chest" || name === "pelvis";
       const g = cachedGeo(key, () =>
         latheGeometry(spec, {
-          rings: lod ? 36 : name === "head" || name === "chest" || name === "pelvis" ? 180 : 140,
-          radial: lod ? 24 : 112,
+          rings: lod ? 36 : mid ? (big ? 72 : 56) : big ? 180 : 140,
+          radial: lod ? 24 : mid ? 56 : 112,
           seed: seedOf(name),
         }),
       );

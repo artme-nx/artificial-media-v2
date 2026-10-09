@@ -15,7 +15,7 @@ export function KursorLab() {
     (async () => {
       const [{ Engine }, { CursorScene }] = await Promise.all([import("@/src/three/core/engine"), import("@/src/three/scenes/cursor-scene")]);
       if (disposed || !canvas.current || !host.current) return;
-      engine = new Engine(canvas.current, { tier: (q.get("q") as "high") || "auto", probe: true });
+      engine = new Engine(canvas.current, { tier: (q.get("q") as "high") || "auto", probe: true, budget: false });
       const s = new CursorScene();
       const sw = readSwitches();
       s.ringOn = sw.maskRing;

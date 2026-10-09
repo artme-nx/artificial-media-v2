@@ -15,7 +15,7 @@ export function ScenaLab() {
     (async () => {
       const [{ Engine }, { StageLabScene }] = await Promise.all([import("@/src/three/core/engine"), import("@/src/three/scenes/stage-lab-scene")]);
       if (disposed || !canvas.current || !host.current) return;
-      engine = new Engine(canvas.current, { tier: (q.get("q") as "high") || "auto", probe: true });
+      engine = new Engine(canvas.current, { tier: (q.get("q") as "high") || "auto", probe: true, budget: false });
       const s = new StageLabScene(host.current, {
         cam: (q.get("cam") as StageCam) || "still",
         pose: (q.get("pose") as PoseName) || undefined,

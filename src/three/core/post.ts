@@ -100,7 +100,8 @@ export class Post {
   setTier(tier: Tier) {
     this.tier = tier;
     const q = TIERS[tier];
-    Object.assign(this.n8ao.configuration, { halfRes: q.aoHalf, aoSamples: q.aoSamples, denoiseSamples: q.aoHalf ? 4 : 6 });
+    // halfRes postavlja setSize (po osnovnom DPR-u); svaka promjena halfRes/aoSamples prevodi shader AO-a iznova
+    Object.assign(this.n8ao.configuration, { aoSamples: q.aoSamples, denoiseSamples: q.aoHalf ? 4 : 6 });
     this.volumetric.setResolutionScale(q.volScale);
     this.volumetric.setSteps(q.volSteps);
     this.dof.resolution.scale = q.dofScale;
@@ -163,16 +164,21 @@ export class Post {
     this.grain.amount = (c.grain ?? 0.06) * 0.22;
   }
 
-  /** w, h u CSS pikselima; dpr = trenutni omjer piksela (dinamička rezolucija). */
-  setSize(w: number, h: number, dpr = 1) {
+  /**
+   * w, h u CSS pikselima; dpr = trenutni omjer piksela (dinamička rezolucija), baseDpr = osnovni za tu veličinu.
+   * AO u pola rezolucije i MSAA biraju se po osnovnom DPR-u, ne po dinamičkom: promjena rezolucije usred scrolla
+   * tada ne prevodi shader AO-a iznova i ne mijenja MSAA spremnike.
+   */
+  setSize(w: number, h: number, dpr = 1, baseDpr = dpr) {
     const q = TIERS[this.tier];
-    // volumetrija i AO u rezoluciji vezanoj za CSS piksele (ne rastu s DPR-om)
+    // volumetrija u rezoluciji vezanoj za CSS piksele (ne raste s DPR-om)
     this.volumetric.setResolutionScale(Math.min(1, q.volScale / Math.max(1, dpr)));
-    Object.assign(this.n8ao.configuration, { halfRes: q.aoHalf || dpr > 1.4 });
-    // MSAA samo kad je DPR nizak (pri DPR ≥ 1,5 slika je ionako nadsamplirana)
-    // pri DPR ~1 rubovi su najvidljiviji: MSAA 4 (izmjereno: kadar uvoda i dalje 60 fps na M5); do 1,3 razina; iznad 0
-    const samples = q.msaa > 0 && dpr <= 1.05 ? 4 : dpr <= 1.3 ? q.msaa : 0;
-    this.composer.multisampling = Math.min(samples, this.renderer.capabilities.maxSamples);
+    const half = q.aoHalf || baseDpr > 1.4;
+    if (this.n8ao.configuration.halfRes !== half) this.n8ao.configuration.halfRes = half;
+    // MSAA kad je DPR nizak (pri DPR ≥ 1,5 slika je ionako nadsamplirana); pri DPR ~1 rubovi su najvidljiviji: MSAA 4
+    const samples = q.msaa > 0 && baseDpr <= 1.05 ? 4 : baseDpr <= 1.3 ? q.msaa : 0;
+    const ms = Math.min(samples, this.renderer.capabilities.maxSamples);
+    if (this.composer.multisampling !== ms) this.composer.multisampling = ms;
     this.composer.setSize(w, h, false);
     const db = this.renderer.getDrawingBufferSize(new THREE.Vector2());
     this.n8ao.setSize(db.x, db.y);

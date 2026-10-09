@@ -13,6 +13,7 @@ npm run serve-out    # posluži out/ na http://localhost:3108/artificial-media-v
 npm test             # Playwright na dev serveru (desktop 1440, 1920, mobitel 390)
 npm run build && PW_PROD=1 npx playwright test   # isto na produkcijskom buildu pod basePathom
 npm run deploy       # build → gh-pages (GitHub Pages)
+node scripts/perf-scroll.mjs   # glatkoća scrolla: pravi Chromium s GPU-om, 1470×830 @2 (Retina), fps po sekciji
 ```
 
 - `npm run sync-brand` kopira kanon lutke, `lutka-core.js`, `lutka-v2.json` i logo iz `brand/` u `src/brand/` (ne uređuj tamo).
@@ -36,7 +37,8 @@ Zadane vrijednosti su u `config/switches.ts` (jedan redak po prekidaču); za pro
 | `?q=` | **auto** · high · medium · low | razina kvalitete 3D-a |
 | `?izvor=` | **auto** · realtime · frames | uvod i balet: 3D uživo ili nizovi slika (auto: uživo na jakim desktopima, slike na mobitelu i slabim) |
 | `?status=1` | — | obrubi i oznake statusa (approved / proposal / needs-confirmation / placeholder) na svim tekstovima |
-| `?probe=1` | — | FPS sonda (`window.__fps`) i u produkcijskom buildu |
+| `?probe=1` | — | FPS sonda (`window.__fps`, s DPR-om i trzajima) i u produkcijskom buildu |
+| `?dpr=` | — | mjerenje: stalni omjer piksela 3D-a (bez proračuna i dinamičke rezolucije), npr. `?dpr=2` za usporedbu |
 
 Ostalo: boja palice `BATON_COLOR` i endpoint forme `FORM_ENDPOINT` (ispod) u istoj datoteci; ljubičasta nijansa je token `primitive.color.violet` u `design/tokens.json`.
 

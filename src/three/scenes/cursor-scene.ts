@@ -72,6 +72,8 @@ export class CursorScene implements StageScene {
   camera = lensCamera(40);
   wood: Figure;
   robot: Figure;
+  /** krupni kadar drva i čelika: više piksela (Engine.PIXEL_BUDGET) */
+  readonly pixelScale = 1.7;
   contact = new ContactShadows({ width: 3, depth: 3, far: 1.2, blur: 1.8, opacity: 0.9, darkness: 1.9 });
   key: THREE.SpotLight;
   /** prekidači */
@@ -192,6 +194,14 @@ export class CursorScene implements StageScene {
       this.wood.group.visible = prev[0];
       this.robot.group.visible = prev[1];
     };
+  }
+
+  /** redatelj prevodi shadere za stvarne ciljeve: lutke u spremnik (linearno), spoj na ekran */
+  compileJobs() {
+    return [
+      { scene: this.scene, camera: this.camera as THREE.Camera, target: this.rtA },
+      { scene: this.compScene, camera: this.compCam as THREE.Camera, target: null },
+    ];
   }
 
   prepareEnvironment(renderer: THREE.WebGLRenderer) {

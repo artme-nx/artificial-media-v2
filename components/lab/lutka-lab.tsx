@@ -32,7 +32,7 @@ export function LutkaLab() {
       const p = (q.get("pose") as PoseName) || "kontrapost";
       const c = (q.get("cam") as LabCam) || "blizu";
       const w = q.get("struk") === "B" ? "B" : "A";
-      engine = new Engine(canvas.current, { tier: (q.get("q") as "high") || "auto", probe: true });
+      engine = new Engine(canvas.current, { tier: (q.get("q") as "high") || "auto", probe: true, budget: false });
       const s = new LabScene(host.current, { pose: p, cam: c, waist: w, look: q.get("izgled") === "robot" ? "robot" : "wood", costume: q.get("kostim") === "1" });
       s.autoOrbit = q.get("orbit") === "1";
       sceneRef.current = s;
